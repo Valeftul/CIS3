@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>СкладПро — Клиенты</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;--accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;--red:#ff4757;--blue:#3d8bff;--text:#e8ecf4;--muted:#6b7599;--font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;}
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  [data-theme="light"]{--bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;--accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;--red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+  .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+  .logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}
+  .logo-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+  .nav{padding:16px 12px;flex:1}.nav-section{margin-bottom:24px}
+  .nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 12px 8px}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;transition:all .18s;position:relative;text-decoration:none}
+  .nav-item:hover{background:var(--surface2);color:var(--text)}
+  .nav-item.active{background:rgba(240,165,0,.12);color:var(--accent)}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+  .nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+  .sidebar-user{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg);flex-shrink:0}
+  .user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
+  .logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}.logout-btn:hover{color:var(--red)}
+
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
+  .page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
+  .topbar-right{display:flex;align-items:center;gap:10px}
+  .search-wrap{position:relative}
+  .search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px 8px 36px;width:220px;outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--accent)}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+  .btn-primary{background:var(--accent);color:var(--bg)}.btn-primary:hover{background:#ffb929;transform:translateY(-1px)}
+  .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-danger{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.3)}.btn-danger:hover{background:rgba(255,71,87,.22)}
+  .btn-sm{padding:5px 12px;font-size:12px}
+
+  .content{padding:28px 32px;flex:1;overflow-y:auto}
+
+  /* STATS */
+  .stats-row{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+  .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;flex:1;min-width:140px;animation:fadeUp .4s ease both}
+  .mini-stat:nth-child(1){animation-delay:.05s}.mini-stat:nth-child(2){animation-delay:.10s}.mini-stat:nth-child(3){animation-delay:.15s}
+  .mini-icon{font-size:24px}.mini-val{font-family:var(--font-head);font-size:28px;letter-spacing:1px;line-height:1}
+  .mini-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .mini-stat.yellow .mini-val{color:var(--accent)}.mini-stat.green .mini-val{color:var(--green)}.mini-stat.blue .mini-val{color:var(--blue)}
+
+  /* ДВУХКОЛОНОЧНЫЙ ЛЭЙАУТ */
+  .two-col{display:grid;grid-template-columns:340px 1fr;gap:20px;animation:fadeUp .4s ease .2s both}
+
+  /* СПИСОК КЛИЕНТОВ */
+  .suppliers-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .panel-title{font-family:var(--font-head);font-size:18px;letter-spacing:1px}
+  .supplier-list{flex:1;overflow-y:auto;max-height:calc(100vh - 320px)}
+  .supplier-item{display:flex;align-items:center;padding:14px 20px;gap:14px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;position:relative;}
+  .supplier-item:last-child{border-bottom:none}
+  .supplier-item:hover{background:var(--surface2)}
+  .supplier-item.selected{background:rgba(240,165,0,.08)}
+  .supplier-item.selected::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+  .sup-avatar{width:40px;height:40px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+  .sup-name{font-weight:700;font-size:14px}
+  .sup-meta{font-size:12px;color:var(--muted);margin-top:2px}
+  .sup-right{margin-left:auto;text-align:right}
+  .sup-contracts{font-family:var(--font-head);font-size:18px;color:var(--accent)}
+  .sup-items{font-size:11px;color:var(--muted)}
+
+  /* ДЕТАЛИ КЛИЕНТА */
+  .detail-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 20px;text-align:center;color:var(--muted)}
+  .detail-empty-icon{font-size:56px;margin-bottom:16px;opacity:.25}
+  .detail-empty-text{font-size:15px}
+
+  .detail-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+  .detail-title{font-family:var(--font-head);font-size:26px;letter-spacing:1px}
+  .detail-contacts{margin-top:6px;display:flex;flex-wrap:wrap;gap:12px}
+  .contact-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .contact-item span{color:var(--text)}
+  .detail-actions{display:flex;gap:8px;flex-shrink:0}
+
+  /* Карточки клиента */
+  .client-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:20px 24px;border-bottom:1px solid var(--border)}
+  .info-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px}
+  .info-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px}
+  .info-card-val{font-weight:600;font-size:14px}
+
+  /* Договоры клиента */
+  .detail-table-wrap{flex:1;overflow:auto}
+  .detail-section-title{font-family:var(--font-head);font-size:16px;letter-spacing:1px;padding:16px 24px 8px;color:var(--muted)}
+  .contracts-table{width:100%;border-collapse:collapse}
+  .contracts-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2);white-space:nowrap}
+  .contracts-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .contracts-table tr:last-child td{border-bottom:none}
+  .contracts-table tr:hover td{background:rgba(255,255,255,.02)}
+
+  .st-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+  .st-active  {background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.2)}
+  .st-expired {background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}
+  .st-completed{background:rgba(107,117,153,.1);color:var(--muted);border:1px solid var(--border)}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:480px;max-width:100%;animation:fadeUp .3s ease}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+  .modal-title{font-family:var(--font-head);font-size:22px;letter-spacing:1px}
+  .modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;transition:color .2s}.modal-close:hover{color:var(--red)}
+  .modal-body{padding:24px;display:flex;flex-direction:column;gap:14px}
+  .modal-footer{display:flex;gap:10px;padding:0 24px 24px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+  .field input,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;resize:none}
+  .field input:focus,.field textarea:focus{border-color:var(--accent)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+  .two-field{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:260px}
+  .toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  @media(max-width:1100px){.two-col{grid-template-columns:1fr}}
+  @media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo"><div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div><div class="logo-sub">Управление запасами</div></div>
+  <nav class="nav">
+    <div class="nav-section">
+      <div class="nav-label">Основное</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+      <a class="nav-item" href="/products"><span class="nav-icon">📦</span> Товары</a>
+      <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Справочники</div>
+      <a class="nav-item active" href="/suppliers"><span class="nav-icon">👥</span> Клиенты</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Клиенты</div>
+      <a class="nav-item" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+      <a class="nav-item" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Финансы и отчёты</div>
+      <a class="nav-item" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+      <a class="nav-item" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar" id="userAvatar">АИ</div>
+    <div class="user-info"><div class="user-name" id="userName">Загрузка...</div><div class="user-role" id="userRole">—</div></div>
+    <button class="logout-btn" onclick="logout()">⏏</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="page-title">КЛИЕНТЫ</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" type="text" placeholder="Поиск клиента..." /></div>
+      <button class="btn btn-primary" onclick="openModal()">+ Добавить клиента</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-row">
+      <div class="mini-stat yellow"><div class="mini-icon">👥</div><div><div class="mini-val" id="sTotal">0</div><div class="mini-label">Клиентов</div></div></div>
+      <div class="mini-stat green"> <div class="mini-icon">📄</div><div><div class="mini-val" id="sContracts">0</div><div class="mini-label">Активных договоров</div></div></div>
+      <div class="mini-stat blue">  <div class="mini-icon">📦</div><div><div class="mini-val" id="sProducts">0</div><div class="mini-label">Товаров на хранении</div></div></div>
+    </div>
+
+    <div class="two-col">
+      <!-- Список клиентов -->
+      <div class="suppliers-panel">
+        <div class="panel-header">
+          <div class="panel-title">СПИСОК</div>
+          <div style="font-size:12px;color:var(--muted)" id="suppCount">0 клиентов</div>
+        </div>
+        <div class="supplier-list" id="supplierList"></div>
+      </div>
+
+      <!-- Детали -->
+      <div class="detail-panel" id="detailPanel">
+        <div class="detail-empty">
+          <div class="detail-empty-icon">👥</div>
+          <div class="detail-empty-text">Выберите клиента<br>для просмотра деталей</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">НОВЫЙ КЛИЕНТ</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="field"><label>Название организации / ФИО *</label><input id="f_name" type="text" placeholder="ООО Ромашка или Иванов Иван" /></div>
+      <div class="field"><label>Контактное лицо</label><input id="f_contact" type="text" placeholder="Директор Иванов И.И." /></div>
+      <div class="two-field">
+        <div class="field"><label>Телефон</label><input id="f_phone" type="text" placeholder="+7 (999) 000-00-00" /></div>
+        <div class="field"><label>Email</label><input id="f_email" type="text" placeholder="info@company.ru" /></div>
+      </div>
+      <div class="field"><label>Адрес</label><input id="f_address" type="text" placeholder="г. Москва, ул. Примерная, 1" /></div>
+      <div class="field"><label>Комментарий</label><textarea id="f_comment" rows="2" placeholder="Необязательно..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary" style="flex:2" onclick="saveSupplier()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+let suppliers=[], contracts=[], products=[], editingId=null, selectedId=null;
+
+const stLbl  = { active:'Активен', expired:'Просрочен', completed:'Завершён', cancelled:'Отменён' };
+const stCls  = { active:'st-active', expired:'st-expired', completed:'st-completed', cancelled:'st-completed' };
+
+async function init(){
+  try{
+    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),3000);
+    const res=await fetch('/auth/me',{credentials:'include',signal:ctrl.signal});
+    const user=await res.json();
+    if(!user){location.href='/login';return;}
+    document.getElementById('userName').textContent=user.displayName;
+    document.getElementById('userRole').textContent=user.role==='admin'?'Администратор':'Работник';
+    document.getElementById('userAvatar').textContent=user.displayName.slice(0,2).toUpperCase();
+  }catch{location.href='/login';return;}
+  await loadAll();
+
+  // Подсветка из URL
+  const highlight=new URLSearchParams(location.search).get('highlight');
+  if(highlight){
+    const s=suppliers.find(s=>s.name===highlight);
+    if(s)setTimeout(()=>selectSupplier(s.id||s._id),300);
+  }
+}
+
+async function loadAll(){
+  try{
+    const [sr,pr,cr]=await Promise.all([
+      fetch('/api/suppliers',{credentials:'include'}),
+      fetch('/api/products', {credentials:'include'}),
+      fetch('/api/contracts',{credentials:'include'}),
+    ]);
+    suppliers = sr.ok ? await sr.json() : [];
+    products  = pr.ok ? await pr.json() : [];
+    contracts = cr.ok ? await cr.json() : [];
+  }catch{
+    suppliers=[]; products=[]; contracts=[];
+  }
+  renderSuppliers();
+  updateStats();
+}
+
+function getSupplierContracts(name){
+  return contracts.filter(c=>c.clientName===name);
+}
+function getSupplierProducts(name){
+  return products.filter(p=>p.clientName===name);
+}
+
+function renderSuppliers(){
+  const search=document.getElementById('searchInput').value.toLowerCase();
+  const list=suppliers.filter(s=>s.name.toLowerCase().includes(search));
+  document.getElementById('suppCount').textContent=`${list.length} клиентов`;
+  document.getElementById('supplierList').innerHTML=list.map(s=>{
+    const id=s._id||s.id;
+    const ctrs=getSupplierContracts(s.name);
+    const prods=getSupplierProducts(s.name);
+    return `<div class="supplier-item ${String(id)===String(selectedId)?'selected':''}" onclick="selectSupplier('${id}')">
+      <div class="sup-avatar">👤</div>
+      <div>
+        <div class="sup-name">${s.name}</div>
+        <div class="sup-meta">${s.contact||s.phone||'Нет контакта'}</div>
+      </div>
+      <div class="sup-right">
+        <div class="sup-contracts">${ctrs.length} <span style="font-size:12px;font-family:var(--font-body)">дог.</span></div>
+        <div class="sup-items">${prods.length} товаров</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function updateStats(){
+  const activeContracts=contracts.filter(c=>c.status==='active').length;
+  document.getElementById('sTotal').textContent=suppliers.length;
+  document.getElementById('sContracts').textContent=activeContracts;
+  document.getElementById('sProducts').textContent=products.length;
+}
+
+function selectSupplier(id){
+  selectedId=String(id);
+  renderSuppliers();
+  const s=suppliers.find(s=>String(s._id||s.id)===String(id));
+  if(!s)return;
+
+  const ctrs=getSupplierContracts(s.name);
+  const prods=getSupplierProducts(s.name);
+
+  const contractsHtml = ctrs.length
+    ? `<table class="contracts-table">
+        <thead><tr><th>№ Договора</th><th>Статус</th><th>Товар</th><th>Площадь</th><th>Период</th></tr></thead>
+        <tbody>${ctrs.map(c=>`
+          <tr>
+            <td><b style="color:var(--accent)">${c.number}</b></td>
+            <td><span class="st-badge ${stCls[c.status]||''}">${stLbl[c.status]||c.status}</span></td>
+            <td><div style="font-weight:600">${c.productName||'—'}</div><div style="font-size:11px;color:var(--muted)">${c.quantity||0} ${c.unit||''}</div></td>
+            <td>${c.storageArea||0} м²</td>
+            <td style="font-size:12px;color:var(--muted)">${c.startDate||''} → ${c.endDate||''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`
+    : `<div style="padding:20px 24px;text-align:center;color:var(--muted);font-size:13px">Договоров нет</div>`;
+
+  const productsHtml = prods.length
+    ? `<table class="contracts-table">
+        <thead><tr><th>Товар</th><th>Артикул</th><th>Категория</th><th>Остаток</th></tr></thead>
+        <tbody>${prods.map(p=>`
+          <tr>
+            <td><div style="font-weight:600">${p.name}</div></td>
+            <td style="font-family:monospace;font-size:12px;color:var(--muted)">${p.sku||''}</td>
+            <td><span style="font-size:11px;color:var(--muted)">${p.category||''}</span></td>
+            <td style="font-weight:700">${p.quantity||0} ${p.unit||'шт'}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`
+    : `<div style="padding:20px 24px;text-align:center;color:var(--muted);font-size:13px">Товаров нет</div>`;
+
+  document.getElementById('detailPanel').innerHTML=`
+    <div class="detail-header">
+      <div>
+        <div class="detail-title">${s.name}</div>
+        <div class="detail-contacts">
+          ${s.contact?`<div class="contact-item">👤 <span>${s.contact}</span></div>`:''}
+          ${s.phone?  `<div class="contact-item">📞 <span>${s.phone}</span></div>`:''}
+          ${s.email?  `<div class="contact-item">✉️ <span>${s.email}</span></div>`:''}
+          ${s.address?`<div class="contact-item">📍 <span>${s.address}</span></div>`:''}
+        </div>
+        ${s.comment?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">${s.comment}</div>`:''}
+      </div>
+      <div class="detail-actions">
+        <button class="btn btn-ghost btn-sm" onclick="editSupplier('${s._id||s.id}')">✏️ Изменить</button>
+      </div>
+    </div>
+
+    <div class="client-info-grid">
+      <div class="info-card">
+        <div class="info-card-label">Договоров</div>
+        <div class="info-card-val" style="font-family:var(--font-head);font-size:28px;color:var(--accent)">${ctrs.length}</div>
+      </div>
+      <div class="info-card">
+        <div class="info-card-label">Товаров на хранении</div>
+        <div class="info-card-val" style="font-family:var(--font-head);font-size:28px;color:var(--blue)">${prods.length}</div>
+      </div>
+    </div>
+
+    <div class="detail-table-wrap">
+      <div class="detail-section-title">ДОГОВОРЫ (${ctrs.length})</div>
+      ${contractsHtml}
+      <div class="detail-section-title" style="margin-top:8px">ТОВАРЫ НА ХРАНЕНИИ (${prods.length})</div>
+      ${productsHtml}
+    </div>`;
+}
+
+// MODAL
+function openModal(supplier=null){
+  editingId=supplier?(supplier._id||supplier.id):null;
+  document.getElementById('modalTitle').textContent=supplier?'РЕДАКТИРОВАТЬ КЛИЕНТА':'НОВЫЙ КЛИЕНТ';
+  document.getElementById('f_name').value   =supplier?.name   ||'';
+  document.getElementById('f_contact').value=supplier?.contact||'';
+  document.getElementById('f_phone').value  =supplier?.phone  ||'';
+  document.getElementById('f_email').value  =supplier?.email  ||'';
+  document.getElementById('f_address').value=supplier?.address||'';
+  document.getElementById('f_comment').value=supplier?.comment||'';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function editSupplier(id){openModal(suppliers.find(s=>String(s._id||s.id)===String(id)));}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');editingId=null;}
+
+async function saveSupplier(){
+  const data={
+    name:   document.getElementById('f_name').value.trim(),
+    contact:document.getElementById('f_contact').value.trim(),
+    phone:  document.getElementById('f_phone').value.trim(),
+    email:  document.getElementById('f_email').value.trim(),
+    address:document.getElementById('f_address').value.trim(),
+    comment:document.getElementById('f_comment').value.trim(),
+  };
+  if(!data.name){showToast('error','⚠️','Введите название клиента');return;}
+  try{
+    if(editingId){
+      const res=await fetch(`/api/suppliers/${editingId}`,{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!res.ok)throw new Error();
+      const idx=suppliers.findIndex(s=>String(s._id||s.id)===String(editingId));
+      if(idx!==-1)suppliers[idx]={...suppliers[idx],...data};
+    }else{
+      const res=await fetch('/api/suppliers',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!res.ok)throw new Error();
+      suppliers.unshift(await res.json());
+    }
+  }catch{
+    if(editingId){const i=suppliers.findIndex(s=>String(s._id||s.id)===String(editingId));if(i!==-1)suppliers[i]={...suppliers[i],...data};}
+    else suppliers.unshift({...data,id:Date.now()});
+  }
+  closeModal();renderSuppliers();updateStats();
+  if(editingId&&String(selectedId)===String(editingId))selectSupplier(editingId);
+  showToast('success','✅',editingId?'Клиент обновлён':'Клиент добавлен');
+}
+
+// ТЕМА
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+}
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+})();
+
+async function logout(){await fetch('/auth/logout',{method:'POST',credentials:'include'});location.href='/login';}
+function showToast(type,icon,text){
+  const t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=icon;document.getElementById('toastText').textContent=text;
+  t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);
+}
+document.getElementById('searchInput').addEventListener('input',renderSuppliers);
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>СкладПро — Аренда складского пространства</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0a0d14;--surface:#111520;--surface2:#171e2e;--border:#1e2840;
+  --accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--red:#ff4757;--blue:#3d8bff;
+  --text:#e8ecf4;--muted:#5a6380;
+  --font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);overflow-x:hidden}
+
+/* HEADER */
+.header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 48px;
+  background:rgba(10,13,20,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  transition:all .3s;
+}
+.header-logo{font-family:var(--font-head);font-size:28px;letter-spacing:2px;color:var(--accent);cursor:pointer}
+.header-nav{display:flex;gap:32px;align-items:center}
+.header-nav a{color:var(--muted);font-size:14px;font-weight:500;text-decoration:none;transition:color .2s}
+.header-nav a:hover{color:var(--text)}
+.header-btn{
+  background:var(--accent);color:#0a0d14;font-family:var(--font-body);
+  font-size:13px;font-weight:700;padding:9px 22px;border-radius:8px;
+  text-decoration:none;transition:all .18s;
+}
+.header-btn:hover{background:#ffb929;transform:translateY(-1px)}
+.admin-link{color:var(--muted);font-size:12px;text-decoration:none;display:flex;align-items:center;gap:5px}
+.admin-link:hover{color:var(--accent)}
+
+/* HERO */
+.hero{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden;padding:120px 48px 80px;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 60% 40%, rgba(240,165,0,.06) 0%, transparent 70%),
+             radial-gradient(ellipse 50% 40% at 20% 80%, rgba(61,139,255,.05) 0%, transparent 60%);
+}
+/* Сетка на фоне */
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                   linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+.hero-content{position:relative;z-index:1;max-width:700px;text-align:center}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.25);
+  border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;
+  color:var(--accent);text-transform:uppercase;letter-spacing:2px;
+  margin-bottom:24px;animation:fadeUp .6s ease both;
+}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.8)}}
+
+.hero-title{
+  font-family:var(--font-head);font-size:clamp(56px,8vw,96px);
+  letter-spacing:2px;line-height:.95;color:var(--text);
+  margin-bottom:20px;animation:fadeUp .6s ease .1s both;
+}
+.hero-title span{color:var(--accent)}
+.hero-sub{
+  font-size:18px;color:var(--muted);line-height:1.6;max-width:520px;margin:0 auto 36px;
+  animation:fadeUp .6s ease .2s both;
+}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s ease .3s both}
+.btn-big{
+  padding:14px 32px;border-radius:10px;font-family:var(--font-body);font-size:15px;
+  font-weight:700;cursor:pointer;border:none;transition:all .2s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:8px;
+}
+.btn-accent{background:var(--accent);color:#0a0d14}
+.btn-accent:hover{background:#ffb929;transform:translateY(-2px);box-shadow:0 8px 30px rgba(240,165,0,.3)}
+.btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* WAREHOUSE VISUAL */
+.warehouse-section{padding:80px 48px;max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:3px;color:var(--accent);margin-bottom:12px;text-align:center}
+.section-title{font-family:var(--font-head);font-size:clamp(36px,5vw,56px);letter-spacing:2px;text-align:center;margin-bottom:8px}
+.section-sub{text-align:center;color:var(--muted);font-size:15px;margin-bottom:48px}
+
+/* Схема склада */
+.warehouse-layout{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:32px;margin-bottom:32px;position:relative;overflow:hidden;
+}
+.warehouse-layout::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+}
+.wh-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.wh-title{font-family:var(--font-head);font-size:24px;letter-spacing:1px}
+.wh-meta{display:flex;gap:16px;flex-wrap:wrap}
+.wh-badge{
+  display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;
+  padding:5px 12px;border-radius:20px;
+}
+.wh-badge.total  {background:rgba(61,139,255,.1); color:var(--blue); border:1px solid rgba(61,139,255,.2)}
+.wh-badge.occupied{background:rgba(255,71,87,.1);  color:var(--red);  border:1px solid rgba(255,71,87,.2)}
+.wh-badge.free   {background:rgba(46,213,115,.1); color:var(--green);border:1px solid rgba(46,213,115,.2)}
+
+/* Визуальная карта секций склада */
+.wh-map{
+  display:grid;grid-template-columns:repeat(6,1fr);
+  grid-template-rows:repeat(4,1fr);
+  gap:6px;height:280px;margin-bottom:24px;
+  border:2px solid var(--border);border-radius:12px;padding:12px;
+  background:var(--bg);position:relative;
+}
+.wh-map-label{
+  position:absolute;top:-11px;left:16px;
+  background:var(--bg);padding:0 8px;
+  font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;
+}
+.wh-cell{
+  border-radius:6px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  border:2px solid transparent;position:relative;
+}
+.wh-cell.occupied{background:rgba(255,71,87,.18);border-color:rgba(255,71,87,.3);color:#ff4757}
+.wh-cell.free    {background:rgba(46,213,115,.12);border-color:rgba(46,213,115,.25);color:#2ed573}
+.wh-cell.selected{
+  background:rgba(240,165,0,.2)!important;border-color:var(--accent)!important;
+  color:var(--accent)!important;transform:scale(1.05);
+  box-shadow:0 0 16px rgba(240,165,0,.3);
+}
+.wh-cell.occupied:hover{opacity:.8;cursor:not-allowed}
+.wh-cell.free:hover:not(.selected){background:rgba(46,213,115,.22);border-color:rgba(46,213,115,.5);transform:scale(1.03)}
+.wh-cell-id{font-size:9px;position:absolute;top:3px;left:4px;opacity:.6}
+
+/* Прогресс заполнения */
+.fill-bar-wrap{margin-bottom:8px}
+.fill-bar-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:6px}
+.fill-bar{height:10px;background:var(--border);border-radius:5px;overflow:hidden}
+.fill-bar-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--green),var(--accent));transition:width 1s ease}
+.fill-bar-fill.danger{background:linear-gradient(90deg,var(--accent),var(--red))}
+
+/* Легенда карты */
+.map-legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+.legend-box{width:14px;height:14px;border-radius:3px;border:2px solid}
+.legend-box.occ{background:rgba(255,71,87,.18);border-color:rgba(255,71,87,.4)}
+.legend-box.fre{background:rgba(46,213,115,.12);border-color:rgba(46,213,115,.4)}
+.legend-box.sel{background:rgba(240,165,0,.2);border-color:var(--accent)}
+
+/* КАЛЬКУЛЯТОР */
+.calc-section{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:32px;position:relative;overflow:hidden;
+}
+.calc-section::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--green),var(--blue));
+}
+.calc-title{font-family:var(--font-head);font-size:22px;letter-spacing:1px;margin-bottom:6px}
+.calc-sub{font-size:13px;color:var(--muted);margin-bottom:24px}
+.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px}
+.calc-field{display:flex;flex-direction:column;gap:8px}
+.calc-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+.calc-input{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:var(--font-body);font-size:15px;
+  padding:12px 16px;outline:none;transition:border-color .2s;
+}
+.calc-input:focus{border-color:var(--accent)}
+.calc-input::placeholder{color:var(--muted)}
+
+/* Слайдер периода */
+.period-slider-wrap{grid-column:span 2}
+.period-display{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;
+}
+.period-val{font-family:var(--font-head);font-size:28px;color:var(--accent)}
+.period-unit{font-size:13px;color:var(--muted)}
+input[type=range]{
+  width:100%;height:6px;appearance:none;background:var(--border);border-radius:3px;outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  appearance:none;width:20px;height:20px;border-radius:50%;
+  background:var(--accent);cursor:pointer;border:3px solid var(--bg);
+  box-shadow:0 0 0 2px var(--accent);
+}
+input[type=range]::-webkit-slider-runnable-track{border-radius:3px}
+
+/* Выбранная секция */
+.selected-info{
+  background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.2);
+  border-radius:10px;padding:14px 18px;margin-bottom:20px;
+  display:flex;align-items:center;gap:14px;
+}
+.sel-icon{font-size:24px}
+.sel-text{flex:1}
+.sel-name{font-weight:700;font-size:14px;color:var(--accent)}
+.sel-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.sel-clear{background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:4px;transition:color .2s}
+.sel-clear:hover{color:var(--red)}
+
+/* Итог расчёта */
+.calc-result{
+  background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  margin-bottom:20px;
+}
+.result-breakdown{display:flex;flex-direction:column;gap:6px;flex:1}
+.result-line{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.result-line .rv{color:var(--text);font-weight:600}
+.result-divider{height:1px;background:var(--border);margin:6px 0}
+.result-total-row{display:flex;justify-content:space-between;align-items:center}
+.result-total-label{font-size:15px;font-weight:700;color:var(--text)}
+.result-total-val{font-family:var(--font-head);font-size:36px;color:var(--accent);letter-spacing:1px}
+.result-per-day{font-size:11px;color:var(--muted);text-align:right}
+
+/* Кнопка заявки */
+.btn-submit{
+  width:100%;padding:16px;background:var(--accent);color:#0a0d14;
+  font-family:var(--font-head);font-size:22px;letter-spacing:2px;
+  border:none;border-radius:12px;cursor:pointer;transition:all .2s;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.btn-submit:hover{background:#ffb929;transform:translateY(-1px);box-shadow:0 8px 30px rgba(240,165,0,.3)}
+.btn-submit:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ТАРИФЫ */
+.tariffs-section{padding:0 48px 80px;max-width:1100px;margin:0 auto}
+.tariffs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tariff-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:28px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;
+}
+.tariff-card:hover{border-color:rgba(240,165,0,.4);transform:translateY(-3px)}
+.tariff-card.popular{border-color:var(--accent)}
+.popular-badge{
+  position:absolute;top:16px;right:16px;
+  background:var(--accent);color:#0a0d14;font-size:10px;font-weight:700;
+  padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:1px;
+}
+.tariff-name{font-family:var(--font-head);font-size:24px;letter-spacing:1px;margin-bottom:4px}
+.tariff-period{font-size:13px;color:var(--muted);margin-bottom:20px}
+.tariff-price{font-family:var(--font-head);font-size:44px;letter-spacing:1px;color:var(--accent);line-height:1}
+.tariff-unit{font-size:13px;color:var(--muted);margin-bottom:20px}
+.tariff-features{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.tariff-feat{display:flex;align-items:center;gap:8px;font-size:13px}
+.feat-check{color:var(--green);font-size:16px}
+.tariff-btn{
+  width:100%;padding:11px;border-radius:8px;font-family:var(--font-body);font-size:14px;font-weight:700;
+  cursor:pointer;border:1px solid var(--border);background:var(--surface2);color:var(--text);transition:all .18s;
+}
+.tariff-btn:hover,.tariff-card.popular .tariff-btn{background:var(--accent);color:#0a0d14;border-color:var(--accent)}
+
+/* FEATURES */
+.features-section{padding:0 48px 80px;max-width:1100px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feature-card{
+  background:var(--surface);border:1px solid var(--border);border-radius:14px;
+  padding:24px;transition:border-color .2s;
+}
+.feature-card:hover{border-color:rgba(240,165,0,.3)}
+.feature-icon{font-size:32px;margin-bottom:14px}
+.feature-name{font-weight:700;font-size:15px;margin-bottom:6px}
+.feature-desc{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  width:480px;max-width:100%;animation:fadeUp .3s ease;position:relative;overflow:hidden;
+}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.modal-head{padding:24px 28px 20px;border-bottom:1px solid var(--border)}
+.modal-title{font-family:var(--font-head);font-size:26px;letter-spacing:1px;margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted)}
+.modal-close{position:absolute;top:16px;right:20px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;transition:color .2s}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:24px 28px;display:flex;flex-direction:column;gap:14px}
+.modal-footer{padding:0 28px 24px;display:flex;gap:10px}
+.mfield{display:flex;flex-direction:column;gap:6px}
+.mfield label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+.mfield input,.mfield textarea,.mfield select{
+  background:var(--surface2);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-family:var(--font-body);font-size:14px;padding:11px 14px;
+  outline:none;transition:border-color .2s;resize:none;
+}
+.mfield input:focus,.mfield textarea:focus,.mfield select:focus{border-color:var(--accent)}
+.mfield input::placeholder,.mfield textarea::placeholder{color:var(--muted)}
+.order-summary{
+  background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;
+  font-size:13px;
+}
+.order-sum-row{display:flex;justify-content:space-between;padding:3px 0;color:var(--muted)}
+.order-sum-row .ov{color:var(--text);font-weight:600}
+.order-sum-total{display:flex;justify-content:space-between;padding-top:10px;margin-top:8px;border-top:1px solid var(--border)}
+.order-sum-total span:first-child{font-weight:700;font-size:14px}
+.order-sum-total span:last-child{font-family:var(--font-head);font-size:22px;color:var(--accent)}
+.btn-modal-submit{
+  flex:2;padding:13px;background:var(--accent);color:#0a0d14;font-family:var(--font-head);
+  font-size:20px;letter-spacing:1px;border:none;border-radius:10px;cursor:pointer;transition:all .2s;
+}
+.btn-modal-submit:hover{background:#ffb929}
+.btn-modal-cancel{
+  flex:1;padding:13px;background:var(--surface2);color:var(--muted);
+  border:1px solid var(--border);border-radius:10px;cursor:pointer;font-family:var(--font-body);
+  font-size:14px;font-weight:600;transition:all .2s;
+}
+.btn-modal-cancel:hover{color:var(--text)}
+
+/* SUCCESS */
+.success-screen{display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px 28px;text-align:center}
+.success-icon{font-size:64px;margin-bottom:16px;animation:bounceIn .5s ease}
+.success-title{font-family:var(--font-head);font-size:32px;letter-spacing:1px;margin-bottom:8px;color:var(--green)}
+.success-text{font-size:14px;color:var(--muted);line-height:1.6;max-width:300px}
+@keyframes bounceIn{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* FOOTER */
+.footer{
+  background:var(--surface);border-top:1px solid var(--border);
+  padding:40px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;
+}
+.footer-logo{font-family:var(--font-head);font-size:24px;letter-spacing:2px;color:var(--accent)}
+.footer-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.footer-links{display:flex;gap:24px;flex-wrap:wrap}
+.footer-links a{font-size:13px;color:var(--muted);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--accent)}
+.footer-copy{font-size:12px;color:var(--muted)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:260px}
+.toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+@media(max-width:900px){
+  .header{padding:14px 24px}.hero{padding:100px 24px 60px}
+  .warehouse-section,.tariffs-section,.features-section{padding-left:24px;padding-right:24px}
+  .tariffs-grid,.features-grid{grid-template-columns:1fr}
+  .calc-grid{grid-template-columns:1fr}.period-slider-wrap{grid-column:span 1}
+  .wh-map{height:200px;grid-template-columns:repeat(6,1fr)}
+  .footer{padding:32px 24px;flex-direction:column;text-align:center}
+}
+@media(max-width:600px){
+  .hero-title{font-size:52px}.wh-map{grid-template-columns:repeat(4,1fr);height:180px}
+  .header-nav{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-logo">СКЛАД ПРО</div>
+  <nav class="header-nav">
+    <a href="#warehouse">Склад</a>
+    <a href="#tariffs">Тарифы</a>
+    <a href="#features">Услуги</a>
+    <a href="#warehouse" class="header-btn">Арендовать</a>
+  </nav>
+  <a class="admin-link" href="/login">⚙ Управление</a>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span class="badge-dot"></span> Свободные места есть</div>
+    <h1 class="hero-title">ХРАНЕНИЕ<br><span>ВАШЕГО</span><br>ТОВАРА</h1>
+    <p class="hero-sub">Профессиональный склад с климат-контролем, круглосуточной охраной и гибкими тарифами. Выберите свободное пространство и рассчитайте стоимость прямо сейчас.</p>
+    <div class="hero-cta">
+      <a href="#warehouse" class="btn-big btn-accent">📦 Выбрать место</a>
+      <a href="#tariffs"   class="btn-big btn-outline">Посмотреть тарифы</a>
+    </div>
+  </div>
+</section>
+
+<!-- СКЛАД -->
+<section class="warehouse-section" id="warehouse">
+  <div class="section-label">Наш склад</div>
+  <h2 class="section-title">ЗАНЯТОСТЬ ПЛОЩАДИ</h2>
+  <p class="section-sub">Нажмите на свободную ячейку, чтобы выбрать место и рассчитать стоимость аренды</p>
+
+  <div class="warehouse-layout">
+    <div class="wh-header">
+      <div class="wh-title">СКЛАД А — ОСНОВНОЙ КОРПУС</div>
+      <div class="wh-meta">
+        <div class="wh-badge total">   📐 Всего: <span id="totalM2">1200 м²</span></div>
+        <div class="wh-badge occupied">🔴 Занято: <span id="occupiedM2">—</span></div>
+        <div class="wh-badge free">    🟢 Свободно: <span id="freeM2">—</span></div>
+      </div>
+    </div>
+
+    <div class="fill-bar-wrap">
+      <div class="fill-bar-labels">
+        <span>Заполненность склада</span>
+        <span id="fillPct">—</span>
+      </div>
+      <div class="fill-bar"><div class="fill-bar-fill" id="fillBar" style="width:0%"></div></div>
+    </div>
+
+    <br/>
+
+    <!-- Карта ячеек -->
+    <div class="wh-map" id="whMap">
+      <div class="wh-map-label">ПЛАН СКЛАДА (вид сверху)</div>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div class="map-legend">
+        <div class="legend-item"><div class="legend-box occ"></div>Занято</div>
+        <div class="legend-item"><div class="legend-box fre"></div>Свободно (нажмите для выбора)</div>
+        <div class="legend-item"><div class="legend-box sel"></div>Выбрано вами</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted)">Каждая ячейка = 50 м²</div>
+    </div>
+  </div>
+
+  <!-- КАЛЬКУЛЯТОР -->
+  <div class="calc-section" id="calculator">
+    <div class="calc-title">КАЛЬКУЛЯТОР СТОИМОСТИ</div>
+    <div class="calc-sub">Выберите секцию на карте выше, задайте параметры хранения</div>
+
+    <!-- Выбранная секция -->
+    <div class="selected-info" id="selectedInfo" style="display:none">
+      <div class="sel-icon">📍</div>
+      <div class="sel-text">
+        <div class="sel-name" id="selName">—</div>
+        <div class="sel-meta" id="selMeta">—</div>
+      </div>
+      <button class="sel-clear" onclick="clearSelection()" title="Снять выбор">✕</button>
+    </div>
+    <div id="noSelectionHint" style="background:rgba(255,255,255,.03);border:1px dashed var(--border);border-radius:10px;padding:14px 18px;text-align:center;color:var(--muted);font-size:13px;margin-bottom:20px">
+      👆 Выберите свободную ячейку на карте склада выше
+    </div>
+
+    <div class="calc-grid">
+      <div class="calc-field">
+        <div class="calc-label">Ваши данные (имя / компания)</div>
+        <input class="calc-input" id="clientName" type="text" placeholder="ООО Ромашка / Иван Петров"/>
+      </div>
+      <div class="calc-field">
+        <div class="calc-label">Дата начала хранения</div>
+        <input class="calc-input" id="startDate" type="date"/>
+      </div>
+      <div class="period-slider-wrap">
+        <div class="calc-label" style="margin-bottom:8px">Срок аренды</div>
+        <div class="period-display">
+          <div><span class="period-val" id="periodVal">1</span> <span class="period-unit" id="periodUnit">месяц</span></div>
+          <div style="font-size:12px;color:var(--muted)" id="periodDates">—</div>
+        </div>
+        <input type="range" id="periodSlider" min="1" max="24" value="1" oninput="onPeriodChange(this.value)"/>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px">
+          <span>1 мес</span><span>6 мес</span><span>12 мес</span><span>24 мес</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Итог -->
+    <div class="calc-result" id="calcResult">
+      <div class="result-breakdown" id="breakdown">
+        <div class="result-line"><span>Площадь</span><span class="rv" id="rArea">— м²</span></div>
+        <div class="result-line"><span>Тариф за м²/мес</span><span class="rv" id="rRate">— ₽</span></div>
+        <div class="result-line"><span>Срок</span><span class="rv" id="rPeriod">— мес</span></div>
+        <div class="result-line" id="discountRow" style="display:none"><span>Скидка</span><span class="rv" style="color:#2ed573" id="rDiscount">—</span></div>
+        <div class="result-divider"></div>
+        <div class="result-total-row">
+          <div>
+            <div class="result-total-label">Итого к оплате</div>
+            <div class="result-per-day" id="rPerDay">— ₽/день</div>
+          </div>
+          <div class="result-total-val" id="rTotal">— ₽</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" onclick="openOrderModal()" disabled>
+      📋 ОФОРМИТЬ ЗАЯВКУ
+    </button>
+  </div>
+</section>
+
+<!-- ТАРИФЫ -->
+<section class="tariffs-section" id="tariffs">
+  <div class="section-label">Тарифы</div>
+  <h2 class="section-title">ВЫБЕРИТЕ ТАРИФ</h2>
+  <p class="section-sub">Чем дольше срок — тем выгоднее цена</p>
+
+  <div class="tariffs-grid">
+    <div class="tariff-card">
+      <div class="tariff-name">КРАТКОСРОЧНЫЙ</div>
+      <div class="tariff-period">До 3 месяцев</div>
+      <div class="tariff-price">1 500</div>
+      <div class="tariff-unit">₽ за м² в месяц</div>
+      <div class="tariff-features">
+        <div class="tariff-feat"><span class="feat-check">✓</span>Свободный доступ 8:00–20:00</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Охрана и видеонаблюдение</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Погрузка/разгрузка</div>
+        <div class="tariff-feat" style="color:var(--muted)"><span>—</span> Климат-контроль</div>
+        <div class="tariff-feat" style="color:var(--muted)"><span>—</span> Персональный менеджер</div>
+      </div>
+      <button class="tariff-btn" onclick="document.getElementById('periodSlider').value=1;onPeriodChange(1);document.getElementById('warehouse').scrollIntoView()">Выбрать</button>
+    </div>
+
+    <div class="tariff-card popular">
+      <div class="popular-badge">ПОПУЛЯРНЫЙ</div>
+      <div class="tariff-name">СТАНДАРТ</div>
+      <div class="tariff-period">3–12 месяцев</div>
+      <div class="tariff-price">1 200</div>
+      <div class="tariff-unit">₽ за м² в месяц <span style="color:var(--green);font-size:12px">-20%</span></div>
+      <div class="tariff-features">
+        <div class="tariff-feat"><span class="feat-check">✓</span>Доступ 24/7</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Охрана и видеонаблюдение</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Погрузка/разгрузка</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Климат-контроль</div>
+        <div class="tariff-feat" style="color:var(--muted)"><span>—</span> Персональный менеджер</div>
+      </div>
+      <button class="tariff-btn" onclick="document.getElementById('periodSlider').value=6;onPeriodChange(6);document.getElementById('warehouse').scrollIntoView()">Выбрать</button>
+    </div>
+
+    <div class="tariff-card">
+      <div class="tariff-name">ГОДОВОЙ</div>
+      <div class="tariff-period">От 12 месяцев</div>
+      <div class="tariff-price">950</div>
+      <div class="tariff-unit">₽ за м² в месяц <span style="color:var(--green);font-size:12px">-37%</span></div>
+      <div class="tariff-features">
+        <div class="tariff-feat"><span class="feat-check">✓</span>Доступ 24/7</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Охрана и видеонаблюдение</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Погрузка/разгрузка</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Климат-контроль</div>
+        <div class="tariff-feat"><span class="feat-check">✓</span>Персональный менеджер</div>
+      </div>
+      <button class="tariff-btn" onclick="document.getElementById('periodSlider').value=12;onPeriodChange(12);document.getElementById('warehouse').scrollIntoView()">Выбрать</button>
+    </div>
+  </div>
+</section>
+
+<!-- УСЛУГИ -->
+<section class="features-section" id="features">
+  <div class="section-label">Преимущества</div>
+  <h2 class="section-title">ПОЧЕМУ ВЫБИРАЮТ НАС</h2>
+  <p class="section-sub">Профессиональное хранение с полным сопровождением</p>
+  <div class="features-grid">
+    <div class="feature-card"><div class="feature-icon">🔒</div><div class="feature-name">Охрана 24/7</div><div class="feature-desc">Круглосуточная охрана, видеонаблюдение на всей территории, контроль доступа по пропускам</div></div>
+    <div class="feature-card"><div class="feature-icon">🌡️</div><div class="feature-name">Климат-контроль</div><div class="feature-desc">Поддержание оптимальной температуры и влажности для сохранности любых видов товаров</div></div>
+    <div class="feature-card"><div class="feature-icon">🚛</div><div class="feature-name">Погрузка и доставка</div><div class="feature-desc">Услуги погрузчиков и грузчиков, организация доставки товара на ваш адрес</div></div>
+    <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-name">Онлайн-учёт</div><div class="feature-desc">Личный кабинет с отслеживанием остатков, историей операций и документами</div></div>
+    <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-name">Быстрое оформление</div><div class="feature-desc">Договор и передача ключей в течение одного рабочего дня после подачи заявки</div></div>
+    <div class="feature-card"><div class="feature-icon">💼</div><div class="feature-name">Гибкие условия</div><div class="feature-desc">Изменение площади в любой момент, досрочное расторжение без штрафов при уведомлении за 14 дней</div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div>
+    <div class="footer-logo">СКЛАД ПРО</div>
+    <div class="footer-sub">Профессиональное складское хранение</div>
+  </div>
+  <div class="footer-links">
+    <a href="tel:+74951234567">📞 +7 (495) 123-45-67</a>
+    <a href="mailto:info@skladpro.ru">✉ info@skladpro.ru</a>
+    <a href="#">📍 Москва, Промышленная ул., 12</a>
+  </div>
+  <div class="footer-copy">© 2025 СкладПро</div>
+</footer>
+
+<!-- MODAL ЗАЯВКИ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <!-- Форма -->
+    <div id="modalForm">
+      <div class="modal-head">
+        <div class="modal-title">ОФОРМИТЬ ЗАЯВКУ</div>
+        <div class="modal-sub">Мы свяжемся с вами в течение 30 минут</div>
+      </div>
+      <div class="modal-body">
+        <div class="order-summary" id="orderSummary"></div>
+        <div class="mfield">
+          <label>Имя / Компания *</label>
+          <input id="m_name" type="text" placeholder="ООО Ромашка или Иван Петров"/>
+        </div>
+        <div class="mfield">
+          <label>Телефон *</label>
+          <input id="m_phone" type="tel" placeholder="+7 (___) ___-__-__"/>
+        </div>
+        <div class="mfield">
+          <label>Email</label>
+          <input id="m_email" type="email" placeholder="email@company.ru"/>
+        </div>
+        <div class="mfield">
+          <label>Комментарий</label>
+          <textarea id="m_comment" rows="2" placeholder="Тип товара, особые условия хранения..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancel" onclick="closeModal()">Отмена</button>
+        <button class="btn-modal-submit" onclick="submitOrder()">ОТПРАВИТЬ</button>
+      </div>
+    </div>
+    <!-- Успех -->
+    <div class="success-screen" id="successScreen">
+      <div class="success-icon">✅</div>
+      <div class="success-title">ЗАЯВКА ПРИНЯТА!</div>
+      <div class="success-text">Наш менеджер свяжется с вами в течение 30 минут для подтверждения деталей</div>
+      <br/>
+      <button class="btn-modal-cancel" style="width:100%;margin-top:8px" onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+// ─── КОНФИГ СКЛАДА ───────────────────────────────────────────
+var WAREHOUSE = {
+  rows: 4, cols: 6,
+  cellM2: 50,      // м² на ячейку
+  totalM2: 1200,
+  // Занятые ячейки (индексы 0..23)
+  occupied: [0,1,2,4,6,7,10,12,13,14,17,18,20]
+};
+
+// Тарифы по месяцам
+function getRate(months) {
+  if (months >= 12) return 950;
+  if (months >= 3)  return 1200;
+  return 1500;
+}
+
+// Скидка по сроку
+function getDiscount(months) {
+  if (months >= 12) return 37;
+  if (months >= 6)  return 20;
+  if (months >= 3)  return 10;
+  return 0;
+}
+
+// ─── СОСТОЯНИЕ ───────────────────────────────────────────────
+var selectedCell  = null;
+var currentPeriod = 1;
+
+// ─── КАРТА СКЛАДА ────────────────────────────────────────────
+function buildMap() {
+  var map    = document.getElementById('whMap');
+  var total  = WAREHOUSE.rows * WAREHOUSE.cols;
+  var html   = '<div class="wh-map-label">ПЛАН СКЛАДА (вид сверху)</div>';
+  var freeCount = 0;
+
+  for (var i = 0; i < total; i++) {
+    var isOcc = WAREHOUSE.occupied.indexOf(i) !== -1;
+    var row   = Math.floor(i / WAREHOUSE.cols) + 1;
+    var col   = (i % WAREHOUSE.cols) + 1;
+    var id    = String.fromCharCode(64 + row) + col;
+    if (!isOcc) freeCount++;
+
+    html += '<div class="wh-cell ' + (isOcc ? 'occupied' : 'free') + '" id="cell_' + i + '" ' +
+      (isOcc ? 'title="Занято"' : 'onclick="selectCell(' + i + ',\'' + id + '\')" title="Секция ' + id + ' · 50 м² · Свободно"') + '>' +
+      '<span class="wh-cell-id">' + id + '</span>' +
+      (isOcc ? '🔒' : '✓') +
+      '</div>';
+  }
+
+  map.innerHTML = html;
+
+  // Обновляем счётчики
+  var occupied = WAREHOUSE.occupied.length * WAREHOUSE.cellM2;
+  var free     = freeCount * WAREHOUSE.cellM2;
+  var pct      = Math.round((occupied / WAREHOUSE.totalM2) * 100);
+
+  document.getElementById('occupiedM2').textContent  = occupied + ' м²';
+  document.getElementById('freeM2').textContent      = free + ' м²';
+  document.getElementById('fillPct').textContent     = pct + '%';
+
+  var bar = document.getElementById('fillBar');
+  setTimeout(function(){ bar.style.width = pct + '%'; }, 100);
+  if (pct > 75) bar.classList.add('danger');
+}
+
+// ─── ВЫБОР ЯЧЕЙКИ ────────────────────────────────────────────
+function selectCell(idx, id) {
+  // Снять предыдущий выбор
+  if (selectedCell !== null) {
+    var prev = document.getElementById('cell_' + selectedCell);
+    if (prev) prev.classList.remove('selected');
+  }
+
+  selectedCell = idx;
+  var el = document.getElementById('cell_' + idx);
+  if (el) el.classList.add('selected');
+
+  // Показать инфо
+  document.getElementById('selectedInfo').style.display = 'flex';
+  document.getElementById('noSelectionHint').style.display = 'none';
+  document.getElementById('selName').textContent = 'Секция ' + id + ' — ' + WAREHOUSE.cellM2 + ' м²';
+  document.getElementById('selMeta').textContent = 'Стеллажное хранение · Высота потолков 8м · Ворота 4×4м';
+
+  calcPrice();
+
+  // Скролл к калькулятору
+  setTimeout(function(){
+    document.getElementById('calculator').scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }, 200);
+}
+
+function clearSelection() {
+  if (selectedCell !== null) {
+    var prev = document.getElementById('cell_' + selectedCell);
+    if (prev) prev.classList.remove('selected');
+    selectedCell = null;
+  }
+  document.getElementById('selectedInfo').style.display = 'none';
+  document.getElementById('noSelectionHint').style.display = 'block';
+  document.getElementById('submitBtn').disabled = true;
+  resetResult();
+}
+
+// ─── СЛАЙДЕР ПЕРИОДА ─────────────────────────────────────────
+function onPeriodChange(val) {
+  currentPeriod = parseInt(val);
+  var units = currentPeriod === 1 ? 'месяц' : currentPeriod < 5 ? 'месяца' : 'месяцев';
+  document.getElementById('periodVal').textContent  = currentPeriod;
+  document.getElementById('periodUnit').textContent = units;
+  document.getElementById('periodSlider').value = currentPeriod;
+
+  // Дата окончания
+  var start = document.getElementById('startDate').value;
+  if (start) {
+    var end = new Date(start);
+    end.setMonth(end.getMonth() + currentPeriod);
+    document.getElementById('periodDates').textContent =
+      'до ' + end.toLocaleDateString('ru-RU', { day:'numeric', month:'long', year:'numeric' });
+  }
+
+  calcPrice();
+}
+
+document.getElementById('startDate').addEventListener('change', function(){
+  onPeriodChange(currentPeriod);
+});
+
+// ─── РАСЧЁТ ЦЕНЫ ─────────────────────────────────────────────
+function calcPrice() {
+  if (selectedCell === null) return;
+
+  var area    = WAREHOUSE.cellM2;
+  var rate    = getRate(currentPeriod);
+  var disc    = getDiscount(currentPeriod);
+  var base    = area * rate * currentPeriod;
+  var saving  = Math.round(base * disc / 100);
+  var total   = base - saving;
+  var perDay  = Math.round(total / (currentPeriod * 30));
+
+  document.getElementById('rArea').textContent   = area + ' м²';
+  document.getElementById('rRate').textContent   = rate.toLocaleString('ru') + ' ₽';
+  document.getElementById('rPeriod').textContent = currentPeriod + ' мес';
+  document.getElementById('rTotal').textContent  = total.toLocaleString('ru') + ' ₽';
+  document.getElementById('rPerDay').textContent = perDay.toLocaleString('ru') + ' ₽/день';
+
+  if (disc > 0) {
+    document.getElementById('discountRow').style.display = 'flex';
+    document.getElementById('rDiscount').textContent = '-' + disc + '% (-' + saving.toLocaleString('ru') + ' ₽)';
+  } else {
+    document.getElementById('discountRow').style.display = 'none';
+  }
+
+  document.getElementById('submitBtn').disabled = false;
+}
+
+function resetResult() {
+  document.getElementById('rArea').textContent   = '— м²';
+  document.getElementById('rRate').textContent   = '— ₽';
+  document.getElementById('rPeriod').textContent = '— мес';
+  document.getElementById('rTotal').textContent  = '— ₽';
+  document.getElementById('rPerDay').textContent = '— ₽/день';
+  document.getElementById('discountRow').style.display = 'none';
+}
+
+// ─── МОДАЛКА ЗАЯВКИ ─────────────────────────────────────────
+function openOrderModal() {
+  if (selectedCell === null) { showToast('error','⚠️','Выберите секцию на карте'); return; }
+
+  var area  = WAREHOUSE.cellM2;
+  var rate  = getRate(currentPeriod);
+  var disc  = getDiscount(currentPeriod);
+  var base  = area * rate * currentPeriod;
+  var total = base - Math.round(base * disc / 100);
+  var units = currentPeriod === 1 ? 'месяц' : currentPeriod < 5 ? 'месяца' : 'месяцев';
+
+  var selName = document.getElementById('selName').textContent;
+  document.getElementById('m_name').value = document.getElementById('clientName').value;
+
+  document.getElementById('orderSummary').innerHTML =
+    '<div class="order-sum-row"><span>Секция</span><span class="ov">' + selName + '</span></div>' +
+    '<div class="order-sum-row"><span>Тариф</span><span class="ov">' + rate.toLocaleString('ru') + ' ₽/м²/мес</span></div>' +
+    '<div class="order-sum-row"><span>Срок</span><span class="ov">' + currentPeriod + ' ' + units + '</span></div>' +
+    (disc > 0 ? '<div class="order-sum-row"><span>Скидка</span><span class="ov" style="color:#2ed573">-' + disc + '%</span></div>' : '') +
+    '<div class="order-sum-total"><span>К оплате</span><span>' + total.toLocaleString('ru') + ' ₽</span></div>';
+
+  document.getElementById('modalForm').style.display = 'block';
+  document.getElementById('successScreen').style.display = 'none';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+async function submitOrder() {
+  var name  = document.getElementById('m_name').value.trim();
+  var phone = document.getElementById('m_phone').value.trim();
+  if (!name || !phone) { showToast('error','⚠️','Заполните имя и телефон'); return; }
+
+  // Здесь будет POST /api/orders
+  await new Promise(function(r){ setTimeout(r, 800); }); // имитация запроса
+
+  document.getElementById('modalForm').style.display = 'none';
+  document.getElementById('successScreen').style.display = 'flex';
+}
+
+// ─── УТИЛИТЫ ─────────────────────────────────────────────────
+function showToast(type, icon, text) {
+  var t = document.getElementById('toast');
+  document.getElementById('toastIcon').textContent = icon;
+  document.getElementById('toastText').textContent = text;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e){
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeModal(); });
+
+// Установить сегодняшнюю дату
+var today = new Date().toISOString().split('T')[0];
+document.getElementById('startDate').value = today;
+onPeriodChange(1);
+
+// Строим карту
+buildMap();
+</script>
+</body>
+</html>

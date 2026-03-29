@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>СкладПро — Финансы</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;
+            --accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--red:#ff4757;
+            --blue:#3d8bff;--purple:#a55eea;--text:#e8ecf4;--muted:#6b7599;
+            --font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;
+        }
+        [data-theme="light"]{
+            --bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;
+            --accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--red:#d63045;
+            --blue:#2a6fd4;--purple:#7c3aed;--text:#1a1e2e;--muted:#6b7599;
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+        body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+
+        /* SIDEBAR */
+        .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+        .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+        .logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}
+        .logo-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+        .nav{padding:16px 12px;flex:1}.nav-section{margin-bottom:24px}
+        .nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 12px 8px}
+        .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;transition:all .18s;position:relative;text-decoration:none}
+        .nav-item:hover{background:var(--surface2);color:var(--text)}
+        .nav-item.active{background:rgba(240,165,0,.12);color:var(--accent)}
+        .nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+        .nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+        .sidebar-user{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+        .avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg);flex-shrink:0}
+        .user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
+        .logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}.logout-btn:hover{color:var(--red)}
+
+        /* MAIN */
+        .main{flex:1;display:flex;flex-direction:column;min-width:0}
+        .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
+        .page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
+        .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+        .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+        .btn-sm{padding:5px 14px;font-size:12px}
+        .content{padding:28px 32px;flex:1;overflow-y:auto}
+
+        /* KPI CARDS */
+        .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+        .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;transition:border-color .2s}
+        .kpi-card:hover{border-color:rgba(240,165,0,.3)}
+        .kpi-card:nth-child(1){animation-delay:.05s}.kpi-card:nth-child(2){animation-delay:.10s}
+        .kpi-card:nth-child(3){animation-delay:.15s}.kpi-card:nth-child(4){animation-delay:.20s}
+        .kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px}
+        .kpi-card.c-green::after{background:var(--green)}.kpi-card.c-blue::after{background:var(--blue)}
+        .kpi-card.c-purple::after{background:var(--purple)}.kpi-card.c-accent::after{background:var(--accent)}
+        .kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+        .kpi-val{font-family:var(--font-head);font-size:34px;letter-spacing:1px;line-height:1;margin-bottom:6px}
+        .kpi-card.c-green .kpi-val{color:var(--green)}.kpi-card.c-blue .kpi-val{color:var(--blue)}
+        .kpi-card.c-purple .kpi-val{color:var(--purple)}.kpi-card.c-accent .kpi-val{color:var(--accent)}
+        .kpi-sub{font-size:12px;color:var(--muted)}
+        .kpi-icon{position:absolute;right:16px;top:14px;font-size:30px;opacity:.08}
+
+        /* INCOME BREAKDOWN */
+        .income-breakdown{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px;animation:fadeUp .4s ease .22s both}
+        .breakdown-title{font-family:var(--font-head);font-size:17px;letter-spacing:1px;margin-bottom:16px}
+        .breakdown-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+        .breakdown-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px}
+        .breakdown-item-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px}
+        .breakdown-item-val{font-family:var(--font-head);font-size:26px;letter-spacing:1px}
+        .breakdown-item-sub{font-size:11px;color:var(--muted);margin-top:4px}
+        .breakdown-item.storage .breakdown-item-val{color:var(--accent)}
+        .breakdown-item.insurance .breakdown-item-val{color:var(--green)}
+        .breakdown-item.total .breakdown-item-val{color:var(--blue)}
+
+        /* INS NOTICE */
+        .ins-notice{display:flex;align-items:flex-start;gap:12px;background:rgba(46,213,115,.06);border:1px solid rgba(46,213,115,.2);border-radius:10px;padding:14px 18px;margin-bottom:24px;font-size:13px;color:var(--muted);line-height:1.6}
+        .ins-notice strong{color:var(--green)}
+
+        /* TABLE */
+        .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px;animation:fadeUp .4s ease .28s both}
+        .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:10px;flex-wrap:wrap}
+        .table-title{font-family:var(--font-head);font-size:18px;letter-spacing:1px}
+        .table-sub{font-size:12px;color:var(--muted);margin-top:2px}
+        .products-table{width:100%;border-collapse:collapse}
+        .products-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2);white-space:nowrap}
+        .products-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+        .products-table tr:last-child td{border-bottom:none}
+        .products-table tr:hover td{background:rgba(255,255,255,.025)}
+
+        /* Status badges */
+        .st-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+        .st-active  {background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.2)}
+        .st-expired {background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}
+        .st-completed{background:rgba(107,117,153,.1);color:var(--muted);border:1px solid var(--border)}
+        .st-cancelled{background:rgba(107,117,153,.07);color:var(--muted);border:1px solid var(--border)}
+
+        /* Insurance badge */
+        .ins-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+        .ins-yes{background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.25)}
+        .ins-no {background:rgba(107,117,153,.1);color:var(--muted);border:1px solid var(--border)}
+
+        .val-green{color:var(--green);font-weight:700;font-variant-numeric:tabular-nums}
+        .val-blue {color:var(--blue); font-weight:700;font-variant-numeric:tabular-nums}
+        .val-acc  {color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums;font-family:var(--font-head);font-size:16px}
+        .val-muted{color:var(--muted);font-size:12px}
+
+        /* Penalty row */
+        .penalty-row td{background:rgba(255,71,87,.04)!important}
+        .penalty-val{color:var(--red);font-weight:700}
+
+        /* Empty */
+        .empty-state{text-align:center;padding:40px 20px;color:var(--muted)}
+        .empty-icon{font-size:40px;margin-bottom:10px;opacity:.4}
+
+        /* Payment schedule expand */
+        .contract-row{cursor:pointer;user-select:none;transition:background .15s}
+        .contract-row:hover td{background:rgba(240,165,0,.04)!important}
+        .contract-row.expanded td{background:rgba(240,165,0,.06)!important}
+        .expand-arrow{display:inline-block;transition:transform .25s;margin-right:6px;color:var(--muted);font-size:12px}
+        .contract-row.expanded .expand-arrow{transform:rotate(90deg);color:var(--accent)}
+        .schedule-row{display:none}
+        .schedule-row.open{display:table-row}
+        .schedule-cell{padding:0!important;border-bottom:2px solid var(--accent)!important;background:var(--surface2)!important}
+        .schedule-inner{padding:16px 20px 20px}
+        .schedule-title{font-family:var(--font-head);font-size:15px;letter-spacing:1px;color:var(--accent);margin-bottom:12px}
+        .month-table{width:100%;border-collapse:collapse;font-size:13px}
+        .month-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:7px 12px;background:var(--surface);border-bottom:1px solid var(--border)}
+        .month-table td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+        .month-table tr:last-child td{border-bottom:none}
+        .month-table tr:hover td{background:rgba(255,255,255,.02)}
+        .pay-status-paid{display:inline-flex;align-items:center;gap:5px;background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.25);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;transition:all .15s}
+        .pay-status-unpaid{display:inline-flex;align-items:center;gap:5px;background:rgba(255,71,87,.08);color:var(--red);border:1px solid rgba(255,71,87,.2);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;cursor:pointer;transition:all .15s}
+        .pay-status-future{display:inline-flex;align-items:center;gap:5px;background:rgba(107,117,153,.08);color:var(--muted);border:1px solid var(--border);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px}
+        .pay-status-paid:hover,.pay-status-unpaid:hover{filter:brightness(1.15);transform:translateY(-1px)}
+        .month-label{font-weight:600}
+        .month-amount{font-variant-numeric:tabular-nums;color:var(--blue);font-weight:700}
+
+        .toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:260px}
+        .toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid var(--green)}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+        ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+        @media(max-width:1200px){.kpi-row{grid-template-columns:repeat(2,1fr)}.breakdown-grid{grid-template-columns:1fr 1fr}}
+        @media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}.kpi-row{grid-template-columns:1fr 1fr}.breakdown-grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="logo"><div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div><div class="logo-sub">Управление запасами</div></div>
+        <nav class="nav">
+            <div class="nav-section"><div class="nav-label">Основное</div>
+                <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+                <a class="nav-item" href="/products"><span class="nav-icon">📦</span> Товары</a>
+                <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+            </div>
+            <div class="nav-section"><div class="nav-label">Справочники</div>
+                <a class="nav-item" href="/suppliers"><span class="nav-icon">🚚</span> Поставщики</a>
+            </div>
+            <div class="nav-section"><div class="nav-label">Клиенты</div>
+                <a class="nav-item" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+                <a class="nav-item" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+            </div>
+            <div class="nav-section"><div class="nav-label">Финансы и отчёты</div>
+                <a class="nav-item active" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+                <a class="nav-item" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+            </div>
+        </nav>
+        <div class="sidebar-user">
+            <div class="avatar" id="userAvatar">АИ</div>
+            <div class="user-info"><div class="user-name" id="userName">Загрузка...</div><div class="user-role" id="userRole">—</div></div>
+            <button class="logout-btn" onclick="logout()">⏏</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="page-title">ФИНАНСЫ</div>
+            <div class="topbar-right">
+                <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            </div>
+        </div>
+
+        <div class="content">
+
+            <!-- KPI -->
+            <div class="kpi-row">
+                <div class="kpi-card c-accent">
+                    <span class="kpi-icon">🏪</span>
+                    <div class="kpi-label">Доход от хранения</div>
+                    <div class="kpi-val" id="kpi_storage">—</div>
+                    <div class="kpi-sub" id="kpi_storage_sub">по всем договорам</div>
+                </div>
+                <div class="kpi-card c-green">
+                    <span class="kpi-icon">🛡️</span>
+                    <div class="kpi-label">Страховые взносы</div>
+                    <div class="kpi-val" id="kpi_insurance">—</div>
+                    <div class="kpi-sub" id="kpi_ins_sub">агентское вознаграждение</div>
+                </div>
+                <div class="kpi-card c-blue">
+                    <span class="kpi-icon">💰</span>
+                    <div class="kpi-label">Итого доходов</div>
+                    <div class="kpi-val" id="kpi_total">—</div>
+                    <div class="kpi-sub" id="kpi_total_sub">хранение + страхование</div>
+                </div>
+                <div class="kpi-card c-purple">
+                    <span class="kpi-icon">⚠️</span>
+                    <div class="kpi-label">Начислено штрафов</div>
+                    <div class="kpi-val" id="kpi_penalty">—</div>
+                    <div class="kpi-sub">по просроченным договорам</div>
+                </div>
+            </div>
+
+            <!-- Breakdown -->
+            <div class="income-breakdown">
+                <div class="breakdown-title">СТРУКТУРА ДОХОДОВ</div>
+                <div class="breakdown-grid">
+                    <div class="breakdown-item storage">
+                        <div class="breakdown-item-label">📦 Услуги хранения</div>
+                        <div class="breakdown-item-val" id="br_storage">—</div>
+                        <div class="breakdown-item-sub">Аренда площадей склада</div>
+                    </div>
+                    <div class="breakdown-item insurance">
+                        <div class="breakdown-item-label">🛡️ Страховые взносы</div>
+                        <div class="breakdown-item-val" id="br_insurance">—</div>
+                        <div class="breakdown-item-sub">Агент «СтрахПро» · 10% от объявл. стоимости</div>
+                    </div>
+                    <div class="breakdown-item total">
+                        <div class="breakdown-item-label">💳 Всего к получению</div>
+                        <div class="breakdown-item-val" id="br_total">—</div>
+                        <div class="breakdown-item-sub" id="br_contracts_count">— активных договоров</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Пояснение по страховке -->
+            <div class="ins-notice">
+                <span style="font-size:22px;flex-shrink:0">🛡️</span>
+                <div>
+                    <strong>Страховые взносы — агентская схема:</strong> наша компания выступает агентом страховой компании «СтрахПро».
+                    Клиент самостоятельно оценивает стоимость своего товара — закупочная цена является коммерческой тайной клиента и нигде не фиксируется.
+                    Страховой взнос составляет <strong>10% от объявленной стоимости</strong> и отражается как отдельная статья дохода.
+                    В случае наступления страхового случая возмещение выплачивает «СтрахПро».
+                </div>
+            </div>
+
+            <!-- Договоры хранения -->
+            <div class="table-wrap">
+                <div class="table-header">
+                    <div>
+                        <div class="table-title">ПЛАТЕЖИ ПО ДОГОВОРАМ ХРАНЕНИЯ</div>
+                        <div class="table-sub">Стоимость хранения и страховые взносы по каждому договору</div>
+                    </div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>Договор</th>
+                                <th>Клиент</th>
+                                <th>Статус</th>
+                                <th>Период</th>
+                                <th>Площадь</th>
+                                <th>Хранение/мес</th>
+                                <th>Итого хранение</th>
+                                <th>Страхование</th>
+                                <th>Взнос (10%)</th>
+                                <th>Штраф</th>
+                                <th>К оплате</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contractsBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="contractsEmpty" style="display:none">
+                    <div class="empty-icon">📄</div><div>Договоров нет</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+async function init() {
+    try {
+        const res  = await fetch('/auth/me', { credentials: 'include' });
+        const user = await res.json();
+        if (!user) { location.href = '/login'; return; }
+        document.getElementById('userName').textContent   = user.displayName;
+        document.getElementById('userRole').textContent   = user.role === 'admin' ? 'Администратор' : 'Работник';
+        document.getElementById('userAvatar').textContent = user.displayName.slice(0, 2).toUpperCase();
+    } catch { location.href = '/login'; return; }
+    await loadFinances();
+}
+
+function calcPenalty(c) {
+    if (c.status !== 'expired') return 0;
+    const now   = new Date();
+    const end   = new Date(c.endDate);
+    const days  = Math.max(0, Math.floor((now - end) / 86400000));
+    if (days <= 0) return 0;
+    let pen = c.penaltyType === 'fixed'
+        ? (c.penaltyPerDay || 0) * days
+        : (c.totalStorageCost * (c.penaltyPercent || 1.5) / 100) * days;
+    if (c.maxPenalty > 0) pen = Math.min(pen, c.maxPenalty);
+    return Math.round(pen);
+}
+
+async function loadFinances() {
+    try {
+        const res       = await fetch('/api/contracts', { credentials: 'include' });
+        const contracts = res.ok ? await res.json() : [];
+
+        const fmt = n => n >= 1000000 ? (n / 1000000).toFixed(1) + 'М ₽'
+                       : n >= 1000    ? Math.round(n / 1000) + 'К ₽'
+                       : n.toLocaleString('ru') + ' ₽';
+        const fmtFull = n => n.toLocaleString('ru') + ' ₽';
+
+        // ─── Считаем итоги ───────────────────────────────────
+        const activeContracts = contracts.filter(c => c.status === 'active' || c.status === 'expired');
+
+        const totalStorage   = contracts.reduce((s, c) => s + (c.totalStorageCost || 0), 0);
+        const totalInsurance = contracts.reduce((s, c) => s + (c.insurancePremium || 0), 0);
+        const totalRevenue   = totalStorage + totalInsurance;
+        const totalPenalty   = contracts.reduce((s, c) => s + calcPenalty(c), 0);
+
+        // KPI
+        document.getElementById('kpi_storage').textContent     = fmt(totalStorage);
+        document.getElementById('kpi_insurance').textContent   = fmt(totalInsurance);
+        document.getElementById('kpi_total').textContent       = fmt(totalRevenue);
+        document.getElementById('kpi_penalty').textContent     = fmt(totalPenalty);
+        document.getElementById('kpi_storage_sub').textContent = `${contracts.length} договор${contracts.length===1?'':'ов'}`;
+        document.getElementById('kpi_ins_sub').textContent     = `${contracts.filter(c=>c.insuranceEnabled).length} застраховано`;
+
+        // Breakdown
+        document.getElementById('br_storage').textContent        = fmt(totalStorage);
+        document.getElementById('br_insurance').textContent      = fmt(totalInsurance);
+        document.getElementById('br_total').textContent          = fmt(totalRevenue);
+        document.getElementById('br_contracts_count').textContent = `${activeContracts.length} активных договоров`;
+
+        // ─── Таблица договоров ───────────────────────────────
+        const stLbl  = { active:'Активен', expired:'Просрочен', completed:'Завершён', cancelled:'Отменён' };
+        const stCls  = { active:'st-active', expired:'st-expired', completed:'st-completed', cancelled:'st-cancelled' };
+
+        const tbody = document.getElementById('contractsBody');
+        const empty = document.getElementById('contractsEmpty');
+
+        if (!contracts.length) {
+            tbody.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
+        empty.style.display = 'none';
+
+        // Загружаем сохранённые статусы оплат из localStorage
+        const payKey = 'financePayments';
+        let payments = {};
+        try { payments = JSON.parse(localStorage.getItem(payKey) || '{}'); } catch {}
+
+        function savePayments() { localStorage.setItem(payKey, JSON.stringify(payments)); }
+
+        function buildScheduleRows(c) {
+            const months = c.durationMonths || 1;
+            const perMonth = (c.storageCostPerMonth || 0) + (c.insuranceEnabled ? Math.round((c.insurancePremium||0) / months) : 0);
+            const startDate = new Date(c.startDate);
+            const rows = [];
+            const now = new Date();
+
+            for (let i = 0; i < months; i++) {
+                const d = new Date(startDate);
+                d.setMonth(d.getMonth() + i);
+                const dueDate = new Date(d.getFullYear(), d.getMonth() + 1, 0); // конец месяца
+                const isPast = dueDate < now;
+                const mKey = `${c.number}_m${i}`;
+                const isPaid = !!(payments[mKey]);
+                const monthName = d.toLocaleString('ru', { month: 'long', year: 'numeric' });
+
+                let statusHtml;
+                if (isPaid) {
+                    statusHtml = `<span class="pay-status-paid" onclick="togglePay('${mKey}', event)">✓ Оплачено</span>`;
+                } else if (isPast) {
+                    statusHtml = `<span class="pay-status-unpaid" onclick="togglePay('${mKey}', event)">✗ Не оплачено</span>`;
+                } else {
+                    statusHtml = `<span class="pay-status-future">⏳ Ожидается</span>`;
+                }
+
+                rows.push(`<tr>
+                    <td style="padding:9px 12px;border-bottom:1px solid var(--border)">
+                        <span class="month-label" style="text-transform:capitalize">${monthName}</span>
+                    </td>
+                    <td style="padding:9px 12px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted)">до ${dueDate.toLocaleDateString('ru')}</td>
+                    <td style="padding:9px 12px;border-bottom:1px solid var(--border)"><span class="month-amount">${perMonth.toLocaleString('ru')} ₽</span></td>
+                    <td style="padding:9px 12px;border-bottom:1px solid var(--border)">${statusHtml}</td>
+                </tr>`);
+            }
+            return rows.join('');
+        }
+
+        const colCount = 11; // число колонок таблицы
+
+        const rows = contracts.map((c, idx) => {
+            const penalty = calcPenalty(c);
+            const billable = (c.totalStorageCost || 0) + (c.insurancePremium || 0) + penalty;
+
+            const insHtml = c.insuranceEnabled
+                ? `<div><span class="ins-badge ins-yes">🛡️ Застраховано</span></div>
+                   <div style="font-size:11px;color:var(--muted);margin-top:3px">
+                     Объявл.: ${(c.declaredValue||0).toLocaleString('ru')} ₽
+                   </div>`
+                : `<span class="ins-badge ins-no">Без страховки</span>`;
+
+            const penHtml = penalty > 0
+                ? `<span class="penalty-val">+${penalty.toLocaleString('ru')} ₽</span><div style="font-size:10px;color:var(--muted)">просрочка</div>`
+                : `<span style="color:var(--muted);font-size:12px">—</span>`;
+
+            const rowCls = penalty > 0 ? 'penalty-row contract-row' : 'contract-row';
+
+            const contractRow = `<tr class="${rowCls}" data-idx="${idx}" onclick="toggleSchedule(this, ${idx})">
+                <td><span class="expand-arrow">▶</span><b style="color:var(--accent)">${c.number}</b></td>
+                <td>
+                    <div style="font-weight:600">${c.clientName}</div>
+                    ${c.productName ? `<div style="font-size:11px;color:var(--muted)">📦 ${c.productName}</div>` : ''}
+                </td>
+                <td><span class="st-badge ${stCls[c.status]||''}">${stLbl[c.status]||c.status}</span></td>
+                <td style="font-size:12px;color:var(--muted)">
+                    ${c.startDate} →<br>${c.endDate}
+                    <div style="margin-top:2px;color:var(--text);font-weight:600">${c.durationMonths} мес.</div>
+                </td>
+                <td style="font-weight:600">${c.storageArea} м²</td>
+                <td class="val-muted">${(c.storageCostPerMonth||0).toLocaleString('ru')} ₽</td>
+                <td class="val-acc">${(c.totalStorageCost||0).toLocaleString('ru')} ₽</td>
+                <td>${insHtml}</td>
+                <td class="val-green">${c.insuranceEnabled ? (c.insurancePremium||0).toLocaleString('ru')+' ₽' : '—'}</td>
+                <td>${penHtml}</td>
+                <td>
+                    <div style="font-family:var(--font-head);font-size:20px;color:var(--blue)">${billable.toLocaleString('ru')} ₽</div>
+                    <div style="font-size:11px;color:var(--muted)">к оплате</div>
+                </td>
+            </tr>`;
+
+            const scheduleRow = `<tr class="schedule-row" id="schedule-${idx}">
+                <td class="schedule-cell" colspan="${colCount}">
+                    <div class="schedule-inner">
+                        <div class="schedule-title">📅 ГРАФИК ПЛАТЕЖЕЙ — ${c.number} / ${c.clientName}</div>
+                        <table class="month-table">
+                            <thead>
+                                <tr>
+                                    <th>Месяц</th>
+                                    <th>Срок оплаты</th>
+                                    <th>Сумма</th>
+                                    <th>Статус оплаты</th>
+                                </tr>
+                            </thead>
+                            <tbody>${buildScheduleRows(c)}</tbody>
+                        </table>
+                    </div>
+                </td>
+            </tr>`;
+
+            return contractRow + scheduleRow;
+        });
+
+        tbody.innerHTML = rows.join('');
+
+        window.toggleSchedule = function(row, idx) {
+            const schedRow = document.getElementById('schedule-' + idx);
+            const isOpen = schedRow.classList.contains('open');
+            // Закрыть все
+            document.querySelectorAll('.schedule-row.open').forEach(r => r.classList.remove('open'));
+            document.querySelectorAll('.contract-row.expanded').forEach(r => r.classList.remove('expanded'));
+            if (!isOpen) {
+                schedRow.classList.add('open');
+                row.classList.add('expanded');
+                schedRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        };
+
+        window.togglePay = function(mKey, event) {
+            event.stopPropagation();
+            payments[mKey] = !payments[mKey];
+            if (!payments[mKey]) delete payments[mKey];
+            savePayments();
+            loadFinances(); // перерисовать
+        };
+
+    } catch (e) {
+        console.error('Ошибка загрузки финансов:', e);
+        showToast('error', '⚠️', 'Ошибка загрузки данных');
+    }
+}
+
+function toggleTheme() {
+    var t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', t);
+    localStorage.setItem('theme', t);
+    document.getElementById('themeBtn').textContent = t === 'light' ? '🌙' : '☀️';
+}
+(function () {
+    var t = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', t);
+    var btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = t === 'light' ? '🌙' : '☀️';
+})();
+
+async function logout() { await fetch('/auth/logout', { method: 'POST', credentials: 'include' }); location.href = '/login'; }
+function showToast(type, icon, text) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastIcon').textContent = icon;
+    document.getElementById('toastText').textContent = text;
+    t.className = `toast ${type} show`;
+    setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+init();
+</script>
+</body>
+</html>

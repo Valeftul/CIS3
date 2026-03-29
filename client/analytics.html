@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>СкладПро — Аналитика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;
+  --accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;
+  --red:#ff4757;--blue:#3d8bff;--purple:#a55eea;
+  --text:#e8ecf4;--muted:#6b7599;
+  --font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;
+}
+[data-theme="light"] {
+  --bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;
+  --accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;
+  --red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+.logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}
+.logo-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+.nav{padding:16px 12px;flex:1}.nav-section{margin-bottom:24px}
+.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 12px 8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;transition:all .18s;position:relative;text-decoration:none}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:rgba(240,165,0,.12);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+.nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.sidebar-user{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg);flex-shrink:0}
+.user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
+.logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}.logout-btn:hover{color:var(--red)}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
+.page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.period-tabs{display:flex;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:3px}
+.period-tab{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;border:none;background:none;font-family:var(--font-body)}
+.period-tab.active{background:var(--accent);color:var(--bg)}
+.period-tab:hover:not(.active){color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.btn-sm{padding:5px 14px;font-size:12px}
+.content{padding:28px 32px;flex:1;overflow-y:auto}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;animation:fadeUp .4s ease both;transition:border-color .2s}
+.kpi-card:hover{border-color:rgba(240,165,0,.4)}
+.kpi-card:nth-child(1){animation-delay:.05s}.kpi-card:nth-child(2){animation-delay:.10s}
+.kpi-card:nth-child(3){animation-delay:.15s}.kpi-card:nth-child(4){animation-delay:.20s}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;border-radius:0 0 12px 12px}
+.kpi-card.c1::after{background:#2ed573}.kpi-card.c2::after{background:#3d8bff}
+.kpi-card.c3::after{background:#f0a500}.kpi-card.c4::after{background:#a55eea}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px}
+.kpi-val{font-family:var(--font-head);font-size:36px;letter-spacing:1px;line-height:1;margin-bottom:6px}
+.kpi-card.c1 .kpi-val{color:#2ed573}.kpi-card.c2 .kpi-val{color:#3d8bff}
+.kpi-card.c3 .kpi-val{color:#f0a500}.kpi-card.c4 .kpi-val{color:#a55eea}
+.kpi-change{font-size:12px;color:var(--muted)}
+.kpi-icon{position:absolute;right:16px;top:14px;font-size:32px;opacity:.08}
+
+/* GRIDS */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.grid-3{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+
+/* PANEL */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;animation:fadeUp .4s ease .22s both}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap}
+.panel-title{font-family:var(--font-head);font-size:17px;letter-spacing:1px}
+.panel-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.leg-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:5px}
+.chart-body{padding:16px 20px 10px}
+
+/* SVG */
+.chart-svg{overflow:visible;display:block}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:20px;padding:16px 20px;flex-wrap:wrap}
+.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:140px}
+.donut-item{display:flex;align-items:center;gap:8px}
+.donut-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.donut-name{font-size:12px;font-weight:500;flex:1}
+.donut-pct{font-family:var(--font-head);font-size:15px}
+.donut-amt{font-size:11px;color:var(--muted)}
+
+/* TOP TABLE */
+.top-table{width:100%;border-collapse:collapse}
+.top-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2)}
+.top-table td{padding:11px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+.top-table tr:last-child td{border-bottom:none}
+.top-table tr:hover td{background:rgba(255,255,255,.02)}
+.rank{font-family:var(--font-head);font-size:18px;color:var(--muted);width:28px}
+.rank.gold{color:#ffd700}.rank.silver{color:#c0c0c0}.rank.bronze{color:#cd7f32}
+.item-name{font-weight:600;font-size:13px}.item-sub{font-size:11px;color:var(--muted)}
+.bar-inline{height:4px;background:var(--border);border-radius:2px;overflow:hidden;width:90px;margin-top:4px}
+.bar-inline-fill{height:100%;border-radius:2px;background:#f0a500}
+.val-cell{font-family:var(--font-head);font-size:17px;color:#f0a500;text-align:right;white-space:nowrap}
+
+/* SUP BARS */
+.sup-bar-list{padding:14px 20px;display:flex;flex-direction:column;gap:11px}
+.sup-bar-item{display:flex;align-items:center;gap:10px}
+.sup-bar-name{width:130px;font-size:13px;font-weight:500;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sup-bar-wrap{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.sup-bar-fill{height:100%;border-radius:4px;transition:width .8s ease}
+.sup-bar-val{width:75px;text-align:right;font-size:12px;font-weight:600;flex-shrink:0}
+
+/* HEATMAP */
+.heatmap-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:0 20px 6px;font-size:10px;color:var(--muted);text-align:center}
+.heatmap-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:0 20px 10px}
+.hm-cell{aspect-ratio:1;border-radius:3px;cursor:pointer;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.2)}
+.hm-legend{display:flex;align-items:center;gap:6px;padding:0 20px 14px;font-size:11px;color:var(--muted)}
+.hm-swatch{width:11px;height:11px;border-radius:2px}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:240px}
+.toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid #2ed573}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+@media(max-width:1200px){.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo"><div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div><div class="logo-sub">Управление запасами</div></div>
+  <nav class="nav">
+    <div class="nav-section">
+      <div class="nav-label">Основное</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+      <a class="nav-item" href="/products"><span class="nav-icon">📦</span> Товары</a>
+      <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Справочники</div>
+      <a class="nav-item" href="/suppliers"><span class="nav-icon">🚚</span> Поставщики</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Клиенты</div>
+      <a class="nav-item" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+      <a class="nav-item" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Финансы и отчёты</div>
+      <a class="nav-item" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+      <a class="nav-item active" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar" id="userAvatar">АИ</div>
+    <div class="user-info"><div class="user-name" id="userName">Загрузка...</div><div class="user-role" id="userRole">—</div></div>
+    <button class="logout-btn" onclick="logout()">⏏</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="page-title">АНАЛИТИКА</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <div class="period-tabs">
+        <button class="period-tab" onclick="setPeriod(7,this)">7 дней</button>
+        <button class="period-tab active" onclick="setPeriod(30,this)">30 дней</button>
+        <button class="period-tab" onclick="setPeriod(90,this)">3 месяца</button>
+        <button class="period-tab" onclick="setPeriod(365,this)">Год</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- KPI -->
+    <div class="kpi-row">
+      <div class="kpi-card c1">
+        <span class="kpi-icon">💰</span>
+        <div class="kpi-label">Оборот (приходы)</div>
+        <div class="kpi-val" id="kpi1">—</div>
+        <div class="kpi-change" id="kpi1c">—</div>
+      </div>
+      <div class="kpi-card c2">
+        <span class="kpi-icon">📤</span>
+        <div class="kpi-label">Расходы (выдачи)</div>
+        <div class="kpi-val" id="kpi2">—</div>
+        <div class="kpi-change" id="kpi2c">—</div>
+      </div>
+      <div class="kpi-card c3">
+        <span class="kpi-icon">📦</span>
+        <div class="kpi-label">Операций всего</div>
+        <div class="kpi-val" id="kpi3">—</div>
+        <div class="kpi-change" id="kpi3c">—</div>
+      </div>
+      <div class="kpi-card c4">
+        <span class="kpi-icon">🗑️</span>
+        <div class="kpi-label">Списано (потери)</div>
+        <div class="kpi-val" id="kpi4">—</div>
+        <div class="kpi-change" id="kpi4c">—</div>
+      </div>
+    </div>
+
+    <!-- Линейный + Donut -->
+    <div class="grid-3">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">ДВИЖЕНИЕ ТОВАРОВ</div><div class="panel-sub">Приход / Расход / Списание по дням</div></div>
+          <div class="legend">
+            <span><span class="leg-dot" style="background:#2ed573"></span>Приход</span>
+            <span><span class="leg-dot" style="background:#3d8bff"></span>Расход</span>
+            <span><span class="leg-dot" style="background:#ff4757"></span>Списание</span>
+          </div>
+        </div>
+        <div class="chart-body">
+          <svg id="lineChart" class="chart-svg" width="100%" height="200" viewBox="0 0 680 200" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">ПО КАТЕГОРИЯМ</div><div class="panel-sub">Доля стоимости склада</div></div>
+        </div>
+        <div class="donut-wrap" id="donutWrap"></div>
+      </div>
+    </div>
+
+    <!-- Столбчатый + Топ -->
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">ОБОРОТ ПО МЕСЯЦАМ</div><div class="panel-sub">Приход vs Расход, ₽</div></div>
+          <div class="legend">
+            <span><span class="leg-dot" style="background:#f0a500"></span>Приход</span>
+            <span><span class="leg-dot" style="background:#3d8bff"></span>Расход</span>
+          </div>
+        </div>
+        <div class="chart-body">
+          <svg id="barChart" class="chart-svg" width="100%" height="190" viewBox="0 0 540 190" preserveAspectRatio="none"></svg>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">ТОП-5 ТОВАРОВ</div><div class="panel-sub">По стоимости остатка</div></div>
+        </div>
+        <table class="top-table" id="topTable"></table>
+      </div>
+    </div>
+
+    <!-- Поставщики + Тепловая карта -->
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">ОБОРОТ ПОСТАВЩИКОВ</div><div class="panel-sub">Сумма всех приходов, ₽</div></div>
+        </div>
+        <div class="sup-bar-list" id="supBars"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <div><div class="panel-title">АКТИВНОСТЬ ОПЕРАЦИЙ</div><div class="panel-sub">Кол-во операций по дням (4 недели)</div></div>
+        </div>
+        <div class="heatmap-days"><div>Пн</div><div>Вт</div><div>Ср</div><div>Чт</div><div>Пт</div><div>Сб</div><div>Вс</div></div>
+        <div class="heatmap-grid" id="heatmap"></div>
+        <div class="hm-legend">
+          Меньше
+          <div class="hm-swatch" style="background:#1a2035"></div>
+          <div class="hm-swatch" style="background:#1a3a2a"></div>
+          <div class="hm-swatch" style="background:#1d5c36"></div>
+          <div class="hm-swatch" style="background:#2ed573"></div>
+          Больше
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+// ─── ДАННЫЕ ─────────────────────────────────────────────────
+var MONTHS = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+
+function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+var MONTHLY = MONTHS.map(function(m) {
+  return { month: m, income: rnd(15000,80000), outcome: rnd(8000,45000), writeoff: rnd(500,4000) };
+});
+
+var DAILY = [];
+for (var i = 0; i < 30; i++) {
+  DAILY.push({ day: i+1, income: rnd(0,8000), outcome: rnd(0,5000), writeoff: rnd(0,800) });
+}
+
+var CAT_DATA = [
+  { name: 'Канцелярия',      value: 42000, color: '#f0a500' },
+  { name: 'Бумага и картон', value: 28000, color: '#3d8bff' },
+  { name: 'Расходники',      value: 18000, color: '#a55eea' },
+  { name: 'Мебель',          value: 12000, color: '#2ed573' },
+  { name: 'Упаковка',        value: 6000,  color: '#ff4757' },
+  { name: 'Хоз. товары',     value: 3000,  color: '#ffd32a' }
+];
+
+var TOP_PRODUCTS = [
+  { name: 'Бумага А4, 500 листов',  sku: 'PAP-001', total: 21600, cat: 'Бумага' },
+  { name: 'Картридж HP 85A',        sku: 'INK-017', total: 4500,  cat: 'Расходники' },
+  { name: 'Папки-регистраторы А4',  sku: 'FLD-022', total: 3825,  cat: 'Канцелярия' },
+  { name: 'Степлер настольный',     sku: 'STL-011', total: 2640,  cat: 'Канцелярия' },
+  { name: 'Лоток для бумаг',        sku: 'TRY-014', total: 1960,  cat: 'Мебель' }
+];
+
+var SUP_DATA = [
+  { name: 'ОфисСнаб',       total: 23400, color: '#f0a500' },
+  { name: 'КанцОпт',        total: 18200, color: '#3d8bff' },
+  { name: 'ТехноДом',       total: 12500, color: '#2ed573' },
+  { name: 'МебельОпт',      total: 7800,  color: '#a55eea' },
+  { name: 'УпакСнаб',       total: 4200,  color: '#ff4757' },
+  { name: 'ПоставщикПлюс',  total: 3100,  color: '#ffd32a' }
+];
+
+var HEATMAP = [];
+for (var h = 0; h < 28; h++) { HEATMAP.push(rnd(0, 12)); }
+
+var currentPeriod = 30;
+
+// ─── AUTH ────────────────────────────────────────────────────
+async function init() {
+  try {
+    var ctrl = new AbortController();
+    setTimeout(function(){ ctrl.abort(); }, 3000);
+    var res  = await fetch('/auth/me', { credentials: 'include', signal: ctrl.signal });
+    var user = await res.json();
+    if (!user) { location.href = '/login'; return; }
+    document.getElementById('userName').textContent   = user.displayName;
+    document.getElementById('userRole').textContent   = user.role === 'admin' ? 'Администратор' : 'Работник';
+    document.getElementById('userAvatar').textContent = user.displayName.slice(0,2).toUpperCase();
+  } catch(e) { location.href = '/login'; return; }
+  renderAll();
+}
+
+function setPeriod(days, el) {
+  currentPeriod = days;
+  document.querySelectorAll('.period-tab').forEach(function(t){ t.classList.remove('active'); });
+  el.classList.add('active');
+  renderKPI();
+  renderLineChart();
+}
+
+function fmt(n) {
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'М ₽';
+  if (n >= 1000)    return Math.round(n/1000) + 'К ₽';
+  return n + ' ₽';
+}
+
+function renderAll() {
+  renderKPI();
+  renderLineChart();
+  renderBarChart();
+  renderDonut();
+  renderTopTable();
+  renderSupBars();
+  renderHeatmap();
+}
+
+// ─── KPI ─────────────────────────────────────────────────────
+function renderKPI() {
+  var m = currentPeriod / 30;
+  var income   = Math.round(MONTHLY.slice(-3).reduce(function(s,x){ return s+x.income; },0) * m / 3);
+  var outcome  = Math.round(MONTHLY.slice(-3).reduce(function(s,x){ return s+x.outcome; },0) * m / 3);
+  var ops      = Math.round(23 * m + rnd(-3,5));
+  var writeoff = Math.round(MONTHLY.slice(-3).reduce(function(s,x){ return s+x.writeoff; },0) * m / 3);
+
+  document.getElementById('kpi1').textContent = fmt(income);
+  document.getElementById('kpi2').textContent = fmt(outcome);
+  document.getElementById('kpi3').textContent = ops;
+  document.getElementById('kpi4').textContent = fmt(writeoff);
+
+  document.getElementById('kpi1c').innerHTML = '<span style="color:#2ed573">▲ ' + rnd(4,18) + '%</span> к прошлому периоду';
+  document.getElementById('kpi2c').innerHTML = '<span style="color:#2ed573">▲ ' + rnd(2,12) + '%</span> к прошлому периоду';
+  document.getElementById('kpi3c').innerHTML = '<span style="color:#2ed573">▲ ' + rnd(1,8)  + '</span> к прошлому периоду';
+  document.getElementById('kpi4c').innerHTML = '<span style="color:#ff4757">▼ ' + rnd(1,5)  + '%</span> от оборота';
+}
+
+// ─── ЛИНЕЙНЫЙ ГРАФИК ─────────────────────────────────────────
+function renderLineChart() {
+  var svg = document.getElementById('lineChart');
+  var W = 680, H = 200, PL = 42, PR = 12, PT = 8, PB = 26;
+  var cW = W - PL - PR, cH = H - PT - PB;
+
+  var n    = Math.min(currentPeriod, DAILY.length);
+  var data = DAILY.slice(DAILY.length - n);
+  if (data.length < 2) data = DAILY;
+
+  var maxVal = 0;
+  data.forEach(function(d) {
+    if (d.income   > maxVal) maxVal = d.income;
+    if (d.outcome  > maxVal) maxVal = d.outcome;
+    if (d.writeoff > maxVal) maxVal = d.writeoff;
+  });
+  if (maxVal === 0) maxVal = 1;
+
+  var xStep = cW / (data.length - 1);
+
+  function scX(i) { return PL + i * xStep; }
+  function scY(v) { return PT + cH - (v / maxVal) * cH; }
+
+  // Grid
+  var out = '';
+  for (var gi = 0; gi <= 4; gi++) {
+    var gy  = PT + gi * (cH / 4);
+    var glv = Math.round(maxVal * (1 - gi/4));
+    out += '<line x1="' + PL + '" y1="' + gy + '" x2="' + (PL+cW) + '" y2="' + gy + '" stroke="#2a3050" stroke-width="1" stroke-dasharray="4,4" opacity=".5"/>';
+    out += '<text x="' + (PL-5) + '" y="' + (gy+4) + '" font-family="Golos Text" font-size="10" fill="#6b7599" text-anchor="end">' + (glv>=1000?Math.round(glv/1000)+'К':glv) + '</text>';
+  }
+
+  // X labels
+  var step = Math.max(1, Math.floor(data.length / 7));
+  data.forEach(function(d, i) {
+    if (i % step === 0) {
+      out += '<text x="' + scX(i) + '" y="' + (H-5) + '" font-family="Golos Text" font-size="10" fill="#6b7599" text-anchor="middle">' + d.day + '</text>';
+    }
+  });
+
+  // Series
+  function series(key, color) {
+    var coords = data.map(function(d,i){ return { x: scX(i), y: scY(d[key]) }; });
+    var areaD = 'M' + PL + ',' + (PT+cH);
+    coords.forEach(function(p){ areaD += ' L' + p.x + ',' + p.y; });
+    areaD += ' L' + (PL+cW) + ',' + (PT+cH) + ' Z';
+    var lineD = coords.map(function(p,i){ return (i?'L':'M') + p.x + ',' + p.y; }).join(' ');
+    out += '<path d="' + areaD + '" fill="' + color + '" opacity=".1"/>';
+    out += '<path d="' + lineD + '" fill="none" stroke="' + color + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    coords.forEach(function(p){
+      out += '<circle cx="' + p.x + '" cy="' + p.y + '" r="3" fill="' + color + '"/>';
+    });
+  }
+
+  series('income',   '#2ed573');
+  series('outcome',  '#3d8bff');
+  series('writeoff', '#ff4757');
+
+  svg.innerHTML = out;
+}
+
+// ─── СТОЛБЧАТЫЙ ГРАФИК ───────────────────────────────────────
+function renderBarChart() {
+  var svg = document.getElementById('barChart');
+  var W = 540, H = 190, PL = 44, PR = 10, PT = 8, PB = 26;
+  var cW = W - PL - PR, cH = H - PT - PB;
+  var data = MONTHLY.slice(-8);
+
+  var maxVal = 0;
+  data.forEach(function(d) {
+    if (d.income  > maxVal) maxVal = d.income;
+    if (d.outcome > maxVal) maxVal = d.outcome;
+  });
+  if (maxVal === 0) maxVal = 1;
+
+  var colW = cW / data.length;
+  var bW   = colW * 0.28;
+
+  var out = '';
+  // Grid
+  for (var gi = 0; gi <= 4; gi++) {
+    var gy  = PT + gi * (cH/4);
+    var glv = Math.round(maxVal * (1 - gi/4));
+    out += '<line x1="' + PL + '" y1="' + gy + '" x2="' + (PL+cW) + '" y2="' + gy + '" stroke="#2a3050" stroke-width="1" stroke-dasharray="4,4" opacity=".5"/>';
+    out += '<text x="' + (PL-5) + '" y="' + (gy+4) + '" font-family="Golos Text" font-size="10" fill="#6b7599" text-anchor="end">' + (glv>=1000?Math.round(glv/1000)+'К':glv) + '</text>';
+  }
+
+  data.forEach(function(d, i) {
+    var cx  = PL + i*colW + colW/2;
+    var h1  = (d.income  / maxVal) * cH;
+    var h2  = (d.outcome / maxVal) * cH;
+    var y1  = PT + cH - h1;
+    var y2  = PT + cH - h2;
+    out += '<rect x="' + (cx-bW-2) + '" y="' + y1 + '" width="' + bW + '" height="' + h1 + '" fill="#f0a500" rx="3" opacity=".85"/>';
+    out += '<rect x="' + (cx+2)    + '" y="' + y2 + '" width="' + bW + '" height="' + h2 + '" fill="#3d8bff" rx="3" opacity=".7"/>';
+    out += '<text x="' + cx + '" y="' + (H-6) + '" font-family="Golos Text" font-size="10" fill="#6b7599" text-anchor="middle">' + d.month + '</text>';
+  });
+
+  svg.innerHTML = out;
+}
+
+// ─── DONUT ───────────────────────────────────────────────────
+function renderDonut() {
+  var total = CAT_DATA.reduce(function(s,c){ return s+c.value; }, 0);
+  var R = 68, cx = 85, cy = 85, sw = 20;
+  var offset = 0;
+  var arcs   = '';
+
+  CAT_DATA.forEach(function(cat) {
+    var pct = cat.value / total;
+    var len = pct * 2 * Math.PI * R;
+    var gap = 2.5;
+    arcs += '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none"' +
+      ' stroke="' + cat.color + '" stroke-width="' + sw + '"' +
+      ' stroke-dasharray="' + (len-gap) + ' ' + (2*Math.PI*R-(len-gap)) + '"' +
+      ' stroke-dashoffset="' + (-offset) + '"' +
+      ' transform="rotate(-90 ' + cx + ' ' + cy + ')" opacity=".9"/>';
+    offset += len;
+  });
+
+  var fmtK = function(n){ return n>=1000?Math.round(n/1000)+'К':n; };
+  var legend = CAT_DATA.map(function(cat) {
+    var pct = Math.round(cat.value/total*100);
+    return '<div class="donut-item">' +
+      '<div class="donut-dot" style="background:' + cat.color + '"></div>' +
+      '<div class="donut-name">' + cat.name + '</div>' +
+      '<div><div class="donut-pct" style="color:' + cat.color + '">' + pct + '%</div>' +
+      '<div class="donut-amt">' + fmtK(cat.value) + ' ₽</div></div>' +
+      '</div>';
+  }).join('');
+
+  document.getElementById('donutWrap').innerHTML =
+    '<svg viewBox="0 0 170 170" width="170" height="170" style="flex-shrink:0">' +
+    arcs +
+    '<text x="' + cx + '" y="' + (cy-8) + '" text-anchor="middle" font-family="Bebas Neue" font-size="20" fill="#e8ecf4">' + fmtK(total) + '</text>' +
+    '<text x="' + cx + '" y="' + (cy+12) + '" text-anchor="middle" font-family="Golos Text" font-size="10" fill="#6b7599">₽ на складе</text>' +
+    '</svg>' +
+    '<div class="donut-legend">' + legend + '</div>';
+}
+
+// ─── ТОП ТОВАРОВ ─────────────────────────────────────────────
+function renderTopTable() {
+  var sorted = TOP_PRODUCTS.slice().sort(function(a,b){ return b.total-a.total; });
+  var maxT   = sorted[0].total;
+  var ranks  = ['gold','silver','bronze','',''];
+  var fmtK   = function(n){ return n>=1000?Math.round(n/1000)+'К ₽':n+' ₽'; };
+
+  var rows = sorted.map(function(p,i){
+    return '<tr><td><div class="rank ' + ranks[i] + '">' + (i+1) + '</div></td>' +
+      '<td><div class="item-name">' + p.name + '</div><div class="item-sub">' + p.sku + ' · ' + p.cat + '</div>' +
+      '<div class="bar-inline"><div class="bar-inline-fill" style="width:' + Math.round(p.total/maxT*100) + '%"></div></div></td>' +
+      '<td class="val-cell">' + fmtK(p.total) + '</td></tr>';
+  }).join('');
+
+  document.getElementById('topTable').innerHTML =
+    '<thead><tr><th>#</th><th>Товар</th><th style="text-align:right">Остаток</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>';
+}
+
+// ─── ПОСТАВЩИКИ ──────────────────────────────────────────────
+function renderSupBars() {
+  var maxV = SUP_DATA[0].total;
+  var fmtK = function(n){ return n>=1000?Math.round(n/1000)+'К ₽':n+' ₽'; };
+  document.getElementById('supBars').innerHTML = SUP_DATA.map(function(s) {
+    return '<div class="sup-bar-item">' +
+      '<div class="sup-bar-name">' + s.name + '</div>' +
+      '<div class="sup-bar-wrap"><div class="sup-bar-fill" style="width:' + Math.round(s.total/maxV*100) + '%;background:' + s.color + '"></div></div>' +
+      '<div class="sup-bar-val" style="color:' + s.color + '">' + fmtK(s.total) + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ТЕМА
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+}
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeBtn');
+  if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+})();
+
+// ─── ТЕПЛОВАЯ КАРТА ──────────────────────────────────────────
+function renderHeatmap() {
+  var maxV  = Math.max.apply(null, HEATMAP);
+  var today = new Date();
+
+  function getColor(v) {
+    if (v === 0)           return '#1a2035';
+    var t = v / maxV;
+    if (t < 0.33)          return '#1a3a2a';
+    if (t < 0.66)          return '#1d5c36';
+    return '#2ed573';
+  }
+
+  document.getElementById('heatmap').innerHTML = HEATMAP.map(function(v, i) {
+    var d = new Date(today);
+    d.setDate(d.getDate() - (27 - i));
+    var ds = d.toLocaleDateString('ru-RU', { day:'numeric', month:'short' });
+    return '<div class="hm-cell" style="background:' + getColor(v) + '" title="' + ds + ': ' + v + ' операций"></div>';
+  }).join('');
+}
+
+// ─── УТИЛИТЫ ─────────────────────────────────────────────────
+async function logout() {
+  await fetch('/auth/logout', { method:'POST', credentials:'include' });
+  location.href = '/login';
+}
+
+init();
+</script>
+</body>
+</html>

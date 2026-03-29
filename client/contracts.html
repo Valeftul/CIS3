@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>СкладПро — Договоры хранения</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;--accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;--red:#ff4757;--blue:#3d8bff;--purple:#a55eea;--text:#e8ecf4;--muted:#6b7599;--font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;}
+    [data-theme="light"]{--bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;--accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;--red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+    .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+    .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}.logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}.logo-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+    .nav{padding:16px 12px;flex:1}.nav-section{margin-bottom:24px}.nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 12px 8px}
+    .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;transition:all .18s;position:relative;text-decoration:none}.nav-item:hover{background:var(--surface2);color:var(--text)}.nav-item.active{background:rgba(240,165,0,.12);color:var(--accent)}.nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+    .nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+    .sidebar-user{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+    .avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg);flex-shrink:0}
+    .user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
+    .logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}.logout-btn:hover{color:var(--red)}
+    .main{flex:1;display:flex;flex-direction:column;min-width:0}
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
+    .page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
+    .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .search-wrap{position:relative}.search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px 8px 36px;width:220px;outline:none;transition:border-color .2s}.search-input:focus{border-color:var(--accent)}.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+    .select-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px;outline:none;cursor:pointer}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+    .btn-primary{background:var(--accent);color:var(--bg)}.btn-primary:hover{background:#ffb929;transform:translateY(-1px)}
+    .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+    .btn-danger{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.3)}.btn-danger:hover{background:rgba(255,71,87,.22)}
+    .btn-green{background:rgba(46,213,115,.12);color:var(--green);border:1px solid rgba(46,213,115,.3)}.btn-green:hover{background:rgba(46,213,115,.22)}
+    .btn-sm{padding:5px 12px;font-size:12px}
+    .content{padding:28px 32px;flex:1;overflow-y:auto}
+    .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+    .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;flex:1;min-width:140px;animation:fadeUp .4s ease both}
+    .mini-stat:nth-child(1){animation-delay:.05s}.mini-stat:nth-child(2){animation-delay:.10s}.mini-stat:nth-child(3){animation-delay:.15s}.mini-stat:nth-child(4){animation-delay:.20s}
+    .mini-icon{font-size:24px}.mini-val{font-family:var(--font-head);font-size:26px;letter-spacing:1px;line-height:1}.mini-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+    .mini-stat.yellow .mini-val{color:var(--accent)}.mini-stat.green .mini-val{color:var(--green)}.mini-stat.red .mini-val{color:var(--red)}.mini-stat.blue .mini-val{color:var(--blue)}
+    .contracts-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;animation:fadeUp .4s ease .22s both}
+    .contracts-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+    .contracts-title{font-family:var(--font-head);font-size:18px;letter-spacing:1px}
+    .contracts-list{display:flex;flex-direction:column}
+    .contract-card{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:20px;padding:18px 20px;border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer}
+    .contract-card:last-child{border-bottom:none}.contract-card:hover{background:rgba(255,255,255,.025)}
+    .contract-card.expired-row{border-left:3px solid var(--red)}.contract-card.active-row{border-left:3px solid var(--green)}.contract-card.completed-row{border-left:3px solid var(--muted)}
+    .cc-num{font-family:var(--font-head);font-size:18px;letter-spacing:1px;color:var(--accent);min-width:120px}
+    .cc-client{font-weight:700;font-size:14px;margin-bottom:3px}.cc-product{font-size:12px;color:var(--muted)}
+    .cc-dates{font-size:12px;color:var(--muted);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap}
+    .cc-amounts{text-align:right;min-width:160px}.cc-total{font-family:var(--font-head);font-size:22px;color:var(--text)}.cc-storage{font-size:12px;color:var(--muted)}.cc-penalty{font-size:12px;color:var(--red);font-weight:600;margin-top:2px}
+    .cc-insurance{font-size:12px;color:var(--green);margin-top:2px;font-weight:600}
+    .cc-actions{display:flex;gap:6px;flex-direction:column;min-width:100px}
+    .status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
+    .st-active{background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.2)}.st-expired{background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}.st-completed{background:rgba(107,117,153,.15);color:var(--muted);border:1px solid var(--border)}.st-cancelled{background:rgba(255,71,87,.05);color:var(--muted);border:1px solid var(--border)}
+    .empty-state{text-align:center;padding:60px 20px;color:var(--muted)}.empty-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}.modal-overlay.open{display:flex}
+    .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:700px;max-width:100%;animation:fadeUp .3s ease;position:relative;overflow:hidden;margin:auto}
+    .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 28px;border-bottom:1px solid var(--border)}
+    .modal-title{font-family:var(--font-head);font-size:24px;letter-spacing:1px}
+    .modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;transition:color .2s}.modal-close:hover{color:var(--red)}
+    .modal-body{padding:24px 28px;display:flex;flex-direction:column;gap:20px}
+    .modal-footer{display:flex;gap:10px;padding:0 28px 28px}
+    .form-section{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .form-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:10px 16px;background:var(--surface2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between}
+    .form-section-title::after{content:'▼';font-size:10px;transition:transform .2s;flex-shrink:0}
+    .form-section.collapsed .form-section-title::after{transform:rotate(-90deg)}.form-section.collapsed .form-section-body{display:none}
+    .form-section-body{padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-section-body.cols3{grid-template-columns:1fr 1fr 1fr}.form-section-body.cols1{grid-template-columns:1fr}.span2{grid-column:span 2}
+    .field{display:flex;flex-direction:column;gap:5px}
+    .field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+    .field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:9px 12px;outline:none;transition:border-color .2s;resize:none}
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+    /* ─── СТРАХОВОЙ БЛОК В ФОРМЕ ─── */
+    .ins-form-block{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+    .ins-form-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;background:var(--surface2);transition:background .15s}
+    .ins-form-toggle:hover{background:rgba(46,213,115,.05)}
+    .ins-form-left{display:flex;align-items:center;gap:10px}
+    .ins-form-icon{font-size:20px}
+    .ins-form-title{font-weight:700;font-size:13px}.ins-form-sub{font-size:11px;color:var(--muted);margin-top:1px}
+    .ins-toggle-sw{width:40px;height:22px;background:var(--border);border-radius:11px;position:relative;transition:background .2s;flex-shrink:0}
+    .ins-toggle-sw::after{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
+    .ins-toggle-sw.on{background:var(--green)}.ins-toggle-sw.on::after{transform:translateX(18px)}
+    .ins-form-body{padding:14px 16px;display:none;flex-direction:column;gap:12px;border-top:1px solid var(--border);background:rgba(46,213,115,.03)}
+    .ins-form-body.open{display:flex}
+    .ins-note{font-size:12px;color:var(--muted);line-height:1.5;padding:8px 12px;background:var(--surface2);border-radius:6px}
+    .ins-calc-preview{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+    .ins-calc-row{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:2px 0}
+    .ins-calc-row .iv{color:var(--green);font-weight:700}
+    /* ПРЕВЬЮ РАСЧЁТА */
+    .calc-preview{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 18px}
+    .calc-preview-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px}
+    .calc-row{display:flex;justify-content:space-between;padding:3px 0;font-size:13px;color:var(--muted)}.calc-row .cv{color:var(--text);font-weight:600}
+    .calc-divider{height:1px;background:var(--border);margin:8px 0}
+    .calc-total-row{display:flex;justify-content:space-between;align-items:center}
+    .calc-total-label{font-size:14px;font-weight:700}.calc-total-val{font-family:var(--font-head);font-size:28px;color:var(--accent)}
+    /* ПЕЧАТЬ */
+    .print-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:300;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}.print-overlay.open{display:flex}
+    .print-doc{background:#fff;color:#1a1a1a;width:210mm;max-width:100%;margin:auto;padding:20mm 25mm;font-family:'Times New Roman',serif;font-size:12pt;line-height:1.6;position:relative}
+    .print-close{position:fixed;top:16px;right:16px;background:var(--red);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;z-index:301}
+    .print-print{position:fixed;top:16px;right:130px;background:var(--green);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:600;z-index:301}
+    .doc-header{text-align:center;margin-bottom:24pt}.doc-logo{font-size:18pt;font-weight:700;letter-spacing:2px;margin-bottom:4pt}.doc-title{font-size:16pt;font-weight:700;text-transform:uppercase;margin-bottom:4pt}.doc-number{font-size:12pt;color:#555}
+    .doc-parties{margin-bottom:16pt;font-size:11pt}.doc-parties p{margin-bottom:4pt}
+    .doc-section{margin-bottom:14pt}.doc-section h3{font-size:12pt;font-weight:700;margin-bottom:6pt;border-bottom:1px solid #ccc;padding-bottom:3pt}.doc-section p{margin-bottom:4pt;font-size:11pt}
+    .doc-table{width:100%;border-collapse:collapse;margin:8pt 0;font-size:11pt}.doc-table th{background:#f0f0f0;border:1px solid #ccc;padding:5pt 8pt;font-weight:700;text-align:left}.doc-table td{border:1px solid #ccc;padding:5pt 8pt}.doc-table tr:nth-child(even) td{background:#fafafa}
+    .doc-ins-box{border:2px solid #2a7a2a;border-radius:4pt;padding:10pt 12pt;margin:10pt 0;background:#f0faf0}
+    .doc-ins-title{font-weight:700;color:#1a5c1a;font-size:12pt;margin-bottom:6pt}
+    .doc-no-ins-box{border:1px solid #ccc;border-radius:4pt;padding:10pt 12pt;margin:10pt 0;background:#fafafa;color:#666}
+    .doc-signatures{display:grid;grid-template-columns:1fr 1fr;gap:40pt;margin-top:24pt;font-size:11pt}.sig-block p{margin-bottom:6pt}.sig-line{border-top:1px solid #333;margin-top:24pt;padding-top:4pt;font-size:10pt;color:#555}.doc-stamp{margin-top:8pt;font-size:10pt;color:#777;font-style:italic}
+    .toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:260px}
+    .toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+    @media(max-width:900px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}.contract-card{grid-template-columns:1fr;gap:10px}.form-section-body{grid-template-columns:1fr}.form-section-body.cols3{grid-template-columns:1fr}.span2{grid-column:span 1}}
+    @media print{.print-close,.print-print{display:none}.print-overlay{position:static;background:none;padding:0;display:block}.print-doc{margin:0;padding:15mm 20mm;box-shadow:none}}
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo"><div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div><div class="logo-sub">Управление запасами</div></div>
+    <nav class="nav">
+      <div class="nav-section"><div class="nav-label">Основное</div>
+        <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+        <a class="nav-item" href="/products"><span class="nav-icon">📦</span> Товары</a>
+        <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+      </div>
+      <div class="nav-section"><div class="nav-label">Справочники</div>
+        <a class="nav-item" href="/suppliers"><span class="nav-icon">🚚</span> Поставщики</a>
+      </div>
+      <div class="nav-section"><div class="nav-label">Клиенты</div>
+        <a class="nav-item active" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+        <a class="nav-item" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+      </div>
+      <div class="nav-section"><div class="nav-label">Финансы и отчёты</div>
+        <a class="nav-item" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+        <a class="nav-item" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="avatar" id="userAvatar">АИ</div>
+      <div class="user-info"><div class="user-name" id="userName">Загрузка...</div><div class="user-role" id="userRole">—</div></div>
+      <button class="logout-btn" onclick="logout()">⏏</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="page-title">ДОГОВОРЫ ХРАНЕНИЯ</div>
+      <div class="topbar-right">
+        <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+        <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" type="text" placeholder="Поиск по клиенту..." /></div>
+        <select class="select-input" id="statusFilter">
+          <option value="">Все статусы</option>
+          <option value="active">Активные</option>
+          <option value="expired">Просроченные</option>
+          <option value="completed">Завершённые</option>
+          <option value="cancelled">Отменённые</option>
+        </select>
+        <button class="btn btn-primary" onclick="openCreateModal()">+ Новый договор</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="stats-row">
+        <div class="mini-stat yellow"><div class="mini-icon">📄</div><div><div class="mini-val" id="sTotal">0</div><div class="mini-label">Всего договоров</div></div></div>
+        <div class="mini-stat green"><div class="mini-icon">✅</div><div><div class="mini-val" id="sActive">0</div><div class="mini-label">Активных</div></div></div>
+        <div class="mini-stat red"><div class="mini-icon">⚠️</div><div><div class="mini-val" id="sExpired">0</div><div class="mini-label">Просроченных</div></div></div>
+        <div class="mini-stat blue"><div class="mini-icon">🛡️</div><div><div class="mini-val" id="sInsurance">0</div><div class="mini-label">Застраховано</div></div></div>
+      </div>
+
+      <div class="contracts-wrap">
+        <div class="contracts-head">
+          <div class="contracts-title">СПИСОК ДОГОВОРОВ</div>
+          <div style="font-size:12px;color:var(--muted)" id="contractCount">0 договоров</div>
+        </div>
+        <div class="contracts-list" id="contractsList"></div>
+        <div class="empty-state" id="emptyState" style="display:none"><div class="empty-icon">📄</div><div>Договоров пока нет</div></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modalTitle">НОВЫЙ ДОГОВОР</div>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- 1. Контрагент -->
+        <div class="form-section">
+          <div class="form-section-title" onclick="toggleSection(this)">1. Контрагент</div>
+          <div class="form-section-body">
+            <div class="field span2"><label>Наименование организации / ФИО *</label><input id="f_clientName" type="text" placeholder="ООО Ромашка или Иванов Иван" /></div>
+            <div class="field"><label>Контактное лицо</label><input id="f_clientContact" type="text" placeholder="Директор Иванов И.И." /></div>
+            <div class="field"><label>Телефон</label><input id="f_clientPhone" type="text" placeholder="+7 (495) 000-00-00" /></div>
+            <div class="field"><label>Email</label><input id="f_clientEmail" type="text" placeholder="info@company.ru" /></div>
+            <div class="field"><label>ИНН</label><input id="f_clientInn" type="text" placeholder="7700000000" /></div>
+            <div class="field"><label>КПП</label><input id="f_clientKpp" type="text" placeholder="770001001" /></div>
+            <div class="field"><label>ОГРН / ОГРНИП</label><input id="f_clientOgrn" type="text" placeholder="1027700000000" /></div>
+            <div class="field"><label>Расчётный счёт</label><input id="f_clientAccount" type="text" placeholder="40702810000000000000" /></div>
+            <div class="field"><label>БИК банка</label><input id="f_clientBik" type="text" placeholder="044525225" /></div>
+            <div class="field"><label>Банк</label><input id="f_clientBank" type="text" placeholder="ПАО Сбербанк" /></div>
+            <div class="field"><label>Корр. счёт</label><input id="f_clientKorr" type="text" placeholder="30101810400000000225" /></div>
+            <div class="field span2"><label>Юридический адрес</label><input id="f_clientAddress" type="text" placeholder="г. Москва, ул. Примерная, д. 1" /></div>
+            <div class="field span2"><label>Фактический адрес (если отличается)</label><input id="f_clientFactAddress" type="text" placeholder="г. Москва, ул. Складская, д. 5" /></div>
+          </div>
+        </div>
+
+        <!-- 2. Товар (без закупочной цены) -->
+        <div class="form-section">
+          <div class="form-section-title" onclick="toggleSection(this)">2. Товар на хранение</div>
+          <div class="form-section-body cols3">
+            <div class="field span2"><label>Наименование товара *</label><input id="f_productName" type="text" placeholder="Бумага А4, 500 листов" /></div>
+            <div class="field"><label>Артикул (SKU)</label><input id="f_productSku" type="text" placeholder="PAP-001" /></div>
+            <div class="field"><label>Количество *</label><input id="f_quantity" type="number" placeholder="100" min="1" /></div>
+            <div class="field"><label>Единица</label>
+              <select id="f_unit"><option value="шт">шт</option><option value="кг">кг</option><option value="л">л</option><option value="м">м</option><option value="уп">уп</option><option value="бл">бл</option><option value="кор">кор</option><option value="палл">палл</option></select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Страхование -->
+        <div class="ins-form-block">
+          <div class="ins-form-toggle" onclick="toggleInsForm()">
+            <div class="ins-form-left">
+              <span class="ins-form-icon">🛡️</span>
+              <div>
+                <div class="ins-form-title">Страхование товара</div>
+                <div class="ins-form-sub">Агент страховой компании «СтрахПро» · Взнос 10% от объявленной стоимости</div>
+              </div>
+            </div>
+            <div class="ins-toggle-sw" id="insFormSwitch"></div>
+          </div>
+          <div class="ins-form-body" id="insFormBody">
+            <div class="ins-note">
+              Клиент самостоятельно указывает оценочную стоимость своего товара. Закупочная цена товара является коммерческой тайной клиента и не фиксируется в договоре. Страховой взнос — <strong>10%</strong> от объявленной стоимости, оплачивается единовременно. В случае утраты или повреждения — страховая компания возмещает ущерб.
+            </div>
+            <div class="field">
+              <label>Объявленная стоимость товара, ₽ *</label>
+              <input id="f_declaredValue" type="number" placeholder="Клиент сам оценивает стоимость товара" min="0" oninput="calcPreview()" />
+            </div>
+            <div class="field">
+              <label>Страховая компания</label>
+              <input id="f_insuranceCompany" type="text" value="СтрахПро" placeholder="СтрахПро" />
+            </div>
+            <div class="ins-calc-preview">
+              <div class="ins-calc-row"><span>Объявленная стоимость</span><span class="iv" id="ins_declared">—</span></div>
+              <div class="ins-calc-row"><span>Страховой взнос (10%)</span><span class="iv" id="ins_premium">—</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Условия хранения -->
+        <div class="form-section">
+          <div class="form-section-title" onclick="toggleSection(this)">3. Условия хранения</div>
+          <div class="form-section-body">
+            <div class="field"><label>Площадь, м² *</label><input id="f_storageArea" type="number" placeholder="50" min="1" oninput="calcPreview()" /></div>
+            <div class="field"><label>Стоимость хранения, ₽/м²/мес *</label><input id="f_storageRate" type="number" placeholder="1200" min="0" oninput="calcPreview()" /></div>
+            <div class="field"><label>Дата начала *</label><input id="f_startDate" type="date" oninput="calcPreview()" /></div>
+            <div class="field"><label>Срок хранения, мес *</label><input id="f_durationMonths" type="number" placeholder="3" min="1" max="60" oninput="calcPreview()" /></div>
+          </div>
+        </div>
+
+        <!-- 5. Санкции -->
+        <div class="form-section">
+          <div class="form-section-title" onclick="toggleSection(this)">4. Санкции за просрочку</div>
+          <div class="form-section-body cols3">
+            <div class="field"><label>Тип санкции</label>
+              <select id="f_penaltyType" onchange="togglePenaltyFields()">
+                <option value="percent">% от стоимости хранения в день</option>
+                <option value="fixed">Фиксированная сумма в день, ₽</option>
+              </select>
+            </div>
+            <div class="field" id="penaltyPercentField"><label>Процент в день, %</label><input id="f_penaltyPercent" type="number" value="1.5" min="0" step="0.1" oninput="calcPreview()" /></div>
+            <div class="field" id="penaltyFixedField" style="display:none"><label>Сумма в день, ₽</label><input id="f_penaltyPerDay" type="number" placeholder="500" min="0" oninput="calcPreview()" /></div>
+            <div class="field"><label>Максимальный штраф, ₽ (0 = без лимита)</label><input id="f_maxPenalty" type="number" value="0" min="0" oninput="calcPreview()" /></div>
+          </div>
+        </div>
+
+        <!-- 6. Доп. условия -->
+        <div class="form-section">
+          <div class="form-section-title" onclick="toggleSection(this)">5. Дополнительные условия</div>
+          <div class="form-section-body cols1">
+            <div class="field"><label>Особые условия / примечания</label><textarea id="f_notes" rows="2" placeholder="Требования к температуре, влажности, доступу..."></textarea></div>
+          </div>
+        </div>
+
+        <!-- Превью расчёта -->
+        <div class="calc-preview" id="calcPreviewBlock">
+          <div class="calc-preview-title">Предварительный расчёт</div>
+          <div class="calc-row"><span>Хранение в месяц</span><span class="cv" id="pr_pm">—</span></div>
+          <div class="calc-row"><span>Срок</span><span class="cv" id="pr_dur">—</span></div>
+          <div class="calc-row"><span>Итого хранение</span><span class="cv" id="pr_storage">—</span></div>
+          <div class="calc-row" id="pr_ins_row" style="display:none"><span>🛡️ Страховой взнос (10%)</span><span class="cv" style="color:var(--green)" id="pr_ins">—</span></div>
+          <div class="calc-divider"></div>
+          <div class="calc-total-row">
+            <div><div class="calc-total-label">Итого к оплате</div><div style="font-size:11px;color:var(--muted)" id="pr_penalty">Штраф за просрочку: —</div></div>
+            <div class="calc-total-val" id="pr_total">— ₽</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Отмена</button>
+        <button class="btn btn-primary" style="flex:2" onclick="saveContract()">Сохранить договор</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ПЕЧАТЬ -->
+  <div class="print-overlay" id="printOverlay">
+    <button class="print-close" onclick="closePrint()">✕ Закрыть</button>
+    <button class="print-print" onclick="window.print()">🖨 Печать</button>
+    <div class="print-doc" id="printDoc"></div>
+  </div>
+
+  <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+var contracts  = [];
+var editingId  = null;
+var insFormOn  = false;
+
+// ─── AUTH ────────────────────────────────────────────────────
+async function init() {
+  try {
+    var res  = await fetch('/auth/me', { credentials:'include' });
+    var user = await res.json();
+    if (!user) { location.href='/login'; return; }
+    document.getElementById('userName').textContent  = user.displayName;
+    document.getElementById('userRole').textContent  = user.role==='admin'?'Администратор':'Работник';
+    document.getElementById('userAvatar').textContent = user.displayName.slice(0,2).toUpperCase();
+  } catch(e) { location.href='/login'; return; }
+  await loadContracts();
+}
+
+async function loadContracts() {
+  try {
+    var status = document.getElementById('statusFilter').value;
+    var search = document.getElementById('searchInput').value;
+    var url    = '/api/contracts?' + (status?'status='+status:'') + (search?'&search='+search:'');
+    var res    = await fetch(url, { credentials:'include' });
+    contracts  = res.ok ? await res.json() : [];
+    contracts  = contracts.map(function(c){ if(!c._id) c._id=String(c.id); return c; });
+  } catch(e) { contracts = []; }
+  renderContracts();
+  updateStats();
+}
+
+// ─── РЕНДЕР ──────────────────────────────────────────────────
+function renderContracts() {
+  var search  = document.getElementById('searchInput').value.toLowerCase();
+  var statusF = document.getElementById('statusFilter').value;
+  var filtered = contracts.filter(function(c){
+    return (!search || c.clientName.toLowerCase().includes(search) || c.number.toLowerCase().includes(search))
+        && (!statusF || c.status === statusF);
+  });
+
+  document.getElementById('contractCount').textContent = filtered.length + ' договоров';
+  var list  = document.getElementById('contractsList');
+  var empty = document.getElementById('emptyState');
+
+  if (!filtered.length) { list.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  var stMap  = { active:'st-active', expired:'st-expired', completed:'st-completed', cancelled:'st-cancelled' };
+  var stLbl  = { active:'Активен', expired:'Просрочен', completed:'Завершён', cancelled:'Отменён' };
+  var rowCls = { active:'active-row', expired:'expired-row', completed:'completed-row', cancelled:'completed-row' };
+
+  list.innerHTML = filtered.map(function(c) {
+    var start = new Date(c.startDate).toLocaleDateString('ru-RU');
+    var end   = new Date(c.endDate).toLocaleDateString('ru-RU');
+
+    var penaltyHtml = '';
+    if (c.status === 'expired') {
+      var now  = new Date();
+      var days = Math.max(0, Math.floor((now - new Date(c.endDate)) / 86400000));
+      var pen  = calcPenalty(c, days);
+      if (pen > 0) penaltyHtml = '<div class="cc-penalty">⚠ Штраф: +' + pen.toLocaleString('ru') + ' ₽ (' + days + ' дн.)</div>';
+    }
+
+    var insHtml = c.insuranceEnabled
+      ? '<div class="cc-insurance">🛡️ Застраховано на ' + (c.declaredValue||0).toLocaleString('ru') + ' ₽ (взнос ' + (c.insurancePremium||0).toLocaleString('ru') + ' ₽)</div>'
+      : '<div style="font-size:11px;color:var(--muted)">🛡️ Без страховки</div>';
+
+    return '<div class="contract-card ' + (rowCls[c.status]||'') + '">' +
+      '<div><div class="cc-num">' + c.number + '</div>' +
+      '<span class="status-badge ' + (stMap[c.status]||'') + '">' + (stLbl[c.status]||c.status) + '</span></div>' +
+      '<div class="cc-main">' +
+      '<div class="cc-client">' + c.clientName + '</div>' +
+      '<div class="cc-product">📦 ' + c.productName + ' · ' + c.quantity + ' ' + c.unit + ' · Площадь: ' + c.storageArea + ' м²</div>' +
+      '<div class="cc-dates"><span>📅 ' + start + ' — ' + end + '</span><span>⏱ ' + c.durationMonths + ' мес</span></div>' +
+      insHtml + penaltyHtml +
+      '</div>' +
+      '<div class="cc-amounts">' +
+      '<div class="cc-total">' + c.totalStorageCost.toLocaleString('ru') + ' ₽</div>' +
+      '<div class="cc-storage">Хранение: ' + c.storageCostPerMonth.toLocaleString('ru') + ' ₽/мес</div>' +
+      (c.insuranceEnabled ? '<div class="cc-insurance">+ ' + (c.insurancePremium||0).toLocaleString('ru') + ' ₽ страховка</div>' : '') +
+      '</div>' +
+      '<div class="cc-actions">' +
+      '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();printContract(\'' + c._id + '\')">🖨 Договор</button>' +
+      '<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editContract(\'' + c._id + '\')">✏️</button>' +
+      (c.status==='active' ? '<button class="btn btn-green btn-sm" onclick="event.stopPropagation();changeStatus(\'' + c._id + '\',\'completed\')">✅ Завершить</button>' : '') +
+      '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function calcPenalty(c, days) {
+  if (days <= 0) return 0;
+  var pen = c.penaltyType === 'fixed'
+    ? (c.penaltyPerDay || 0) * days
+    : (c.totalStorageCost * (c.penaltyPercent || 1.5) / 100) * days;
+  if (c.maxPenalty > 0) pen = Math.min(pen, c.maxPenalty);
+  return Math.round(pen);
+}
+
+function updateStats() {
+  var total   = contracts.length;
+  var active  = contracts.filter(function(c){ return c.status==='active'; }).length;
+  var expired = contracts.filter(function(c){ return c.status==='expired'; }).length;
+  var insured = contracts.filter(function(c){ return c.insuranceEnabled; }).length;
+  document.getElementById('sTotal').textContent    = total;
+  document.getElementById('sActive').textContent   = active;
+  document.getElementById('sExpired').textContent  = expired;
+  document.getElementById('sInsurance').textContent = insured;
+}
+
+// ─── СТРАХОВАНИЕ В ФОРМЕ ─────────────────────────────────────
+function toggleInsForm() {
+  insFormOn = !insFormOn;
+  var sw   = document.getElementById('insFormSwitch');
+  var body = document.getElementById('insFormBody');
+  sw.className   = 'ins-toggle-sw' + (insFormOn ? ' on' : '');
+  body.className = 'ins-form-body' + (insFormOn ? ' open' : '');
+  calcPreview();
+}
+
+function setInsForm(val) {
+  insFormOn = Boolean(val);
+  var sw   = document.getElementById('insFormSwitch');
+  var body = document.getElementById('insFormBody');
+  sw.className   = 'ins-toggle-sw' + (insFormOn ? ' on' : '');
+  body.className = 'ins-form-body' + (insFormOn ? ' open' : '');
+}
+
+// ─── ФОРМА ДОГОВОРА ──────────────────────────────────────────
+function openCreateModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = 'НОВЫЙ ДОГОВОР';
+  initSections();
+  clearForm();
+  setInsForm(false);
+  document.getElementById('f_startDate').value      = new Date().toISOString().split('T')[0];
+  document.getElementById('f_durationMonths').value = 3;
+  document.getElementById('f_storageRate').value    = 1200;
+  document.getElementById('f_penaltyPercent').value = 1.5;
+  calcPreview();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function editContract(id) {
+  var c = contracts.find(function(x){ return x._id===id; });
+  if (!c) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = 'РЕДАКТИРОВАТЬ: ' + c.number;
+  initSections();
+
+  var fields = ['clientName','clientContact','clientPhone','clientEmail','clientInn','clientAddress',
+    'clientKpp','clientOgrn','clientAccount','clientBik','clientBank','clientKorr','clientFactAddress',
+    'productName','productSku','quantity','storageArea','notes'];
+  fields.forEach(function(f){ document.getElementById('f_'+f).value = c[f] || ''; });
+
+  document.getElementById('f_unit').value            = c.unit || 'шт';
+  document.getElementById('f_storageRate').value     = c.storageRate || '';
+  document.getElementById('f_startDate').value       = (c.startDate||'').slice(0,10);
+  document.getElementById('f_durationMonths').value  = c.durationMonths || '';
+  document.getElementById('f_penaltyType').value     = c.penaltyType || 'percent';
+  document.getElementById('f_penaltyPercent').value  = c.penaltyPercent || 1.5;
+  document.getElementById('f_penaltyPerDay').value   = c.penaltyPerDay || 0;
+  document.getElementById('f_maxPenalty').value      = c.maxPenalty || 0;
+
+  // Страховка
+  setInsForm(c.insuranceEnabled);
+  document.getElementById('f_declaredValue').value    = c.declaredValue || '';
+  document.getElementById('f_insuranceCompany').value = c.insuranceCompany || 'СтрахПро';
+
+  togglePenaltyFields();
+  calcPreview();
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function clearForm() {
+  ['f_clientName','f_clientContact','f_clientPhone','f_clientEmail','f_clientInn','f_clientAddress',
+   'f_clientKpp','f_clientOgrn','f_clientAccount','f_clientBik','f_clientBank','f_clientKorr','f_clientFactAddress',
+   'f_productName','f_productSku','f_quantity','f_storageArea','f_notes',
+   'f_declaredValue'].forEach(function(id){ document.getElementById(id).value = ''; });
+  document.getElementById('f_unit').value             = 'шт';
+  document.getElementById('f_penaltyType').value      = 'percent';
+  document.getElementById('f_penaltyPercent').value   = 1.5;
+  document.getElementById('f_penaltyPerDay').value    = 0;
+  document.getElementById('f_maxPenalty').value       = 0;
+  document.getElementById('f_durationMonths').value   = 3;
+  document.getElementById('f_storageRate').value      = 1200;
+  document.getElementById('f_insuranceCompany').value = 'СтрахПро';
+  togglePenaltyFields();
+}
+
+function togglePenaltyFields() {
+  var t = document.getElementById('f_penaltyType').value;
+  document.getElementById('penaltyPercentField').style.display = t==='percent'?'flex':'none';
+  document.getElementById('penaltyFixedField').style.display   = t==='fixed'?'flex':'none';
+}
+
+function calcPreview() {
+  var area = parseFloat(document.getElementById('f_storageArea').value) || 0;
+  var rate = parseFloat(document.getElementById('f_storageRate').value) || 0;
+  var dur  = parseInt(document.getElementById('f_durationMonths').value) || 0;
+  var pm   = area * rate;
+  var stor = pm * dur;
+
+  var decl    = insFormOn ? (parseFloat(document.getElementById('f_declaredValue').value)||0) : 0;
+  var premium = insFormOn ? Math.round(decl * 0.1) : 0;
+  var total   = stor + premium;
+
+  var pType = document.getElementById('f_penaltyType').value;
+  var pPct  = parseFloat(document.getElementById('f_penaltyPercent').value) || 0;
+  var pFix  = parseFloat(document.getElementById('f_penaltyPerDay').value) || 0;
+  var penPerDay = pType==='percent' ? (stor*pPct/100) : pFix;
+
+  document.getElementById('pr_pm').textContent      = pm  ? pm.toLocaleString('ru')+' ₽/мес' : '—';
+  document.getElementById('pr_dur').textContent     = dur ? dur+' мес' : '—';
+  document.getElementById('pr_storage').textContent = stor ? stor.toLocaleString('ru')+' ₽' : '—';
+  document.getElementById('pr_total').textContent   = total ? total.toLocaleString('ru')+' ₽' : '— ₽';
+  document.getElementById('pr_penalty').textContent = penPerDay ? 'Штраф: '+Math.round(penPerDay).toLocaleString('ru')+' ₽/день' : 'Штраф за просрочку: —';
+
+  if (premium > 0) {
+    document.getElementById('pr_ins_row').style.display = 'flex';
+    document.getElementById('pr_ins').textContent       = premium.toLocaleString('ru') + ' ₽';
+  } else {
+    document.getElementById('pr_ins_row').style.display = 'none';
+  }
+
+  // мини-расчёт страховки
+  document.getElementById('ins_declared').textContent = decl    ? decl.toLocaleString('ru')+' ₽'    : '—';
+  document.getElementById('ins_premium').textContent  = premium ? premium.toLocaleString('ru')+' ₽' : '—';
+}
+
+async function saveContract() {
+  var name = document.getElementById('f_clientName').value.trim();
+  var prod = document.getElementById('f_productName').value.trim();
+  var qty  = document.getElementById('f_quantity').value;
+  var area = document.getElementById('f_storageArea').value;
+  var rate = document.getElementById('f_storageRate').value;
+  var sd   = document.getElementById('f_startDate').value;
+  var dur  = document.getElementById('f_durationMonths').value;
+
+  var required = [
+    {id:'f_clientName',val:name},{id:'f_productName',val:prod},{id:'f_quantity',val:qty},
+    {id:'f_storageArea',val:area},{id:'f_storageRate',val:rate},{id:'f_startDate',val:sd},{id:'f_durationMonths',val:dur}
+  ];
+  var errors = required.filter(function(f){ return !f.val; });
+  required.forEach(function(f){ var el=document.getElementById(f.id); if(el) el.style.borderColor=''; });
+  if (errors.length) {
+    errors.forEach(function(f){ var el=document.getElementById(f.id); if(el){el.style.borderColor='var(--red)';var s=el.closest('.form-section');if(s)s.classList.remove('collapsed');} });
+    showToast('error','⚠️','Заполните обязательные поля'); return;
+  }
+
+  // Страховка
+  var insuranceEnabled = insFormOn;
+  var declaredValue    = insuranceEnabled ? (Number(document.getElementById('f_declaredValue').value)||0) : 0;
+  var insuranceCompany = insuranceEnabled ? (document.getElementById('f_insuranceCompany').value.trim()||'СтрахПро') : '';
+
+  var data = {
+    clientName: name, clientContact: document.getElementById('f_clientContact').value.trim(),
+    clientPhone: document.getElementById('f_clientPhone').value.trim(), clientEmail: document.getElementById('f_clientEmail').value.trim(),
+    clientInn: document.getElementById('f_clientInn').value.trim(), clientAddress: document.getElementById('f_clientAddress').value.trim(),
+    clientKpp: document.getElementById('f_clientKpp').value.trim(), clientOgrn: document.getElementById('f_clientOgrn').value.trim(),
+    clientAccount: document.getElementById('f_clientAccount').value.trim(), clientBik: document.getElementById('f_clientBik').value.trim(),
+    clientBank: document.getElementById('f_clientBank').value.trim(), clientKorr: document.getElementById('f_clientKorr').value.trim(),
+    clientFactAddress: document.getElementById('f_clientFactAddress').value.trim(),
+    productName: prod, productSku: document.getElementById('f_productSku').value.trim(),
+    quantity: Number(qty), unit: document.getElementById('f_unit').value,
+    insuranceEnabled, declaredValue, insuranceCompany,
+    storageArea: Number(area), storageRate: Number(rate), startDate: sd, durationMonths: Number(dur),
+    penaltyType: document.getElementById('f_penaltyType').value,
+    penaltyPercent: Number(document.getElementById('f_penaltyPercent').value),
+    penaltyPerDay: Number(document.getElementById('f_penaltyPerDay').value),
+    maxPenalty: Number(document.getElementById('f_maxPenalty').value),
+    notes: document.getElementById('f_notes').value.trim(),
+  };
+
+  try {
+    var url = editingId ? '/api/contracts/'+editingId : '/api/contracts';
+    var method = editingId ? 'PUT' : 'POST';
+    var res = await fetch(url, { method, credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+    if (res.ok) {
+      var saved = await res.json();
+      if (!saved._id) saved._id = String(saved.id);
+      if (editingId) { var i=contracts.findIndex(function(c){return c._id===editingId;}); if(i!==-1) contracts[i]=saved; }
+      else contracts.unshift(saved);
+    } else { throw new Error(); }
+  } catch(e) {
+    var storagePm = Number(area) * Number(rate);
+    var premium   = insuranceEnabled ? Math.round(declaredValue * 0.1) : 0;
+    var end = new Date(sd); end.setMonth(end.getMonth() + Number(dur));
+    var mock = Object.assign({}, data, {
+      _id: String(Date.now()),
+      number: 'ДХ-' + new Date().getFullYear() + '-' + String(contracts.length+1).padStart(4,'0'),
+      status: 'active', createdAt: new Date().toISOString(),
+      storageCostPerMonth: storagePm,
+      totalStorageCost: storagePm * Number(dur),
+      insurancePremium: premium,
+      endDate: end.toISOString().split('T')[0],
+    });
+    if (editingId) { var i=contracts.findIndex(function(c){return c._id===editingId;}); if(i!==-1) contracts[i]=Object.assign({},contracts[i],data,{insurancePremium:premium}); }
+    else contracts.unshift(mock);
+  }
+
+  closeModal();
+  renderContracts();
+  updateStats();
+  showToast('success','✅', editingId ? 'Договор обновлён' : 'Договор создан');
+}
+
+async function changeStatus(id, status) {
+  try { await fetch('/api/contracts/'+id, { method:'PUT', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status}) }); }
+  catch(e) {}
+  var c = contracts.find(function(x){ return x._id===id; });
+  if (c) c.status = status;
+  renderContracts(); updateStats();
+  showToast('success','✅','Статус обновлён');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId=null; }
+
+// ─── ПЕЧАТЬ ДОГОВОРА ─────────────────────────────────────────
+function printContract(id) {
+  var c = contracts.find(function(x){ return x._id===id; });
+  if (!c) return;
+
+  var start  = new Date(c.startDate).toLocaleDateString('ru-RU');
+  var end    = new Date(c.endDate).toLocaleDateString('ru-RU');
+  var today  = new Date().toLocaleDateString('ru-RU');
+  var now    = new Date();
+  var overdue= Math.max(0, Math.floor((now - new Date(c.endDate)) / 86400000));
+  var penalty= calcPenalty(c, overdue);
+  var penDesc= c.penaltyType==='fixed'
+    ? (c.penaltyPerDay||0).toLocaleString('ru') + ' ₽ в день'
+    : (c.penaltyPercent||1.5) + '% от стоимости хранения в день';
+
+  // Блок страхования
+  var insSection = c.insuranceEnabled
+    ? `<div class="doc-ins-box">
+        <div class="doc-ins-title">🛡️ Страхование товара</div>
+        <p>Хранитель действует в качестве страхового агента <strong>${c.insuranceCompany||'СтрахПро'}</strong>.</p>
+        <p>Поклажедатель самостоятельно оценивает стоимость передаваемого на хранение товара.</p>
+        <table class="doc-table" style="margin-top:6pt">
+          <tr><th>Параметр</th><th>Значение</th></tr>
+          <tr><td>Объявленная стоимость товара</td><td><strong>${(c.declaredValue||0).toLocaleString('ru')} ₽</strong></td></tr>
+          <tr><td>Страховой взнос (10%)</td><td><strong>${(c.insurancePremium||0).toLocaleString('ru')} ₽</strong></td></tr>
+        </table>
+        <p style="margin-top:8pt">В случае утраты, недостачи или повреждения товара по вине Хранителя страховая компания <strong>${c.insuranceCompany||'СтрахПро'}</strong> возмещает Поклажедателю ущерб в размере объявленной стоимости.</p>
+        <p><em>Закупочная цена товара является коммерческой тайной Поклажедателя и не фиксируется в настоящем договоре.</em></p>
+       </div>`
+    : `<div class="doc-no-ins-box">
+        <p>⚠️ <strong>Страхование товара не оформлено.</strong> Поклажедатель отказался от страхования. Ответственность Хранителя за утрату или повреждение товара ограничена условиями настоящего договора (раздел 5).</p>
+       </div>`;
+
+  document.getElementById('printDoc').innerHTML = `
+    <div class="doc-header">
+      <div class="doc-logo">СКЛАД ПРО</div>
+      <div class="doc-title">Договор ответственного хранения</div>
+      <div class="doc-number">№ ${c.number} от ${today}</div>
+    </div>
+    <div class="doc-section">
+      <h3>1. Стороны договора</h3>
+      <div class="doc-parties">
+        <p><strong>Хранитель:</strong> ООО «СкладПро», адрес: г. Москва, Промышленная ул., д. 12, ИНН 7700000001</p>
+        <p><strong>Поклажедатель:</strong> ${c.clientName}${c.clientInn?', ИНН '+c.clientInn:''}${c.clientKpp?', КПП '+c.clientKpp:''}${c.clientOgrn?', ОГРН '+c.clientOgrn:''}</p>
+        <p><strong>Адрес:</strong> ${c.clientAddress||'—'}${c.clientFactAddress&&c.clientFactAddress!==c.clientAddress?'; факт.: '+c.clientFactAddress:''}</p>
+        ${c.clientAccount?'<p><strong>Банк:</strong> '+c.clientBank+', р/с '+c.clientAccount+', БИК '+c.clientBik+', к/с '+c.clientKorr+'</p>':''}
+        ${c.clientContact?'<p><strong>Контакт:</strong> '+c.clientContact+(c.clientPhone?', тел.: '+c.clientPhone:'')+(c.clientEmail?', email: '+c.clientEmail:'')+'</p>':''}
+      </div>
+    </div>
+    <div class="doc-section">
+      <h3>2. Предмет договора</h3>
+      <p>Хранитель принимает на ответственное хранение товар Поклажедателя и обязуется обеспечить его сохранность в течение установленного срока.</p>
+      <table class="doc-table">
+        <thead><tr><th>Наименование товара</th><th>Артикул</th><th>Количество</th><th>Ед.</th></tr></thead>
+        <tbody><tr>
+          <td>${c.productName}</td><td>${c.productSku||'—'}</td>
+          <td>${c.quantity}</td><td>${c.unit}</td>
+        </tr></tbody>
+      </table>
+      ${c.notes?'<p><strong>Особые условия хранения:</strong> '+c.notes+'</p>':''}
+    </div>
+    <div class="doc-section">
+      <h3>3. Страхование товара</h3>
+      ${insSection}
+    </div>
+    <div class="doc-section">
+      <h3>4. Сроки и стоимость хранения</h3>
+      <table class="doc-table">
+        <tr><th style="width:50%">Параметр</th><th>Значение</th></tr>
+        <tr><td>Площадь хранения</td><td>${c.storageArea} м²</td></tr>
+        <tr><td>Тариф хранения</td><td>${c.storageRate.toLocaleString('ru')} ₽ за м² в месяц</td></tr>
+        <tr><td>Стоимость хранения в месяц</td><td>${c.storageCostPerMonth.toLocaleString('ru')} ₽</td></tr>
+        <tr><td>Срок хранения</td><td>${c.durationMonths} мес. (с ${start} по ${end})</td></tr>
+        <tr><td><strong>Итого стоимость хранения</strong></td><td><strong>${c.totalStorageCost.toLocaleString('ru')} ₽</strong></td></tr>
+        ${c.insuranceEnabled?'<tr><td>Страховой взнос</td><td><strong style="color:#1a7a1a">'+((c.insurancePremium||0).toLocaleString('ru'))+' ₽</strong></td></tr>':''}
+        <tr><td><strong>Итого к оплате</strong></td><td><strong>${(c.totalStorageCost+(c.insurancePremium||0)).toLocaleString('ru')} ₽</strong></td></tr>
+      </table>
+    </div>
+    <div class="doc-section">
+      <h3>5. Ответственность и санкции за несвоевременный вывоз</h3>
+      <p>В случае если по истечении срока хранения (${end}) Поклажедатель не вывез товар, Хранитель вправе начислять неустойку за каждый день просрочки в размере: <strong>${penDesc}</strong>.</p>
+      ${c.maxPenalty>0?'<p>Максимальная неустойка: <strong>'+c.maxPenalty.toLocaleString('ru')+' ₽</strong>.</p>':''}
+      ${overdue>0?'<p style="color:red"><strong>⚠ Текущая просрочка: '+overdue+' дн., штраф: '+penalty.toLocaleString('ru')+' ₽</strong></p>':''}
+    </div>
+    <div class="doc-section">
+      <h3>6. Прочие условия</h3>
+      <p>Настоящий договор составлен в двух экземплярах, имеющих одинаковую юридическую силу, по одному для каждой из Сторон.</p>
+    </div>
+    <div class="doc-signatures">
+      <div class="sig-block">
+        <p><strong>ХРАНИТЕЛЬ:</strong></p>
+        <p>ООО «СкладПро»</p><p>ИНН 7700000001</p><p>г. Москва, Промышленная ул., 12</p>
+        <div class="sig-line">Подпись _________________ / _________________ /</div>
+        <div class="doc-stamp">М.П.</div>
+      </div>
+      <div class="sig-block">
+        <p><strong>ПОКЛАЖЕДАТЕЛЬ:</strong></p>
+        <p>${c.clientName}</p>
+        ${c.clientInn?'<p>ИНН '+c.clientInn+'</p>':''}
+        ${c.clientAddress?'<p>'+c.clientAddress+'</p>':''}
+        <div class="sig-line">Подпись _________________ / _________________ /</div>
+        <div class="doc-stamp">М.П.</div>
+      </div>
+    </div>`;
+
+  document.getElementById('printOverlay').classList.add('open');
+}
+
+function closePrint() { document.getElementById('printOverlay').classList.remove('open'); }
+
+// ─── УТИЛИТЫ ─────────────────────────────────────────────────
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+}
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+})();
+
+async function logout(){ await fetch('/auth/logout',{method:'POST',credentials:'include'}); location.href='/login'; }
+function showToast(type,icon,text){
+  var t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=icon; document.getElementById('toastText').textContent=text;
+  t.className='toast '+type+' show'; setTimeout(function(){t.classList.remove('show');},3500);
+}
+
+document.getElementById('searchInput').addEventListener('input', renderContracts);
+document.getElementById('statusFilter').addEventListener('change', renderContracts);
+document.getElementById('modalOverlay').addEventListener('click', function(e){ if(e.target.id==='modalOverlay') closeModal(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeModal(); closePrint(); } });
+
+function toggleSection(titleEl){ titleEl.parentElement.classList.toggle('collapsed'); }
+function initSections(){
+  var sections = document.querySelectorAll('.form-section');
+  sections.forEach(function(s,i){ if(i===0) s.classList.remove('collapsed'); else s.classList.add('collapsed'); });
+}
+
+// Предзаполнение из заявки
+var prefill = sessionStorage.getItem('prefillContract');
+if (prefill) {
+  sessionStorage.removeItem('prefillContract');
+  var r = JSON.parse(prefill);
+  openCreateModal();
+  document.getElementById('f_clientName').value    = r.clientName || '';
+  document.getElementById('f_clientPhone').value   = r.clientPhone || '';
+  document.getElementById('f_clientEmail').value   = r.clientEmail || '';
+  document.getElementById('f_storageArea').value   = r.area || '';
+  document.getElementById('f_storageRate').value   = r.storageRate || 1200;
+  document.getElementById('f_durationMonths').value= r.periodMonths || 1;
+  document.getElementById('f_startDate').value     = r.startDate || new Date().toISOString().split('T')[0];
+  // Страховка из заявки
+  if (r.insuranceEnabled) {
+    setInsForm(true);
+    document.getElementById('f_declaredValue').value = r.declaredValue || '';
+  }
+  calcPreview();
+}
+
+init();
+</script>
+</body>
+</html>

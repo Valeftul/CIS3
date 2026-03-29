@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>СкладПро — Заявки с сайта</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #0f1117;
+            --surface: #181c27;
+            --surface2: #1f2538;
+            --border: #2a3050;
+            --accent: #f0a500;
+            --accent2: #e05c2a;
+            --green: #2ed573;
+            --yellow: #ffd32a;
+            --red: #ff4757;
+            --blue: #3d8bff;
+            --text: #e8ecf4;
+            --muted: #6b7599;
+            --font-head: 'Bebas Neue', sans-serif;
+            --font-body: 'Golos Text', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        [data-theme="light"] {
+            --bg: #f0f2f7;
+            --surface: #ffffff;
+            --surface2: #e8ecf4;
+            --border: #d0d8e8;
+            --accent: #f0a500;
+            --accent2: #e05c2a;
+            --green: #1a9e52;
+            --yellow: #d4a000;
+            --red: #d63045;
+            --blue: #2a6fd4;
+            --text: #1a1e2e;
+            --muted: #6b7599;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden
+        }
+
+        .sidebar {
+            width: 240px;
+            min-height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto
+        }
+
+        .logo {
+            padding: 28px 24px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .logo-title {
+            font-family: var(--font-head);
+            font-size: 32px;
+            letter-spacing: 2px;
+            color: var(--accent);
+            line-height: 1;
+            cursor: pointer
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 4px
+        }
+
+        .nav {
+            padding: 16px 12px;
+            flex: 1
+        }
+
+        .nav-section {
+            margin-bottom: 24px
+        }
+
+        .nav-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--muted);
+            padding: 0 12px 8px
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--muted);
+            font-weight: 500;
+            transition: all .18s;
+            position: relative;
+            text-decoration: none
+        }
+
+        .nav-item:hover {
+            background: var(--surface2);
+            color: var(--text)
+        }
+
+        .nav-item.active {
+            background: rgba(240, 165, 0, .12);
+            color: var(--accent)
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 20%;
+            bottom: 20%;
+            width: 3px;
+            background: var(--accent);
+            border-radius: 0 3px 3px 0
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            width: 22px;
+            text-align: center;
+            flex-shrink: 0
+        }
+
+        .sidebar-user {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--bg);
+            flex-shrink: 0
+        }
+
+        .user-info {
+            flex: 1;
+            min-width: 0
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .user-role {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 16px;
+            padding: 4px;
+            transition: color .2s
+        }
+
+        .logout-btn:hover {
+            color: var(--red)
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .page-title {
+            font-family: var(--font-head);
+            font-size: 28px;
+            letter-spacing: 1.5px;
+            line-height: 1
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .search-wrap {
+            position: relative
+        }
+
+        .search-input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 13px;
+            padding: 8px 12px 8px 36px;
+            width: 220px;
+            outline: none;
+            transition: border-color .2s
+        }
+
+        .search-input:focus {
+            border-color: var(--accent)
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-family: var(--font-body);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all .18s
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg)
+        }
+
+        .btn-primary:hover {
+            background: #ffb929;
+            transform: translateY(-1px)
+        }
+
+        .btn-ghost {
+            background: var(--surface2);
+            color: var(--text);
+            border: 1px solid var(--border)
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent)
+        }
+
+        .btn-danger {
+            background: rgba(255, 71, 87, .12);
+            color: var(--red);
+            border: 1px solid rgba(255, 71, 87, .3)
+        }
+
+        .btn-danger:hover {
+            background: rgba(255, 71, 87, .22)
+        }
+
+        .btn-sm {
+            padding: 5px 12px;
+            font-size: 12px
+        }
+
+        .select-input {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 13px;
+            padding: 8px 12px;
+            outline: none;
+            cursor: pointer
+        }
+
+        .select-input:focus {
+            border-color: var(--accent)
+        }
+
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .page-title {
+            font-family: var(--font-head);
+            font-size: 28px;
+            letter-spacing: 1.5px;
+            line-height: 1
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .content {
+            padding: 28px 32px;
+            flex: 1;
+            overflow-y: auto
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap
+        }
+
+        .mini-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 140px
+        }
+
+        .mini-icon {
+            font-size: 24px
+        }
+
+        .mini-val {
+            font-family: var(--font-head);
+            font-size: 28px;
+            letter-spacing: 1px;
+            line-height: 1
+        }
+
+        .mini-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px
+        }
+
+        .mini-stat.yellow .mini-val {
+            color: var(--accent)
+        }
+
+        .mini-stat.green .mini-val {
+            color: var(--green)
+        }
+
+        .mini-stat.blue .mini-val {
+            color: var(--blue)
+        }
+
+        .mini-stat.red .mini-val {
+            color: var(--red)
+        }
+
+        .table-wrap {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .table-title {
+            font-family: var(--font-head);
+            font-size: 18px;
+            letter-spacing: 1px
+        }
+
+        .table-count {
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .req-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .req-table th {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            text-align: left;
+            padding: 10px 16px;
+            background: var(--surface2);
+            white-space: nowrap
+        }
+
+        .req-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle
+        }
+
+        .req-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .req-table tr:hover td {
+            background: rgba(255, 255, 255, .025)
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted)
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: .4
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 400;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .3s ease;
+            pointer-events: none;
+            min-width: 260px
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1
+        }
+
+        .toast.success {
+            border-left: 3px solid var(--green)
+        }
+
+        .toast.error {
+            border-left: 3px solid var(--red)
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg)
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .content {
+                padding: 16px
+            }
+
+            .topbar {
+                padding: 14px 16px
+            }
+        }
+
+        .content {
+            padding: 28px 32px;
+            flex: 1;
+            overflow-y: auto
+        }
+
+        /* STATS */
+        .stats-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 28px;
+            flex-wrap: wrap
+        }
+
+        .mini-stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+            min-width: 140px;
+            animation: fadeUp .4s ease both
+        }
+
+        .mini-stat:nth-child(1) {
+            animation-delay: .05s
+        }
+
+        .mini-stat:nth-child(2) {
+            animation-delay: .10s
+        }
+
+        .mini-stat:nth-child(3) {
+            animation-delay: .15s
+        }
+
+        .mini-stat:nth-child(4) {
+            animation-delay: .20s
+        }
+
+        .mini-icon {
+            font-size: 24px
+        }
+
+        .mini-val {
+            font-family: var(--font-head);
+            font-size: 28px;
+            letter-spacing: 1px;
+            line-height: 1
+        }
+
+        .mini-label {
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px
+        }
+
+        .mini-stat.yellow .mini-val {
+            color: var(--accent)
+        }
+
+        .mini-stat.green .mini-val {
+            color: var(--green)
+        }
+
+        .mini-stat.blue .mini-val {
+            color: var(--blue)
+        }
+
+        .mini-stat.red .mini-val {
+            color: var(--red)
+        }
+
+        /* ДВУХКОЛОНОЧНЫЙ ЛЭЙАУТ */
+        .two-col {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 20px;
+            animation: fadeUp .4s ease .2s both
+        }
+
+        /* СПИСОК ПОСТАВЩИКОВ */
+        .suppliers-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between
+        }
+
+        .panel-title {
+            font-family: var(--font-head);
+            font-size: 18px;
+            letter-spacing: 1px
+        }
+
+        .supplier-list {
+            flex: 1;
+            overflow-y: auto;
+            max-height: calc(100vh - 320px)
+        }
+
+        .supplier-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            gap: 14px;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: all .15s;
+            position: relative;
+        }
+
+        .supplier-item:last-child {
+            border-bottom: none
+        }
+
+        .supplier-item:hover {
+            background: var(--surface2)
+        }
+
+        .supplier-item.selected {
+            background: rgba(240, 165, 0, .08);
+            border-left: 3px solid var(--accent)
+        }
+
+        .supplier-item.selected::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--accent)
+        }
+
+        .sup-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0
+        }
+
+        .sup-name {
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .sup-meta {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px
+        }
+
+        .sup-right {
+            margin-left: auto;
+            text-align: right
+        }
+
+        .sup-turnover {
+            font-family: var(--font-head);
+            font-size: 18px;
+            color: var(--accent)
+        }
+
+        .sup-items {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        /* ДЕТАЛИ ПОСТАВЩИКА */
+        .detail-panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column
+        }
+
+        .detail-empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        .detail-empty-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            opacity: .25
+        }
+
+        .detail-empty-text {
+            font-size: 15px
+        }
+
+        /* Шапка детали */
+        .detail-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px
+        }
+
+        .detail-title {
+            font-family: var(--font-head);
+            font-size: 26px;
+            letter-spacing: 1px
+        }
+
+        .detail-contacts {
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .contact-item span {
+            color: var(--text)
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0
+        }
+
+        /* Оборот поставщика */
+        .turnover-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .turnover-card {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px
+        }
+
+        .turnover-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            margin-bottom: 6px
+        }
+
+        .turnover-val {
+            font-family: var(--font-head);
+            font-size: 24px;
+            letter-spacing: 1px
+        }
+
+        .turnover-card.green .turnover-val {
+            color: var(--green)
+        }
+
+        .turnover-card.blue .turnover-val {
+            color: var(--blue)
+        }
+
+        .turnover-card.yellow .turnover-val {
+            color: var(--accent)
+        }
+
+        /* Таблица товаров поставщика */
+        .detail-table-wrap {
+            flex: 1;
+            overflow: auto
+        }
+
+        .detail-section-title {
+            font-family: var(--font-head);
+            font-size: 16px;
+            letter-spacing: 1px;
+            padding: 14px 24px 0;
+            color: var(--muted)
+        }
+
+        .sup-products-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .sup-products-table th {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            text-align: left;
+            padding: 10px 16px;
+            background: var(--surface2);
+            white-space: nowrap
+        }
+
+        .sup-products-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle
+        }
+
+        .sup-products-table tr:last-child td {
+            border-bottom: none
+        }
+
+        .sup-products-table tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .prod-name {
+            font-weight: 600
+        }
+
+        .prod-sku {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: monospace
+        }
+
+        .stock-mini {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .stock-bar-mini {
+            width: 60px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden
+        }
+
+        .stock-fill-mini {
+            height: 100%;
+            border-radius: 2px
+        }
+
+        .status-dot-only {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0
+        }
+
+        /* Оборот - история поставок */
+        .history-list {
+            padding: 0 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px
+        }
+
+        .history-type {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0
+        }
+
+        .history-type.income {
+            background: rgba(46, 213, 115, .15)
+        }
+
+        .history-desc {
+            flex: 1
+        }
+
+        .history-product {
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .history-amount {
+            font-family: var(--font-head);
+            font-size: 18px;
+            color: var(--green)
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .75);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px
+        }
+
+        .modal-overlay.open {
+            display: flex
+        }
+
+        .modal {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 480px;
+            max-width: 100%;
+            animation: fadeUp .3s ease
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border)
+        }
+
+        .modal-title {
+            font-family: var(--font-head);
+            font-size: 22px;
+            letter-spacing: 1px
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 20px;
+            padding: 4px;
+            transition: color .2s
+        }
+
+        .modal-close:hover {
+            color: var(--red)
+        }
+
+        .modal-body {
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            padding: 0 24px 24px
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px
+        }
+
+        .field label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted)
+        }
+
+        .field input,
+        .field textarea {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: var(--font-body);
+            font-size: 14px;
+            padding: 10px 12px;
+            outline: none;
+            transition: border-color .2s;
+            resize: none
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: var(--accent)
+        }
+
+        .field input::placeholder,
+        .field textarea::placeholder {
+            color: var(--muted)
+        }
+
+        .two-field {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 400;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            transform: translateY(80px);
+            opacity: 0;
+            transition: all .3s ease;
+            pointer-events: none;
+            min-width: 260px
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1
+        }
+
+        .toast.success {
+            border-left: 3px solid var(--green)
+        }
+
+        .toast.error {
+            border-left: 3px solid var(--red)
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg)
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 3px
+        }
+
+        @media(max-width:1100px) {
+            .two-col {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:768px) {
+            .sidebar {
+                display: none
+            }
+
+            .content {
+                padding: 16px
+            }
+
+            .topbar {
+                padding: 14px 16px
+            }
+
+            .turnover-grid {
+                grid-template-columns: 1fr 1fr
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <aside class="sidebar">
+        <div class="logo">
+            <div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div>
+            <div class="logo-sub">Управление запасами</div>
+        </div>
+        <nav class="nav">
+            <div class="nav-section">
+                <div class="nav-label">Основное</div>
+                <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+                <a class="nav-item" href="/products"><span class="nav-icon">📦</span> Товары</a>
+                <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-label">Справочники</div>
+                <a class="nav-item" href="/suppliers"><span class="nav-icon">🚚</span> Поставщики</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-label">Клиенты</div>
+                <a class="nav-item" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+                <a class="nav-item active" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-label">Финансы и отчёты</div>
+                <a class="nav-item" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+                <a class="nav-item" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+            </div>
+        </nav>
+        <div class="sidebar-user">
+            <div class="avatar" id="userAvatar">АИ</div>
+            <div class="user-info">
+                <div class="user-name" id="userName">Загрузка...</div>
+                <div class="user-role" id="userRole">—</div>
+            </div>
+            <button class="logout-btn" onclick="logout()">⏏</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="page-title">ЗАЯВКИ С САЙТА</div>
+            <div class="topbar-right">
+                <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+                <select class="select-input" id="statusFilter" onchange="loadRequests()">
+                    <option value="">Все статусы</option>
+                    <option value="new">🆕 Новые</option>
+                    <option value="processing">⏳ В работе</option>
+                    <option value="converted">✅ Оформлены</option>
+                    <option value="rejected">❌ Отклонены</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="stats-row">
+                <div class="mini-stat yellow">
+                    <div class="mini-icon">📨</div>
+                    <div>
+                        <div class="mini-val" id="sTotal">0</div>
+                        <div class="mini-label">Всего заявок</div>
+                    </div>
+                </div>
+                <div class="mini-stat red">
+                    <div class="mini-icon">🆕</div>
+                    <div>
+                        <div class="mini-val" id="sNew">0</div>
+                        <div class="mini-label">Новых</div>
+                    </div>
+                </div>
+                <div class="mini-stat blue">
+                    <div class="mini-icon">⏳</div>
+                    <div>
+                        <div class="mini-val" id="sProc">0</div>
+                        <div class="mini-label">В работе</div>
+                    </div>
+                </div>
+                <div class="mini-stat green">
+                    <div class="mini-icon">✅</div>
+                    <div>
+                        <div class="mini-val" id="sConv">0</div>
+                        <div class="mini-label">Оформлено</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <div class="table-header">
+                    <div class="table-title">ВХОДЯЩИЕ ЗАЯВКИ</div>
+                    <div class="table-count" id="reqCount">0 заявок</div>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="req-table">
+                        <thead>
+                            <tr>
+                                <th>Дата</th>
+                                <th>Клиент</th>
+                                <th>Телефон</th>
+                                <th>Email</th>
+                                <th>Секция</th>
+                                <th>Площадь</th>
+                                <th>Срок</th>
+                                <th>Сумма</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reqBody"></tbody>
+                    </table>
+                </div>
+                <div class="empty-state" id="emptyState" style="display:none">
+                    <div class="empty-icon">📨</div>
+                    <div>Заявок пока нет</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">НОВЫЙ ПОСТАВЩИК</div><button class="modal-close"
+                    onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="field"><label>Название организации *</label><input id="f_name" type="text"
+                        placeholder="ООО Канцелярский Дом" /></div>
+                <div class="field"><label>Контактное лицо</label><input id="f_contact" type="text"
+                        placeholder="Иванов Иван Иванович" /></div>
+                <div class="two-field">
+                    <div class="field"><label>Телефон</label><input id="f_phone" type="text"
+                            placeholder="+7 (999) 000-00-00" /></div>
+                    <div class="field"><label>Email</label><input id="f_email" type="text"
+                            placeholder="info@company.ru" /></div>
+                </div>
+                <div class="field"><label>Адрес</label><input id="f_address" type="text"
+                        placeholder="г. Москва, ул. Примерная, 1" /></div>
+                <div class="field"><label>Комментарий</label><textarea id="f_comment" rows="2"
+                        placeholder="Необязательно..."></textarea></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-primary" style="flex:2" onclick="saveSupplier()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+    <script>
+        async function init() {
+            try {
+                const res = await fetch('/auth/me', { credentials: 'include' });
+                const user = await res.json();
+                if (!user) { location.href = '/login'; return; }
+                document.getElementById('userName').textContent = user.displayName;
+                document.getElementById('userRole').textContent = user.role === 'admin' ? 'Администратор' : 'Работник';
+                document.getElementById('userAvatar').textContent = user.displayName.slice(0, 2).toUpperCase();
+            } catch { location.href = '/login'; return; }
+            await loadRequests();
+        }
+
+        async function loadRequests() {
+            try {
+                const res = await fetch('/api/public-requests', { credentials: 'include' });
+                if (!res.ok) throw new Error();
+                let data = await res.json();
+
+                const statusF = document.getElementById('statusFilter').value;
+                if (statusF) data = data.filter(r => r.status === statusF);
+
+                updateStats(data);
+                renderTable(data);
+            } catch (e) {
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        }
+
+        function updateStats(data) {
+            document.getElementById('sTotal').textContent = data.length;
+            document.getElementById('sNew').textContent = data.filter(r => r.status === 'new').length;
+            document.getElementById('sProc').textContent = data.filter(r => r.status === 'processing').length;
+            document.getElementById('sConv').textContent = data.filter(r => r.status === 'converted').length;
+        }
+
+        const ST_LABEL = { new: '🆕 Новая', processing: '⏳ В работе', converted: '✅ Оформлена', rejected: '❌ Отклонена' };
+        const ST_COLOR = { new: 'var(--accent)', processing: 'var(--blue)', converted: 'var(--green)', rejected: 'var(--red)' };
+
+        function renderTable(data) {
+            document.getElementById('reqCount').textContent = data.length + ' заявок';
+            const empty = document.getElementById('emptyState');
+            if (!data.length) { document.getElementById('reqBody').innerHTML = ''; empty.style.display = 'block'; return; }
+            empty.style.display = 'none';
+
+            document.getElementById('reqBody').innerHTML = data.map(r => `
+    <tr>
+      <td style="font-size:12px;color:var(--muted)">${r.createdAt}</td>
+      <td><b>${r.clientName}</b></td>
+      <td><a href="tel:${r.clientPhone}" style="color:var(--blue)">${r.clientPhone}</a></td>
+      <td style="font-size:12px">${r.clientEmail || '—'}</td>
+      <td><b style="color:var(--accent)">${r.sectionId || '—'}</b></td>
+      <td>${r.area} м²</td>
+      <td>${r.periodMonths} мес</td>
+      <td><b>${r.totalCost.toLocaleString('ru')} ₽</b></td>
+      <td><span style="font-size:12px;font-weight:700;color:${ST_COLOR[r.status] || 'var(--muted)'}">${ST_LABEL[r.status] || r.status}</span></td>
+      <td>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${r.status === 'new' ? `<button class="btn btn-ghost btn-sm" onclick="setStatus(${r.id},'processing')">В работу</button>` : ''}
+          ${r.status !== 'converted' && r.status !== 'rejected' ? `<button class="btn btn-primary btn-sm" onclick="convertToContract(${r.id})">→ Договор</button>` : ''}
+          ${r.status !== 'rejected' ? `<button class="btn btn-danger btn-sm" onclick="setStatus(${r.id},'rejected')">Отклонить</button>` : ''}
+        </div>
+      </td>
+    </tr>`).join('');
+        }
+
+        async function setStatus(id, status) {
+            await fetch('/api/public-requests/' + id, {
+                method: 'PUT', credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status })
+            });
+            showToast('success', '✅', 'Статус обновлён');
+            await loadRequests();
+        }
+
+        async function convertToContract(id) {
+            // Помечаем как оформленную и переходим к созданию договора
+            await setStatus(id, 'converted');
+            // Сохраняем данные заявки в sessionStorage для предзаполнения формы договора
+            const res = await fetch('/api/public-requests', { credentials: 'include' });
+            const list = await res.json();
+            const req = list.find(r => r.id === id);
+            if (req) sessionStorage.setItem('prefillContract', JSON.stringify(req));
+            location.href = '/contracts';
+        }
+
+        function toggleTheme() {
+            var t = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', t);
+            localStorage.setItem('theme', t);
+            document.getElementById('themeBtn').textContent = t === 'light' ? '🌙' : '☀️';
+        }
+        (function () {
+            var t = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', t);
+            var btn = document.getElementById('themeBtn');
+            if (btn) btn.textContent = t === 'light' ? '🌙' : '☀️';
+        })();
+
+        async function logout() { await fetch('/auth/logout', { method: 'POST', credentials: 'include' }); location.href = '/login'; }
+        function showToast(type, icon, text) {
+            const t = document.getElementById('toast');
+            document.getElementById('toastIcon').textContent = icon;
+            document.getElementById('toastText').textContent = text;
+            t.className = `toast ${type} show`;
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

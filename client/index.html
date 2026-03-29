@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>СкладПро — Вход</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:       #0f1117;
+    --surface:  #181c27;
+    --surface2: #1f2538;
+    --border:   #2a3050;
+    --accent:   #f0a500;
+    --accent2:  #e05c2a;
+    --green:    #2ed573;
+    --red:      #ff4757;
+    --text:     #e8ecf4;
+    --muted:    #6b7599;
+    --font-head:'Bebas Neue', sans-serif;
+    --font-body:'Golos Text', sans-serif;
+  }
+  [data-theme="light"] {
+  --bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;
+  --accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;
+  --red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;
+}
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ─── LEFT PANEL ─── */
+  .left-panel {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px;
+    overflow: hidden;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+  }
+
+  /* Сетка на фоне */
+  .left-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.35;
+  }
+
+  /* Диагональный акцент */
+  .left-panel::after {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(240,165,0,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .brand { position: relative; z-index: 1; }
+  .brand-title {
+    font-family: var(--font-head);
+    font-size: 64px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    line-height: 1;
+    animation: slideDown 0.6s ease both;
+  }
+  .brand-sub {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-top: 6px;
+    animation: slideDown 0.6s ease 0.1s both;
+  }
+
+  /* Большие цифры-фичи */
+  .features {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: slideDown 0.6s ease 0.2s both;
+  }
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .feature-num {
+    font-family: var(--font-head);
+    font-size: 48px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    opacity: 0.25;
+    min-width: 80px;
+    line-height: 1;
+  }
+  .feature-text strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .feature-text span {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .left-footer {
+    position: relative;
+    z-index: 1;
+    font-size: 12px;
+    color: var(--muted);
+    animation: slideDown 0.6s ease 0.3s both;
+  }
+
+  /* ─── RIGHT PANEL (форма) ─── */
+  .right-panel {
+    width: 460px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 40px;
+    background: var(--bg);
+    position: relative;
+  }
+
+  .form-wrap {
+    width: 100%;
+    animation: fadeUp 0.5s ease 0.15s both;
+  }
+
+  .form-header { margin-bottom: 36px; }
+  .form-title {
+    font-family: var(--font-head);
+    font-size: 42px;
+    letter-spacing: 2px;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .form-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* Поля */
+  .field { margin-bottom: 20px; }
+  .field-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .field-wrap { position: relative; }
+  .field-icon {
+    position: absolute;
+    left: 14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .field-input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    padding: 14px 14px 14px 44px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .field-input::placeholder { color: var(--muted); }
+  .field-input:focus {
+    border-color: var(--accent);
+    background: var(--surface2);
+  }
+  .field-input.error { border-color: var(--red); }
+
+  /* Показать пароль */
+  .toggle-pass {
+    position: absolute;
+    right: 14px; top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--muted);
+    padding: 4px;
+    transition: color 0.2s;
+  }
+  .toggle-pass:hover { color: var(--text); }
+
+  /* Ошибка */
+  .error-msg {
+    display: none;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,71,87,0.1);
+    border: 1px solid rgba(255,71,87,0.3);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--red);
+    margin-bottom: 20px;
+    animation: shake 0.4s ease;
+  }
+  .error-msg.visible { display: flex; }
+
+  /* Кнопка входа */
+  .btn-login {
+    width: 100%;
+    padding: 16px;
+    background: var(--accent);
+    color: var(--bg);
+    font-family: var(--font-head);
+    font-size: 22px;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .btn-login:hover { background: #ffb929; transform: translateY(-1px); }
+  .btn-login:active { transform: translateY(0); }
+  .btn-login:disabled {
+    background: var(--border);
+    color: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Спиннер внутри кнопки */
+  .btn-loader {
+    display: none;
+    width: 20px; height: 20px;
+    border: 2px solid rgba(15,17,23,0.3);
+    border-top-color: var(--bg);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin: 0 auto;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .hint-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .hint-box strong { color: var(--text); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 4px; }
+  .hint-code {
+    font-family: monospace;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 6px;
+    color: var(--accent);
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .hint-code:hover { background: rgba(240,165,0,0.1); }
+
+  /* Прогресс-бар загрузки */
+  .progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0%;
+    transition: width 0.3s ease;
+    z-index: 999;
+    display: none;
+  }
+
+  /* АНИМАЦИИ */
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%     { transform: translateX(-6px); }
+    40%     { transform: translateX(6px); }
+    60%     { transform: translateX(-4px); }
+    80%     { transform: translateX(4px); }
+  }
+
+  /* Пульсация на лейбле при фокусе */
+  .field-input:focus + .field-label,
+  .field-wrap:focus-within ~ .field-label { color: var(--accent); }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .left-panel { display: none; }
+    .right-panel { width: 100%; padding: 32px 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- ═══════════════ LEFT ═══════════════ -->
+<div class="left-panel">
+  <div class="brand">
+    <div class="brand-title">СКЛАД ПРО</div>
+    <div class="brand-sub">Система управления запасами</div>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-num">01</div>
+      <div class="feature-text">
+        <strong>Учёт в реальном времени</strong>
+        <span>Приход, расход и списание мгновенно обновляют остатки</span>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">02</div>
+      <div class="feature-text">
+        <strong>Контроль остатков</strong>
+        <span>Автоматические уведомления при низком запасе товара</span>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">03</div>
+      <div class="feature-text">
+        <strong>Роли и доступы</strong>
+        <span>Разграничение прав между администраторами и работниками</span>
+      </div>
+    </div>
+    <div class="feature">
+      <div class="feature-num">04</div>
+      <div class="feature-text">
+        <strong>Аналитика и отчёты</strong>
+        <span>Графики движения товаров и стоимости склада</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="left-footer">
+    © 2025 СкладПро &mdash; Складской учёт и управление запасами
+  </div>
+</div>
+
+<!-- ═══════════════ RIGHT (форма) ═══════════════ -->
+<div class="right-panel">
+  <div class="form-wrap">
+
+    <div class="form-header">
+      <div class="form-title">ВХОД В СИСТЕМУ</div>
+      <div class="form-desc">Введите ваши учётные данные<br>для доступа к складу</div>
+    </div>
+
+    <!-- Ошибка -->
+    <div class="error-msg" id="errorMsg">
+      <span>⚠</span>
+      <span id="errorText">Неверный логин или пароль</span>
+    </div>
+
+    <form id="loginForm" autocomplete="off">
+
+      <div class="field">
+        <label class="field-label" for="username">Логин</label>
+        <div class="field-wrap">
+          <span class="field-icon">👤</span>
+          <input
+            class="field-input"
+            id="username"
+            type="text"
+            placeholder="Введите логин"
+            autocomplete="username"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Пароль</label>
+        <div class="field-wrap">
+          <span class="field-icon">🔒</span>
+          <input
+            class="field-input"
+            id="password"
+            type="password"
+            placeholder="Введите пароль"
+            autocomplete="current-password"
+            required
+          />
+          <button type="button" class="toggle-pass" id="togglePass" title="Показать пароль">👁</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-login" id="loginBtn">
+        <span id="btnText">ВОЙТИ</span>
+        <div class="btn-loader" id="btnLoader"></div>
+      </button>
+
+    </form>
+
+    <div class="divider">для первого запуска</div>
+
+    
+
+  </div>
+</div>
+
+<script>
+// ─── ВХОД ───────────────────────────────────────────────
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const btnText   = document.getElementById('btnText');
+  const btnLoader = document.getElementById('btnLoader');
+  const loginBtn  = document.getElementById('loginBtn');
+  const errorMsg  = document.getElementById('errorMsg');
+  const errorText = document.getElementById('errorText');
+  const progress  = document.getElementById('progressBar');
+
+  // Сброс ошибки
+  errorMsg.classList.remove('visible');
+  document.getElementById('username').classList.remove('error');
+  document.getElementById('password').classList.remove('error');
+
+  // Лоадер
+  btnText.style.display   = 'none';
+  btnLoader.style.display = 'block';
+  loginBtn.disabled       = true;
+  progress.style.display  = 'block';
+  progress.style.width    = '40%';
+
+  try {
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+
+    progress.style.width = '80%';
+
+    if (res.ok) {
+      progress.style.width = '100%';
+      btnText.textContent   = '✓ ВХОЖУ...';
+      btnText.style.display = 'block';
+      btnLoader.style.display = 'none';
+      loginBtn.style.background = 'var(--green)';
+
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 400);
+
+    } else {
+      const data = await res.json().catch(() => ({}));
+      const msg  = data.error || 'Неверный логин или пароль';
+
+      errorText.textContent = msg;
+      errorMsg.classList.add('visible');
+
+      document.getElementById('username').classList.add('error');
+      document.getElementById('password').classList.add('error');
+      document.getElementById('password').value = '';
+
+      // Сброс кнопки
+      btnText.style.display   = 'block';
+      btnLoader.style.display = 'none';
+      loginBtn.disabled       = false;
+      progress.style.width    = '0%';
+      setTimeout(() => { progress.style.display = 'none'; }, 300);
+    }
+
+  } catch (err) {
+    errorText.textContent = 'Нет соединения с сервером';
+    errorMsg.classList.add('visible');
+
+    btnText.style.display   = 'block';
+    btnLoader.style.display = 'none';
+    loginBtn.disabled       = false;
+    progress.style.width    = '0%';
+    setTimeout(() => { progress.style.display = 'none'; }, 300);
+  }
+});
+
+// ─── ПОКАЗАТЬ ПАРОЛЬ ────────────────────────────────────
+document.getElementById('togglePass').addEventListener('click', () => {
+  const inp = document.getElementById('password');
+  const btn = document.getElementById('togglePass');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+});
+
+// ТЕМА
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+}
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeBtn');
+  if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+})();
+
+// ─── КОПИРОВАТЬ КОМАНДУ ─────────────────────────────────
+function copyCmd(el) {
+  const text = `curl -X POST http://localhost:5000/auth/register -H "Content-Type: application/json" -d '{"username":"admin","password":"admin123","displayName":"Администратор","role":"admin"}'`;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = el.innerHTML;
+    el.innerHTML = '✓ Скопировано!';
+    el.style.color = 'var(--green)';
+    setTimeout(() => { el.innerHTML = orig; el.style.color = ''; }, 2000);
+  });
+}
+
+// ─── ЕСЛИ УЖЕ АВТОРИЗОВАН — РЕДИРЕКТ ───────────────────
+fetch('/auth/me', { credentials: 'include' })
+  .then(r => r.json())
+  .then(user => {
+    if (user) window.location.href = '/dashboard';
+  })
+  .catch(() => {});
+
+// Фокус на поле логина
+document.getElementById('username').focus();
+</script>
+</body>
+</html>

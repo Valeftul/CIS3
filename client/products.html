@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>СкладПро — Товары на хранении</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;
+    --accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;
+    --red:#ff4757;--blue:#3d8bff;--text:#e8ecf4;--muted:#6b7599;
+    --font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;
+  }
+  [data-theme="light"] {
+    --bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;
+    --accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;
+    --red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+  .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+  .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
+  .logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}
+  .logo-sub{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:2px;margin-top:4px}
+  .nav{padding:16px 12px;flex:1}.nav-section{margin-bottom:24px}
+  .nav-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0 12px 8px}
+  .nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;transition:all .18s;position:relative;text-decoration:none}
+  .nav-item:hover{background:var(--surface2);color:var(--text)}
+  .nav-item.active{background:rgba(240,165,0,.12);color:var(--accent)}
+  .nav-item.active::before{content:'';position:absolute;left:0;top:20%;bottom:20%;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
+  .nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+  .sidebar-user{padding:16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+  .avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--bg);flex-shrink:0}
+  .user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
+  .logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}
+  .logout-btn:hover{color:var(--red)}
+  .main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
+  .page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
+  .topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .search-wrap{position:relative}
+  .search-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px 8px 36px;width:220px;outline:none;transition:border-color .2s}
+  .search-input:focus{border-color:var(--accent)}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+  .select-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:13px;padding:8px 12px;outline:none;cursor:pointer}
+  .select-input:focus{border-color:var(--accent)}
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-family:var(--font-body);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s}
+  .btn-primary{background:var(--accent);color:var(--bg)}.btn-primary:hover{background:#ffb929;transform:translateY(-1px)}
+  .btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-danger{background:rgba(255,71,87,.12);color:var(--red);border:1px solid rgba(255,71,87,.3)}.btn-danger:hover{background:rgba(255,71,87,.22)}
+  .btn-sm{padding:5px 12px;font-size:12px}
+  .content{padding:28px 32px;flex:1;overflow-y:auto}
+
+  /* STATS */
+  .stats-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+  .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;flex:1;min-width:140px;animation:fadeUp .4s ease both}
+  .mini-stat:nth-child(1){animation-delay:.05s}.mini-stat:nth-child(2){animation-delay:.10s}.mini-stat:nth-child(3){animation-delay:.15s}.mini-stat:nth-child(4){animation-delay:.20s}
+  .mini-icon{font-size:24px}.mini-val{font-family:var(--font-head);font-size:28px;letter-spacing:1px;line-height:1}
+  .mini-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
+  .mini-stat.yellow .mini-val{color:var(--accent)}.mini-stat.green .mini-val{color:var(--green)}
+  .mini-stat.orange .mini-val{color:var(--yellow)}.mini-stat.red .mini-val{color:var(--red)}
+
+  .legend{display:flex;gap:16px;margin-bottom:20px;flex-wrap:wrap;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px}
+  .legend-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted)}
+  .legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;animation:fadeUp .4s ease .28s both}
+  .table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
+  .table-title{font-family:var(--font-head);font-size:18px;letter-spacing:1px}.table-count{font-size:12px;color:var(--muted)}
+  .products-table{width:100%;border-collapse:collapse}
+  .products-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2);white-space:nowrap;cursor:pointer;user-select:none}
+  .products-table th:hover{color:var(--accent)}.products-table th.sorted{color:var(--accent)}
+  .products-table td{padding:13px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
+  .products-table tr:last-child td{border-bottom:none}.products-table tr:hover td{background:rgba(255,255,255,.025)}
+  .product-name{font-weight:600;font-size:14px}.product-sku{font-size:11px;color:var(--muted);font-family:monospace;margin-top:2px}
+  .cat-tag{display:inline-block;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px;color:var(--muted)}
+  .stock-wrap{display:flex;align-items:center;gap:10px;min-width:140px}
+  .stock-bar{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden;min-width:50px}
+  .stock-bar-fill{height:100%;border-radius:3px;transition:width .5s ease}
+  .stock-val{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:13px}
+  .status-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .status-ok      {background:rgba(46,213,115,.10);color:var(--green); border:1px solid rgba(46,213,115,.2)}
+  .status-medium  {background:rgba(255,211,42,.10);color:var(--yellow);border:1px solid rgba(255,211,42,.3)}
+  .status-low     {background:rgba(255,71,87,.10); color:var(--red);   border:1px solid rgba(255,71,87,.2)}
+  .status-critical{background:rgba(100,100,100,.15);color:#aaa;        border:1px solid #444}
+  .status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+  .client-cell{font-size:12px;color:var(--blue);font-weight:500}
+  .supplier-link{font-size:12px;color:var(--blue);cursor:pointer;text-decoration:none}.supplier-link:hover{text-decoration:underline}
+  .actions-cell{display:flex;gap:6px}
+  .empty-state{text-align:center;padding:60px 20px;color:var(--muted);display:none}
+  .empty-icon{font-size:48px;margin-bottom:12px;opacity:.4}
+  .pagination{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-top:1px solid var(--border)}
+  .page-info{font-size:12px;color:var(--muted)}.page-btns{display:flex;gap:6px}
+  .page-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:13px;font-weight:600;transition:all .15s}
+  .page-btn:hover{border-color:var(--accent);color:var(--accent)}.page-btn.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}.page-btn:disabled{opacity:.3;cursor:not-allowed}
+
+  /* MODAL */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:520px;max-width:100%;max-height:90vh;overflow-y:auto;animation:fadeUp .3s ease}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+  .modal-title{font-family:var(--font-head);font-size:22px;letter-spacing:1px}
+  .modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;transition:color .2s}.modal-close:hover{color:var(--red)}
+  .modal-body{padding:24px}.modal-footer{display:flex;gap:10px;padding:0 24px 24px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.form-grid .span2{grid-column:span 2}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+  .field input,.field select,.field textarea{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 12px;outline:none;transition:border-color .2s;resize:none}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
+  .field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+
+  .confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;align-items:center;justify-content:center}
+  .confirm-overlay.open{display:flex}
+  .confirm-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:28px;width:360px;text-align:center;animation:fadeUp .25s ease}
+  .confirm-icon{font-size:36px;margin-bottom:12px}.confirm-title{font-family:var(--font-head);font-size:22px;margin-bottom:8px}
+  .confirm-text{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}.confirm-btns{display:flex;gap:10px}
+  .toast{position:fixed;bottom:24px;right:24px;z-index:400;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:500;transform:translateY(80px);opacity:0;transition:all .3s ease;pointer-events:none;min-width:260px}
+  .toast.show{transform:translateY(0);opacity:1}.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+  @media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}.form-grid{grid-template-columns:1fr}.form-grid .span2{grid-column:span 1}}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+  <div class="logo"><div class="logo-title" onclick="location.href='/dashboard'">СКЛАД ПРО</div><div class="logo-sub">Управление запасами</div></div>
+  <nav class="nav">
+    <div class="nav-section">
+      <div class="nav-label">Основное</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⊞</span> Дашборд</a>
+      <a class="nav-item active" href="/products"><span class="nav-icon">📦</span> Товары</a>
+      <a class="nav-item" href="/transactions"><span class="nav-icon">↕️</span> Операции</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Справочники</div>
+      <a class="nav-item" href="/suppliers"><span class="nav-icon">👥</span> Клиенты</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Клиенты</div>
+      <a class="nav-item" href="/contracts"><span class="nav-icon">📄</span> Договоры</a>
+      <a class="nav-item" href="/public-requests"><span class="nav-icon">📨</span> Заявки с сайта</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Финансы и отчёты</div>
+      <a class="nav-item" href="/finances"><span class="nav-icon">💳</span> Финансы</a>
+      <a class="nav-item" href="/analytics"><span class="nav-icon">📊</span> Аналитика</a>
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar" id="userAvatar">АИ</div>
+    <div class="user-info"><div class="user-name" id="userName">Загрузка...</div><div class="user-role" id="userRole">—</div></div>
+    <button class="logout-btn" onclick="logout()">⏏</button>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="topbar">
+    <div class="page-title">ТОВАРЫ НА ХРАНЕНИИ</div>
+    <div class="topbar-right">
+      <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" type="text" placeholder="Название или артикул..." /></div>
+      <select class="select-input" id="categoryFilter"><option value="">Все категории</option></select>
+      <select class="select-input" id="stockFilter">
+        <option value="">Все остатки</option>
+        <option value="ok">✅ В норме</option>
+        <option value="medium">🟡 Средний</option>
+        <option value="low">🔴 Низкий</option>
+        <option value="critical">⚫ Нет в наличии</option>
+      </select>
+      <button class="btn btn-primary" onclick="openModal()">+ Добавить товар</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-row">
+      <div class="mini-stat yellow"><div class="mini-icon">📦</div><div><div class="mini-val" id="sTotal">0</div><div class="mini-label">Товаров на хранении</div></div></div>
+      <div class="mini-stat green"> <div class="mini-icon">✅</div><div><div class="mini-val" id="sOk">0</div><div class="mini-label">В норме</div></div></div>
+      <div class="mini-stat orange"><div class="mini-icon">🟡</div><div><div class="mini-val" id="sMedium">0</div><div class="mini-label">Средний остаток</div></div></div>
+      <div class="mini-stat red">   <div class="mini-icon">⚠️</div><div><div class="mini-val" id="sLow">0</div><div class="mini-label">Низкий / нет</div></div></div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div>В норме — остаток выше 2× минимума</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div>Средний — от минимума до 2× минимума</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div>Низкий — на уровне минимума или ниже</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#555"></div>Нет в наличии — 0 единиц</div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <div><div class="table-title">СПИСОК ТОВАРОВ</div><div class="table-count" id="tableCount">0 позиций</div></div>
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">📥 Экспорт CSV</button>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="products-table">
+          <thead><tr>
+            <th onclick="sortBy('name')" id="th-name">Товар ↕</th>
+            <th>Категория</th>
+            <th onclick="sortBy('quantity')" id="th-quantity">Остаток ↕</th>
+            <th>Статус</th>
+            <th>Клиент / Договор</th>
+            <th>Действия</th>
+          </tr></thead>
+          <tbody id="productsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="emptyState"><div class="empty-icon">📦</div><div>Товары не найдены</div></div>
+      <div class="pagination">
+        <div class="page-info" id="pageInfo">Показано 0–0 из 0</div>
+        <div class="page-btns" id="pageBtns"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title" id="modalTitle">НОВЫЙ ТОВАР</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field span2"><label>Наименование товара *</label><input id="f_name" type="text" placeholder="Например: Бумага А4, 500 листов" /></div>
+        <div class="field"><label>Артикул (SKU) *</label><input id="f_sku" type="text" placeholder="PAP-001" /></div>
+        <div class="field"><label>Категория *</label>
+          <select id="f_category">
+            <option value="">Выберите категорию</option>
+            <option>Бумага и картон</option><option>Канцелярия</option><option>Оргтехника</option>
+            <option>Расходники</option><option>Упаковка</option><option>Мебель</option><option>Хоз. товары</option>
+          </select>
+        </div>
+        <div class="field"><label>Количество *</label><input id="f_quantity" type="number" placeholder="0" min="0" /></div>
+        <div class="field"><label>Единица измерения</label>
+          <select id="f_unit"><option value="шт">шт</option><option value="кг">кг</option><option value="л">л</option><option value="м">м</option><option value="уп">уп</option><option value="бл">бл</option><option value="кор">кор</option></select>
+        </div>
+        <div class="field"><label>Минимальный остаток</label><input id="f_minQuantity" type="number" placeholder="0" min="0" /></div>
+        <div class="field"><label>Клиент (владелец товара)</label><input id="f_clientName" type="text" placeholder="ООО Ромашка" /></div>
+        <div class="field"><label>№ Договора</label><input id="f_contractNum" type="text" placeholder="ДХ-2025-0001" /></div>
+        <div class="field span2"><label>Описание / Особые условия хранения</label><textarea id="f_description" rows="2" placeholder="Хранить в сухом тёмном месте..."></textarea></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Отмена</button>
+      <button class="btn btn-primary" style="flex:2" onclick="saveProduct()">Сохранить товар</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div><div class="confirm-title">УДАЛИТЬ ТОВАР?</div>
+    <div class="confirm-text" id="confirmText">Это действие нельзя отменить.</div>
+    <div class="confirm-btns">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeConfirm()">Отмена</button>
+      <button class="btn btn-danger" style="flex:1" onclick="confirmDelete()">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
+
+<script>
+let products=[], filtered=[], editingId=null, deleteId=null, sortField='name', sortDir=1, currentPage=1;
+const PAGE_SIZE=10;
+
+function getLevel(p){
+  if(p.quantity===0) return 'critical';
+  if(p.quantity<=p.minQuantity) return 'low';
+  if(p.quantity<=p.minQuantity*2) return 'medium';
+  return 'ok';
+}
+function getBadge(p){
+  const lvl=getLevel(p);
+  return {
+    ok:`<span class="status-badge status-ok"><span class="status-dot"></span>В норме</span>`,
+    medium:`<span class="status-badge status-medium"><span class="status-dot"></span>Средний</span>`,
+    low:`<span class="status-badge status-low"><span class="status-dot"></span>Низкий</span>`,
+    critical:`<span class="status-badge status-critical"><span class="status-dot"></span>Нет в наличии</span>`,
+  }[lvl];
+}
+function getColor(p){return{ok:'var(--green)',medium:'var(--yellow)',low:'var(--red)',critical:'#444'}[getLevel(p)];}
+
+async function init(){
+  try{
+    const ctrl=new AbortController(); setTimeout(()=>ctrl.abort(),3000);
+    const res=await fetch('/auth/me',{credentials:'include',signal:ctrl.signal});
+    const user=await res.json();
+    if(!user){location.href='/login';return;}
+    document.getElementById('userName').textContent=user.displayName;
+    document.getElementById('userRole').textContent=user.role==='admin'?'Администратор':'Работник';
+    document.getElementById('userAvatar').textContent=user.displayName.slice(0,2).toUpperCase();
+  }catch{location.href='/login';return;}
+  await loadProducts();
+}
+
+async function loadProducts(){
+  try{
+    const ctrl=new AbortController(); setTimeout(()=>ctrl.abort(),5000);
+    const res=await fetch('/api/products',{credentials:'include',signal:ctrl.signal});
+    if(res.ok){
+      products=await res.json();
+    } else {
+      products=[];
+    }
+  }catch(e){
+    console.error('Ошибка загрузки товаров:', e);
+    products=[];
+  }
+  applyFilters();
+  updateStats();
+  updateCategoryFilter();
+}
+
+function applyFilters(){
+  const s=document.getElementById('searchInput').value.toLowerCase();
+  const c=document.getElementById('categoryFilter').value;
+  const st=document.getElementById('stockFilter').value;
+  filtered=products.filter(p=>{
+    return (!s||p.name.toLowerCase().includes(s)||(p.sku||'').toLowerCase().includes(s))
+        &&(!c||p.category===c)&&(!st||getLevel(p)===st);
+  });
+  filtered.sort((a,b)=>{let av=a[sortField],bv=b[sortField];if(typeof av==='string')av=av.toLowerCase();if(typeof bv==='string')bv=bv.toLowerCase();return av<bv?-sortDir:av>bv?sortDir:0;});
+  currentPage=1;renderTable();
+}
+
+function sortBy(field){
+  if(sortField===field)sortDir*=-1;else{sortField=field;sortDir=1;}
+  document.querySelectorAll('.products-table th').forEach(th=>th.classList.remove('sorted'));
+  const el=document.getElementById(`th-${field}`);if(el)el.classList.add('sorted');
+  applyFilters();
+}
+
+function renderTable(){
+  const tbody=document.getElementById('productsBody');
+  const empty=document.getElementById('emptyState');
+  const total=filtered.length,start=(currentPage-1)*PAGE_SIZE,end=Math.min(start+PAGE_SIZE,total),page=filtered.slice(start,end);
+  document.getElementById('tableCount').textContent=`${total} позиций`;
+  document.getElementById('pageInfo').textContent=`Показано ${total?start+1:0}–${end} из ${total}`;
+  if(!page.length){tbody.innerHTML='';empty.style.display='block';document.getElementById('pageBtns').innerHTML='';return;}
+  empty.style.display='none';
+
+  tbody.innerHTML=page.map(p=>{
+    const id=p._id||p.id;
+    const barMax=Math.max((p.minQuantity||0)*3,p.quantity||0,1);
+    const barPct=Math.min(100,((p.quantity||0)/barMax)*100);
+    const clientHtml=p.clientName
+      ?`<div class="client-cell">${p.clientName}</div><div style="font-size:11px;color:var(--muted)">${p.contractNum||''}</div>`
+      :'—';
+
+    return `<tr>
+      <td><div class="product-name">${p.name}</div><div class="product-sku">${p.sku||''}</div></td>
+      <td><span class="cat-tag">${p.category||'—'}</span></td>
+      <td>
+        <div class="stock-wrap">
+          <div class="stock-bar"><div class="stock-bar-fill" style="width:${barPct}%;background:${getColor(p)}"></div></div>
+          <span class="stock-val" style="color:${getColor(p)}">${p.quantity||0} ${p.unit||'шт'}</span>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-top:3px">мин: ${p.minQuantity||0} ${p.unit||'шт'}</div>
+      </td>
+      <td>${getBadge(p)}</td>
+      <td>${clientHtml}</td>
+      <td><div class="actions-cell">
+        <button class="btn btn-ghost btn-sm" onclick="editProduct('${id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="askDelete('${id}','${p.name.replace(/'/g,"\\'")}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+  renderPagination(total);
+}
+
+function renderPagination(total){
+  const pages=Math.ceil(total/PAGE_SIZE),btns=document.getElementById('pageBtns');
+  if(pages<=1){btns.innerHTML='';return;}
+  let h=`<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}>‹</button>`;
+  for(let i=1;i<=pages;i++)h+=`<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  h+=`<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}>›</button>`;
+  btns.innerHTML=h;
+}
+function goPage(p){const pages=Math.ceil(filtered.length/PAGE_SIZE);if(p<1||p>pages)return;currentPage=p;renderTable();}
+
+function updateStats(){
+  const ok=products.filter(p=>getLevel(p)==='ok').length;
+  const med=products.filter(p=>getLevel(p)==='medium').length;
+  const low=products.filter(p=>['low','critical'].includes(getLevel(p))).length;
+  document.getElementById('sTotal').textContent=products.length;
+  document.getElementById('sOk').textContent=ok;
+  document.getElementById('sMedium').textContent=med;
+  document.getElementById('sLow').textContent=low;
+}
+
+function updateCategoryFilter(){
+  const cats=[...new Set(products.map(p=>p.category).filter(Boolean))].sort();
+  const sel=document.getElementById('categoryFilter'),cur=sel.value;
+  sel.innerHTML='<option value="">Все категории</option>'+cats.map(c=>`<option ${c===cur?'selected':''}>${c}</option>`).join('');
+}
+
+function openModal(product=null){
+  editingId=product?(product._id||product.id):null;
+  document.getElementById('modalTitle').textContent=product?'РЕДАКТИРОВАТЬ ТОВАР':'НОВЫЙ ТОВАР';
+  ['name','sku','quantity','minQuantity','description','clientName','contractNum'].forEach(f=>{
+    const el=document.getElementById(`f_${f}`);
+    if(el)el.value=product?(product[f]??''):'';
+  });
+  if(product?.category)document.getElementById('f_category').value=product.category;
+  else document.getElementById('f_category').value='';
+  if(product?.unit)document.getElementById('f_unit').value=product.unit;
+  else document.getElementById('f_unit').value='шт';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function editProduct(id){
+  const p=products.find(p=>(p._id||p.id)==id||String(p._id||p.id)===String(id));
+  if(p)openModal(p);
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');editingId=null;}
+
+async function saveProduct(){
+  const data={
+    name:        document.getElementById('f_name').value.trim(),
+    sku:         document.getElementById('f_sku').value.trim(),
+    category:    document.getElementById('f_category').value,
+    quantity:    Number(document.getElementById('f_quantity').value)||0,
+    unit:        document.getElementById('f_unit').value,
+    minQuantity: Number(document.getElementById('f_minQuantity').value)||0,
+    clientName:  document.getElementById('f_clientName').value.trim(),
+    contractNum: document.getElementById('f_contractNum').value.trim(),
+    description: document.getElementById('f_description').value.trim(),
+    purchasePrice: 0,
+  };
+  if(!data.name||!data.sku||!data.category){showToast('error','⚠️','Заполните обязательные поля');return;}
+
+  try{
+    let saved;
+    if(editingId){
+      const res=await fetch(`/api/products/${editingId}`,{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!res.ok)throw new Error(await res.text());
+      saved=await res.json();
+      const idx=products.findIndex(p=>String(p._id||p.id)===String(editingId));
+      if(idx!==-1)products[idx]=saved;
+    }else{
+      const res=await fetch('/api/products',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      if(!res.ok)throw new Error(await res.text());
+      saved=await res.json();
+      products.unshift(saved);
+    }
+  }catch(e){
+    showToast('error','⚠️','Ошибка сохранения: '+e.message);
+    return;
+  }
+
+  closeModal();applyFilters();updateStats();updateCategoryFilter();
+  showToast('success','✅',editingId?'Товар обновлён':'Товар добавлен');
+}
+
+function askDelete(id,name){deleteId=id;document.getElementById('confirmText').textContent=`Удалить "${name}"?`;document.getElementById('confirmOverlay').classList.add('open');}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');deleteId=null;}
+async function confirmDelete(){
+  try{
+    const res=await fetch(`/api/products/${deleteId}`,{method:'DELETE',credentials:'include'});
+    if(!res.ok)throw new Error();
+  }catch(e){
+    showToast('error','⚠️','Ошибка удаления');closeConfirm();return;
+  }
+  products=products.filter(p=>String(p._id||p.id)!==String(deleteId));
+  closeConfirm();applyFilters();updateStats();
+  showToast('success','🗑️','Товар удалён');
+}
+
+function exportCSV(){
+  const h=['Название','Артикул','Категория','Кол-во','Ед.','Мин. остаток','Клиент','Договор','Статус'];
+  const rows=filtered.map(p=>[p.name,p.sku,p.category,p.quantity,p.unit,p.minQuantity,p.clientName||'',p.contractNum||'',getLevel(p)]);
+  const csv=[h,...rows].map(r=>r.map(v=>`"${v}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`товары_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  showToast('success','📥','CSV файл скачан');
+}
+
+function toggleTheme(){
+  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+}
+(function(){
+  var t=localStorage.getItem('theme')||'dark';
+  document.documentElement.setAttribute('data-theme',t);
+  var btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+})();
+
+async function logout(){await fetch('/auth/logout',{method:'POST',credentials:'include'});location.href='/login';}
+function showToast(type,icon,text){
+  const t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=icon;document.getElementById('toastText').textContent=text;
+  t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);
+}
+document.getElementById('searchInput').addEventListener('input',applyFilters);
+document.getElementById('categoryFilter').addEventListener('change',applyFilters);
+document.getElementById('stockFilter').addEventListener('change',applyFilters);
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
+document.getElementById('confirmOverlay').addEventListener('click',e=>{if(e.target.id==='confirmOverlay')closeConfirm();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeConfirm();}});
+init();
+</script>
+</body>
+</html>
