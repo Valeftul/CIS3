@@ -422,9 +422,19 @@
         document.getElementById('cnt-products').textContent = data.totalProducts || 0;
         document.getElementById('cnt-low').textContent = (data.lowStockProducts || []).length;
 
+        // Используем totalTransactions если есть, иначе запрашиваем отдельно
+        if (data.totalTransactions !== undefined) {
+          document.getElementById('cnt-ops').textContent = data.totalTransactions;
+        } else {
+          // Fallback: отдельный запрос для точного счётчика
+          fetch('/api/transactions?limit=1', { credentials: 'include' })
+            .then(function(r){ return r.json(); })
+            .then(function(d){ document.getElementById('cnt-ops').textContent = d.total || 0; })
+            .catch(function(){});
+        }
+
         var txs = data.recentTransactions || [];
         allTransactions = txs;
-        document.getElementById('cnt-ops').textContent = txs.length;
         document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 
         renderTransactions(txs);
@@ -438,7 +448,7 @@
       }
     }
 
-    // ─── РЕНДЕР ОПЕРАЦИЙ (БЕЗ СУММЫ) ──────────────────────────────
+    // ─── РЕНДЕР ОПЕРАЦИЙ ──────────────────────────────────────────
     function renderTransactions(list) {
       var txBody = document.getElementById('txBody');
       if (!list || !list.length) {
