@@ -7,10 +7,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-  :root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;--accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;--red:#ff4757;--blue:#3d8bff;--text:#e8ecf4;--muted:#6b7599;--font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;}
+  :root{--bg:#0f1117;--surface:#181c27;--surface2:#1f2538;--border:#2a3050;--accent:#f0a500;--accent2:#e05c2a;--green:#2ed573;--yellow:#ffd32a;--red:#ff4757;--blue:#3d8bff;--purple:#a55eea;--text:#e8ecf4;--muted:#6b7599;--font-head:'Bebas Neue',sans-serif;--font-body:'Golos Text',sans-serif;}
+  [data-theme="light"]{--bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;--accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;--red:#d63045;--blue:#2a6fd4;--purple:#7c3aed;--text:#1a1e2e;--muted:#6b7599;}
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  [data-theme="light"]{--bg:#f0f2f7;--surface:#ffffff;--surface2:#e8ecf4;--border:#d0d8e8;--accent:#f0a500;--accent2:#e05c2a;--green:#1a9e52;--yellow:#d4a000;--red:#d63045;--blue:#2a6fd4;--text:#1a1e2e;--muted:#6b7599;}
   body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:14px;min-height:100vh;display:flex;overflow-x:hidden}
+
+  /* SIDEBAR */
   .sidebar{width:240px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
   .logo{padding:28px 24px 20px;border-bottom:1px solid var(--border)}
   .logo-title{font-family:var(--font-head);font-size:32px;letter-spacing:2px;color:var(--accent);line-height:1;cursor:pointer}
@@ -27,6 +29,7 @@
   .user-info{flex:1;min-width:0}.user-name{font-weight:600;font-size:13px}.user-role{font-size:11px;color:var(--muted)}
   .logout-btn{background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:4px;transition:color .2s}.logout-btn:hover{color:var(--red)}
 
+  /* MAIN */
   .main{flex:1;display:flex;flex-direction:column;min-width:0}
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 32px;border-bottom:1px solid var(--border);background:var(--surface);gap:16px;flex-wrap:wrap}
   .page-title{font-family:var(--font-head);font-size:28px;letter-spacing:1.5px;line-height:1}
@@ -44,70 +47,106 @@
   .content{padding:28px 32px;flex:1;overflow-y:auto}
 
   /* STATS */
-  .stats-row{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
-  .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;flex:1;min-width:140px;animation:fadeUp .4s ease both}
-  .mini-stat:nth-child(1){animation-delay:.05s}.mini-stat:nth-child(2){animation-delay:.10s}.mini-stat:nth-child(3){animation-delay:.15s}
+  .stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+  .mini-stat{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 20px;display:flex;align-items:center;gap:14px;flex:1;min-width:140px;animation:fadeUp .4s ease both;transition:border-color .2s}
+  .mini-stat:hover{border-color:rgba(240,165,0,.3)}
+  .mini-stat:nth-child(1){animation-delay:.05s}.mini-stat:nth-child(2){animation-delay:.10s}.mini-stat:nth-child(3){animation-delay:.15s}.mini-stat:nth-child(4){animation-delay:.20s}
   .mini-icon{font-size:24px}.mini-val{font-family:var(--font-head);font-size:28px;letter-spacing:1px;line-height:1}
   .mini-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px}
-  .mini-stat.yellow .mini-val{color:var(--accent)}.mini-stat.green .mini-val{color:var(--green)}.mini-stat.blue .mini-val{color:var(--blue)}
+  .mini-stat.yellow .mini-val{color:var(--accent)}.mini-stat.green .mini-val{color:var(--green)}.mini-stat.blue .mini-val{color:var(--blue)}.mini-stat.red .mini-val{color:var(--red)}
 
-  /* ДВУХКОЛОНОЧНЫЙ ЛЭЙАУТ */
-  .two-col{display:grid;grid-template-columns:340px 1fr;gap:20px;animation:fadeUp .4s ease .2s both}
+  /* TWO COLUMN */
+  .two-col{display:grid;grid-template-columns:320px 1fr;gap:20px;animation:fadeUp .4s ease .2s both}
 
   /* СПИСОК КЛИЕНТОВ */
   .suppliers-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
   .panel-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
   .panel-title{font-family:var(--font-head);font-size:18px;letter-spacing:1px}
-  .supplier-list{flex:1;overflow-y:auto;max-height:calc(100vh - 320px)}
-  .supplier-item{display:flex;align-items:center;padding:14px 20px;gap:14px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;position:relative;}
+  .supplier-list{flex:1;overflow-y:auto;max-height:calc(100vh - 280px)}
+  .supplier-item{display:flex;align-items:center;padding:14px 16px;gap:12px;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;position:relative}
   .supplier-item:last-child{border-bottom:none}
   .supplier-item:hover{background:var(--surface2)}
   .supplier-item.selected{background:rgba(240,165,0,.08)}
   .supplier-item.selected::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
-  .sup-avatar{width:40px;height:40px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-  .sup-name{font-weight:700;font-size:14px}
-  .sup-meta{font-size:12px;color:var(--muted);margin-top:2px}
-  .sup-right{margin-left:auto;text-align:right}
-  .sup-contracts{font-family:var(--font-head);font-size:18px;color:var(--accent)}
+  .sup-avatar{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:var(--bg);flex-shrink:0}
+  .sup-name{font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sup-meta{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sup-right{margin-left:auto;text-align:right;flex-shrink:0}
+  .sup-contracts-count{font-family:var(--font-head);font-size:18px}
   .sup-items{font-size:11px;color:var(--muted)}
+  /* Индикаторы статусов */
+  .status-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .dot-active{background:var(--green)}.dot-expired{background:var(--red)}.dot-none{background:var(--muted)}
 
   /* ДЕТАЛИ КЛИЕНТА */
-  .detail-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+  .detail-panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:400px}
   .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:60px 20px;text-align:center;color:var(--muted)}
-  .detail-empty-icon{font-size:56px;margin-bottom:16px;opacity:.25}
-  .detail-empty-text{font-size:15px}
+  .detail-empty-icon{font-size:56px;margin-bottom:16px;opacity:.2}
 
-  .detail-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-  .detail-title{font-family:var(--font-head);font-size:26px;letter-spacing:1px}
-  .detail-contacts{margin-top:6px;display:flex;flex-wrap:wrap;gap:12px}
-  .contact-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-  .contact-item span{color:var(--text)}
+  /* Шапка детали */
+  .detail-header{padding:20px 24px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--surface),var(--surface2))}
+  .detail-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
+  .detail-avatar{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:var(--bg);flex-shrink:0}
+  .detail-title{font-family:var(--font-head);font-size:24px;letter-spacing:1px;line-height:1.1}
+  .detail-contacts{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+  .contact-chip{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:3px 10px}
+  .contact-chip span{color:var(--text)}
   .detail-actions{display:flex;gap:8px;flex-shrink:0}
 
-  /* Карточки клиента */
-  .client-info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:20px 24px;border-bottom:1px solid var(--border)}
-  .info-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px}
-  .info-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:6px}
-  .info-card-val{font-weight:600;font-size:14px}
+  /* Сводка KPI клиента */
+  .client-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .client-kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;text-align:center}
+  .client-kpi-val{font-family:var(--font-head);font-size:22px;letter-spacing:1px;line-height:1}
+  .client-kpi-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
 
-  /* Договоры клиента */
-  .detail-table-wrap{flex:1;overflow:auto}
-  .detail-section-title{font-family:var(--font-head);font-size:16px;letter-spacing:1px;padding:16px 24px 8px;color:var(--muted)}
-  .contracts-table{width:100%;border-collapse:collapse}
-  .contracts-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2);white-space:nowrap}
-  .contracts-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle}
-  .contracts-table tr:last-child td{border-bottom:none}
-  .contracts-table tr:hover td{background:rgba(255,255,255,.02)}
+  /* Вкладки деталей */
+  .detail-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface2)}
+  .detail-tab{padding:12px 20px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;user-select:none}
+  .detail-tab:hover{color:var(--text)}
+  .detail-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--surface)}
+  .detail-tab-content{display:none;flex:1;overflow-y:auto}
+  .detail-tab-content.active{display:block}
 
+  /* Таблицы в деталях */
+  .detail-table{width:100%;border-collapse:collapse}
+  .detail-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);text-align:left;padding:10px 16px;background:var(--surface2);white-space:nowrap}
+  .detail-table td{padding:12px 16px;border-bottom:1px solid var(--border);vertical-align:middle;font-size:13px}
+  .detail-table tr:last-child td{border-bottom:none}
+  .detail-table tr:hover td{background:rgba(255,255,255,.02);cursor:pointer}
+
+  /* Статусы договоров */
   .st-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap}
   .st-active  {background:rgba(46,213,115,.1);color:var(--green);border:1px solid rgba(46,213,115,.2)}
   .st-expired {background:rgba(255,71,87,.1);color:var(--red);border:1px solid rgba(255,71,87,.2)}
   .st-completed{background:rgba(107,117,153,.1);color:var(--muted);border:1px solid var(--border)}
+  .st-cancelled{background:rgba(107,117,153,.07);color:var(--muted);border:1px solid var(--border)}
+
+  /* Остаток товара */
+  .stock-bar-wrap{display:flex;align-items:center;gap:8px}
+  .stock-bar-bg{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;min-width:50px}
+  .stock-bar-fill{height:100%;border-radius:2px}
+
+  /* Пустое состояние в табе */
+  .tab-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:13px}
+  .tab-empty-icon{font-size:36px;margin-bottom:8px;opacity:.3}
+
+  /* История операций */
+  .tx-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);gap:12px;transition:background .15s}
+  .tx-row:hover{background:rgba(255,255,255,.02)}
+  .tx-row:last-child{border-bottom:none}
+  .tx-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+  .tx-income  {background:rgba(46,213,115,.1)}
+  .tx-outcome {background:rgba(61,139,255,.1)}
+  .tx-writeoff{background:rgba(255,71,87,.1)}
+  .tx-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px}
+  .badge-income  {background:rgba(46,213,115,.12);color:var(--green)}
+  .badge-outcome {background:rgba(61,139,255,.12);color:var(--blue)}
+  .badge-writeoff{background:rgba(255,71,87,.12);color:var(--red)}
 
   /* MODAL */
   .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
   .modal-overlay.open{display:flex}
-  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:480px;max-width:100%;animation:fadeUp .3s ease}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;width:500px;max-width:100%;animation:fadeUp .3s ease}
   .modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
   .modal-title{font-family:var(--font-head);font-size:22px;letter-spacing:1px}
   .modal-close{background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;padding:4px;transition:color .2s}.modal-close:hover{color:var(--red)}
@@ -125,8 +164,8 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
   ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-  @media(max-width:1100px){.two-col{grid-template-columns:1fr}}
-  @media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}}
+  @media(max-width:1100px){.two-col{grid-template-columns:1fr}.supplier-list{max-height:300px}}
+  @media(max-width:768px){.sidebar{display:none}.content{padding:16px}.topbar{padding:14px 16px}.client-kpi{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -167,16 +206,21 @@
     <div class="page-title">КЛИЕНТЫ</div>
     <div class="topbar-right">
       <button class="btn btn-ghost btn-sm" onclick="toggleTheme()" id="themeBtn">🌙</button>
-      <div class="search-wrap"><span class="search-icon">🔍</span><input class="search-input" id="searchInput" type="text" placeholder="Поиск клиента..." /></div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" id="searchInput" type="text" placeholder="Поиск клиента..." oninput="renderSuppliers()" />
+      </div>
       <button class="btn btn-primary" onclick="openModal()">+ Добавить клиента</button>
     </div>
   </div>
 
   <div class="content">
+    <!-- Статистика -->
     <div class="stats-row">
       <div class="mini-stat yellow"><div class="mini-icon">👥</div><div><div class="mini-val" id="sTotal">0</div><div class="mini-label">Клиентов</div></div></div>
-      <div class="mini-stat green"> <div class="mini-icon">📄</div><div><div class="mini-val" id="sContracts">0</div><div class="mini-label">Активных договоров</div></div></div>
-      <div class="mini-stat blue">  <div class="mini-icon">📦</div><div><div class="mini-val" id="sProducts">0</div><div class="mini-label">Товаров на хранении</div></div></div>
+      <div class="mini-stat green"> <div class="mini-icon">✅</div><div><div class="mini-val" id="sActive">0</div><div class="mini-label">Активных договоров</div></div></div>
+      <div class="mini-stat blue">  <div class="mini-icon">📦</div><div><div class="mini-val" id="sTotalArea">0</div><div class="mini-label">м² арендовано</div></div></div>
+      <div class="mini-stat red">   <div class="mini-icon">⚠️</div><div><div class="mini-val" id="sExpired">0</div><div class="mini-label">Просроченных</div></div></div>
     </div>
 
     <div class="two-col">
@@ -186,27 +230,33 @@
           <div class="panel-title">СПИСОК</div>
           <div style="font-size:12px;color:var(--muted)" id="suppCount">0 клиентов</div>
         </div>
-        <div class="supplier-list" id="supplierList"></div>
+        <div class="supplier-list" id="supplierList">
+          <div style="padding:20px;text-align:center;color:var(--muted)">Загрузка...</div>
+        </div>
       </div>
 
-      <!-- Детали -->
+      <!-- Детали клиента -->
       <div class="detail-panel" id="detailPanel">
         <div class="detail-empty">
           <div class="detail-empty-icon">👥</div>
-          <div class="detail-empty-text">Выберите клиента<br>для просмотра деталей</div>
+          <div style="font-size:15px;margin-bottom:8px">Выберите клиента</div>
+          <div style="font-size:13px;color:var(--muted)">Нажмите на клиента слева<br>для просмотра договоров и товаров</div>
         </div>
       </div>
     </div>
   </div>
 </main>
 
-<!-- MODAL -->
+<!-- MODAL создания/редактирования клиента -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
-    <div class="modal-header"><div class="modal-title" id="modalTitle">НОВЫЙ КЛИЕНТ</div><button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">НОВЫЙ КЛИЕНТ</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
     <div class="modal-body">
       <div class="field"><label>Название организации / ФИО *</label><input id="f_name" type="text" placeholder="ООО Ромашка или Иванов Иван" /></div>
-      <div class="field"><label>Контактное лицо</label><input id="f_contact" type="text" placeholder="Директор Иванов И.И." /></div>
+      <div class="field"><label>Контактное лицо</label><input id="f_contact" type="text" placeholder="Иванов Иван Иванович" /></div>
       <div class="two-field">
         <div class="field"><label>Телефон</label><input id="f_phone" type="text" placeholder="+7 (999) 000-00-00" /></div>
         <div class="field"><label>Email</label><input id="f_email" type="text" placeholder="info@company.ru" /></div>
@@ -224,224 +274,467 @@
 <div class="toast" id="toast"><span id="toastIcon"></span><span id="toastText"></span></div>
 
 <script>
-let suppliers=[], contracts=[], products=[], editingId=null, selectedId=null;
+var suppliers    = [];
+var contracts    = [];
+var products     = [];
+var transactions = [];
+var editingId    = null;
+var selectedId   = null;
+var activeTab    = 'contracts';
 
-const stLbl  = { active:'Активен', expired:'Просрочен', completed:'Завершён', cancelled:'Отменён' };
-const stCls  = { active:'st-active', expired:'st-expired', completed:'st-completed', cancelled:'st-completed' };
+var ST_LBL = { active:'Активен', expired:'Просрочен', completed:'Завершён', cancelled:'Отменён' };
+var ST_CLS = { active:'st-active', expired:'st-expired', completed:'st-completed', cancelled:'st-cancelled' };
 
-async function init(){
-  try{
-    const ctrl=new AbortController();setTimeout(()=>ctrl.abort(),3000);
-    const res=await fetch('/auth/me',{credentials:'include',signal:ctrl.signal});
-    const user=await res.json();
-    if(!user){location.href='/login';return;}
-    document.getElementById('userName').textContent=user.displayName;
-    document.getElementById('userRole').textContent=user.role==='admin'?'Администратор':'Работник';
-    document.getElementById('userAvatar').textContent=user.displayName.slice(0,2).toUpperCase();
-  }catch{location.href='/login';return;}
+// ─── ИНИЦИАЛИЗАЦИЯ ───────────────────────────────────────────
+async function init() {
+  try {
+    var res  = await fetch('/auth/me', { credentials:'include' });
+    var user = await res.json();
+    if (!user) { location.href='/login'; return; }
+    document.getElementById('userName').textContent   = user.displayName;
+    document.getElementById('userRole').textContent   = user.role==='admin'?'Администратор':'Работник';
+    document.getElementById('userAvatar').textContent = user.displayName.slice(0,2).toUpperCase();
+  } catch { location.href='/login'; return; }
+
   await loadAll();
 
   // Подсветка из URL
-  const highlight=new URLSearchParams(location.search).get('highlight');
-  if(highlight){
-    const s=suppliers.find(s=>s.name===highlight);
-    if(s)setTimeout(()=>selectSupplier(s.id||s._id),300);
+  var highlight = new URLSearchParams(location.search).get('highlight');
+  if (highlight) {
+    var s = suppliers.find(function(s){ return s.name===highlight; });
+    if (s) setTimeout(function(){ selectSupplier(s.id); }, 200);
   }
 }
 
-async function loadAll(){
-  try{
-    const [sr,pr,cr]=await Promise.all([
-      fetch('/api/suppliers',{credentials:'include'}),
-      fetch('/api/products', {credentials:'include'}),
-      fetch('/api/contracts',{credentials:'include'}),
+// ─── ЗАГРУЗКА ДАННЫХ ─────────────────────────────────────────
+async function loadAll() {
+  try {
+    var [sr, cr, pr, tr] = await Promise.all([
+      fetch('/api/suppliers',              { credentials:'include' }),
+      fetch('/api/contracts',              { credentials:'include' }),
+      fetch('/api/products',               { credentials:'include' }),
+      fetch('/api/transactions?limit=500', { credentials:'include' }),
     ]);
-    suppliers = sr.ok ? await sr.json() : [];
-    products  = pr.ok ? await pr.json() : [];
-    contracts = cr.ok ? await cr.json() : [];
-  }catch{
-    suppliers=[]; products=[]; contracts=[];
+    suppliers    = sr.ok ? await sr.json() : [];
+    contracts    = cr.ok ? await cr.json() : [];
+    products     = pr.ok ? await pr.json() : [];
+    var txData   = tr.ok ? await tr.json() : {};
+    transactions = txData.transactions || txData || [];
+  } catch(e) {
+    suppliers=[]; contracts=[]; products=[]; transactions=[];
   }
   renderSuppliers();
   updateStats();
 }
 
-function getSupplierContracts(name){
-  return contracts.filter(c=>c.clientName===name);
-}
-function getSupplierProducts(name){
-  return products.filter(p=>p.clientName===name);
+// ─── ГЛОБАЛЬНАЯ СТАТИСТИКА ───────────────────────────────────
+function updateStats() {
+  var active  = contracts.filter(function(c){ return c.status==='active'; });
+  var expired = contracts.filter(function(c){ return c.status==='expired'; });
+  var totalArea = active.reduce(function(s,c){ return s+(c.storageArea||0); }, 0);
+  document.getElementById('sTotal').textContent    = suppliers.length;
+  document.getElementById('sActive').textContent   = active.length;
+  document.getElementById('sTotalArea').textContent= totalArea;
+  document.getElementById('sExpired').textContent  = expired.length;
 }
 
-function renderSuppliers(){
-  const search=document.getElementById('searchInput').value.toLowerCase();
-  const list=suppliers.filter(s=>s.name.toLowerCase().includes(search));
-  document.getElementById('suppCount').textContent=`${list.length} клиентов`;
-  document.getElementById('supplierList').innerHTML=list.map(s=>{
-    const id=s._id||s.id;
-    const ctrs=getSupplierContracts(s.name);
-    const prods=getSupplierProducts(s.name);
-    return `<div class="supplier-item ${String(id)===String(selectedId)?'selected':''}" onclick="selectSupplier('${id}')">
-      <div class="sup-avatar">👤</div>
-      <div>
-        <div class="sup-name">${s.name}</div>
-        <div class="sup-meta">${s.contact||s.phone||'Нет контакта'}</div>
-      </div>
-      <div class="sup-right">
-        <div class="sup-contracts">${ctrs.length} <span style="font-size:12px;font-family:var(--font-body)">дог.</span></div>
-        <div class="sup-items">${prods.length} товаров</div>
-      </div>
-    </div>`;
+// ─── СПИСОК КЛИЕНТОВ ─────────────────────────────────────────
+function renderSuppliers() {
+  var search = document.getElementById('searchInput').value.toLowerCase();
+  var list   = suppliers.filter(function(s){ return s.name.toLowerCase().includes(search); });
+  document.getElementById('suppCount').textContent = list.length + ' клиентов';
+
+  if (!list.length) {
+    document.getElementById('supplierList').innerHTML =
+      '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Клиенты не найдены</div>';
+    return;
+  }
+
+  document.getElementById('supplierList').innerHTML = list.map(function(s) {
+    var id = s.id || s._id;
+    // Договоры этого клиента
+    var ctrs = contracts.filter(function(c){ return c.clientName===s.name; });
+    var hasActive  = ctrs.some(function(c){ return c.status==='active'; });
+    var hasExpired = ctrs.some(function(c){ return c.status==='expired'; });
+    var initials   = s.name.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase() || '?';
+    var dotCls     = hasExpired ? 'dot-expired' : hasActive ? 'dot-active' : 'dot-none';
+    var prods      = products.filter(function(p){ return (p.clientName||p.supplier)===s.name; });
+
+    return '<div class="supplier-item ' + (String(id)===String(selectedId)?'selected':'') + '" onclick="selectSupplier(' + id + ')">' +
+      '<div class="sup-avatar">' + initials + '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="display:flex;align-items:center;gap:6px">' +
+          '<div class="status-dot ' + dotCls + '"></div>' +
+          '<div class="sup-name">' + s.name + '</div>' +
+        '</div>' +
+        '<div class="sup-meta">' + (s.contact||s.phone||'Нет контакта') + '</div>' +
+      '</div>' +
+      '<div class="sup-right">' +
+        '<div class="sup-contracts-count" style="color:' + (hasActive?'var(--green)':'var(--muted)') + '">' + ctrs.length + '</div>' +
+        '<div class="sup-items">' + (ctrs.length===1?'договор':ctrs.length<5?'договора':'договоров') + ' · ' + prods.length + ' тов.</div>' +
+      '</div>' +
+    '</div>';
   }).join('');
 }
 
-function updateStats(){
-  const activeContracts=contracts.filter(c=>c.status==='active').length;
-  document.getElementById('sTotal').textContent=suppliers.length;
-  document.getElementById('sContracts').textContent=activeContracts;
-  document.getElementById('sProducts').textContent=products.length;
-}
-
-function selectSupplier(id){
-  selectedId=String(id);
+// ─── ВЫБОР КЛИЕНТА ───────────────────────────────────────────
+function selectSupplier(id) {
+  selectedId = String(id);
   renderSuppliers();
-  const s=suppliers.find(s=>String(s._id||s.id)===String(id));
-  if(!s)return;
 
-  const ctrs=getSupplierContracts(s.name);
-  const prods=getSupplierProducts(s.name);
+  var s = suppliers.find(function(s){ return String(s.id||s._id)===String(id); });
+  if (!s) return;
 
-  const contractsHtml = ctrs.length
-    ? `<table class="contracts-table">
-        <thead><tr><th>№ Договора</th><th>Статус</th><th>Товар</th><th>Площадь</th><th>Период</th></tr></thead>
-        <tbody>${ctrs.map(c=>`
-          <tr>
-            <td><b style="color:var(--accent)">${c.number}</b></td>
-            <td><span class="st-badge ${stCls[c.status]||''}">${stLbl[c.status]||c.status}</span></td>
-            <td><div style="font-weight:600">${c.productName||'—'}</div><div style="font-size:11px;color:var(--muted)">${c.quantity||0} ${c.unit||''}</div></td>
-            <td>${c.storageArea||0} м²</td>
-            <td style="font-size:12px;color:var(--muted)">${c.startDate||''} → ${c.endDate||''}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`
-    : `<div style="padding:20px 24px;text-align:center;color:var(--muted);font-size:13px">Договоров нет</div>`;
-
-  const productsHtml = prods.length
-    ? `<table class="contracts-table">
-        <thead><tr><th>Товар</th><th>Артикул</th><th>Категория</th><th>Остаток</th></tr></thead>
-        <tbody>${prods.map(p=>`
-          <tr>
-            <td><div style="font-weight:600">${p.name}</div></td>
-            <td style="font-family:monospace;font-size:12px;color:var(--muted)">${p.sku||''}</td>
-            <td><span style="font-size:11px;color:var(--muted)">${p.category||''}</span></td>
-            <td style="font-weight:700">${p.quantity||0} ${p.unit||'шт'}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`
-    : `<div style="padding:20px 24px;text-align:center;color:var(--muted);font-size:13px">Товаров нет</div>`;
-
-  document.getElementById('detailPanel').innerHTML=`
-    <div class="detail-header">
-      <div>
-        <div class="detail-title">${s.name}</div>
-        <div class="detail-contacts">
-          ${s.contact?`<div class="contact-item">👤 <span>${s.contact}</span></div>`:''}
-          ${s.phone?  `<div class="contact-item">📞 <span>${s.phone}</span></div>`:''}
-          ${s.email?  `<div class="contact-item">✉️ <span>${s.email}</span></div>`:''}
-          ${s.address?`<div class="contact-item">📍 <span>${s.address}</span></div>`:''}
-        </div>
-        ${s.comment?`<div style="margin-top:8px;font-size:12px;color:var(--muted)">${s.comment}</div>`:''}
-      </div>
-      <div class="detail-actions">
-        <button class="btn btn-ghost btn-sm" onclick="editSupplier('${s._id||s.id}')">✏️ Изменить</button>
-      </div>
-    </div>
-
-    <div class="client-info-grid">
-      <div class="info-card">
-        <div class="info-card-label">Договоров</div>
-        <div class="info-card-val" style="font-family:var(--font-head);font-size:28px;color:var(--accent)">${ctrs.length}</div>
-      </div>
-      <div class="info-card">
-        <div class="info-card-label">Товаров на хранении</div>
-        <div class="info-card-val" style="font-family:var(--font-head);font-size:28px;color:var(--blue)">${prods.length}</div>
-      </div>
-    </div>
-
-    <div class="detail-table-wrap">
-      <div class="detail-section-title">ДОГОВОРЫ (${ctrs.length})</div>
-      ${contractsHtml}
-      <div class="detail-section-title" style="margin-top:8px">ТОВАРЫ НА ХРАНЕНИИ (${prods.length})</div>
-      ${productsHtml}
-    </div>`;
+  renderDetail(s);
 }
 
-// MODAL
-function openModal(supplier=null){
-  editingId=supplier?(supplier._id||supplier.id):null;
-  document.getElementById('modalTitle').textContent=supplier?'РЕДАКТИРОВАТЬ КЛИЕНТА':'НОВЫЙ КЛИЕНТ';
-  document.getElementById('f_name').value   =supplier?.name   ||'';
-  document.getElementById('f_contact').value=supplier?.contact||'';
-  document.getElementById('f_phone').value  =supplier?.phone  ||'';
-  document.getElementById('f_email').value  =supplier?.email  ||'';
-  document.getElementById('f_address').value=supplier?.address||'';
-  document.getElementById('f_comment').value=supplier?.comment||'';
+// ─── ДЕТАЛИ КЛИЕНТА ──────────────────────────────────────────
+function renderDetail(s) {
+  var ctrs   = contracts.filter(function(c){ return c.clientName===s.name; });
+  var prods  = products.filter(function(p){ return (p.clientName||p.supplier)===s.name; });
+  var txList = transactions.filter(function(t){ return t.supplier===s.name; });
+
+  var activeCtrs    = ctrs.filter(function(c){ return c.status==='active'; });
+  var totalArea     = activeCtrs.reduce(function(s,c){ return s+(c.storageArea||0); }, 0);
+  var totalRevenue  = ctrs.reduce(function(s,c){ return s+(c.totalStorageCost||0)+(c.insurancePremium||0); }, 0);
+  var totalQty      = prods.reduce(function(s,p){ return s+(p.quantity||0); }, 0);
+  var initials      = s.name.split(' ').slice(0,2).map(function(w){ return w[0]||''; }).join('').toUpperCase()||'?';
+
+  var panel = document.getElementById('detailPanel');
+  panel.innerHTML =
+    // Шапка
+    '<div class="detail-header">' +
+      '<div class="detail-header-top">' +
+        '<div style="display:flex;align-items:flex-start;gap:14px;flex:1">' +
+          '<div class="detail-avatar">' + initials + '</div>' +
+          '<div style="flex:1">' +
+            '<div class="detail-title">' + s.name + '</div>' +
+            '<div class="detail-contacts">' +
+              (s.contact ? '<div class="contact-chip">👤 <span>' + s.contact + '</span></div>' : '') +
+              (s.phone   ? '<div class="contact-chip">📞 <a href="tel:' + s.phone + '" style="color:var(--blue);text-decoration:none">' + s.phone + '</a></div>' : '') +
+              (s.email   ? '<div class="contact-chip">✉️ <a href="mailto:' + s.email + '" style="color:var(--blue);text-decoration:none">' + s.email + '</a></div>' : '') +
+              (s.address ? '<div class="contact-chip">📍 <span>' + s.address + '</span></div>' : '') +
+            '</div>' +
+            (s.comment ? '<div style="margin-top:8px;font-size:12px;color:var(--muted);font-style:italic">' + s.comment + '</div>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="detail-actions">' +
+          '<button class="btn btn-ghost btn-sm" onclick="editSupplier(' + (s.id||s._id) + ')">✏️ Изменить</button>' +
+        '</div>' +
+      '</div>' +
+      // KPI клиента
+      '<div class="client-kpi">' +
+        '<div class="client-kpi-card">' +
+          '<div class="client-kpi-val" style="color:var(--accent)">' + ctrs.length + '</div>' +
+          '<div class="client-kpi-label">Договоров</div>' +
+        '</div>' +
+        '<div class="client-kpi-card">' +
+          '<div class="client-kpi-val" style="color:var(--green)">' + activeCtrs.length + '</div>' +
+          '<div class="client-kpi-label">Активных</div>' +
+        '</div>' +
+        '<div class="client-kpi-card">' +
+          '<div class="client-kpi-val" style="color:var(--blue)">' + totalArea + '</div>' +
+          '<div class="client-kpi-label">м² арендует</div>' +
+        '</div>' +
+        '<div class="client-kpi-card">' +
+          '<div class="client-kpi-val" style="color:var(--purple)">' + prods.length + '</div>' +
+          '<div class="client-kpi-label">Товаров</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Вкладки
+    '<div class="detail-tabs">' +
+      '<div class="detail-tab ' + (activeTab==='contracts'?'active':'') + '" onclick="switchTab(\'contracts\')">📄 Договоры (' + ctrs.length + ')</div>' +
+      '<div class="detail-tab ' + (activeTab==='products'?'active':'') + '"  onclick="switchTab(\'products\')" >📦 Товары (' + prods.length + ')</div>' +
+      '<div class="detail-tab ' + (activeTab==='finance'?'active':'') + '"   onclick="switchTab(\'finance\')"  >💳 Финансы</div>' +
+      '<div class="detail-tab ' + (activeTab==='history'?'active':'') + '"   onclick="switchTab(\'history\')"  >🔄 Операции (' + txList.length + ')</div>' +
+    '</div>' +
+
+    // Контракты
+    '<div class="detail-tab-content ' + (activeTab==='contracts'?'active':'') + '" id="tab-contracts">' +
+      renderContractsTab(ctrs, s.name) +
+    '</div>' +
+
+    // Товары
+    '<div class="detail-tab-content ' + (activeTab==='products'?'active':'') + '" id="tab-products">' +
+      renderProductsTab(prods) +
+    '</div>' +
+
+    // Финансы
+    '<div class="detail-tab-content ' + (activeTab==='finance'?'active':'') + '" id="tab-finance">' +
+      renderFinanceTab(ctrs, totalRevenue) +
+    '</div>' +
+
+    // История операций
+    '<div class="detail-tab-content ' + (activeTab==='history'?'active':'') + '" id="tab-history">' +
+      renderHistoryTab(txList) +
+    '</div>';
+}
+
+// ─── ТАБ: ДОГОВОРЫ ───────────────────────────────────────────
+function renderContractsTab(ctrs, clientName) {
+  if (!ctrs.length) return '<div class="tab-empty"><div class="tab-empty-icon">📄</div>Договоров нет.<br><a href="/contracts" style="color:var(--accent)">Создать договор →</a></div>';
+
+  var rows = ctrs.map(function(c) {
+    var start = c.startDate ? new Date(c.startDate).toLocaleDateString('ru-RU') : '—';
+    var end   = c.endDate   ? new Date(c.endDate).toLocaleDateString('ru-RU')   : '—';
+    var insHtml = c.insuranceEnabled
+      ? '<span style="font-size:11px;color:var(--green)">🛡️ ' + (c.declaredValue||0).toLocaleString('ru') + ' ₽</span>'
+      : '<span style="font-size:11px;color:var(--muted)">—</span>';
+    return '<tr onclick="location.href=\'/contracts\'">' +
+      '<td><b style="color:var(--accent)">' + c.number + '</b></td>' +
+      '<td><span class="st-badge ' + (ST_CLS[c.status]||'') + '">' + (ST_LBL[c.status]||c.status) + '</span></td>' +
+      '<td>' +
+        '<div style="font-weight:600">' + c.productName + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + (c.quantity||0) + ' ' + (c.unit||'') + ' · ' + c.storageArea + ' м²</div>' +
+      '</td>' +
+      '<td style="font-size:12px;color:var(--muted)">' + start + '<br>' + end + '<br><span style="color:var(--text);font-weight:600">' + c.durationMonths + ' мес.</span></td>' +
+      '<td style="text-align:right">' +
+        '<div style="font-weight:700;color:var(--accent)">' + (c.totalStorageCost||0).toLocaleString('ru') + ' ₽</div>' +
+        '<div>' + insHtml + '</div>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<table class="detail-table">' +
+    '<thead><tr><th>Договор</th><th>Статус</th><th>Товар / Площадь</th><th>Период</th><th style="text-align:right">Сумма</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+  '</table>' +
+  '<div style="padding:12px 16px;border-top:1px solid var(--border)">' +
+    '<a href="/contracts" class="btn btn-ghost btn-sm">+ Создать новый договор</a>' +
+  '</div>';
+}
+
+// ─── ТАБ: ТОВАРЫ ─────────────────────────────────────────────
+function renderProductsTab(prods) {
+  if (!prods.length) return '<div class="tab-empty"><div class="tab-empty-icon">📦</div>Товаров нет.<br><span style="font-size:12px">Товары добавляются автоматически при создании договора</span></div>';
+
+  var rows = prods.map(function(p) {
+    var maxQ  = Math.max(p.minQuantity*3||1, p.quantity||1);
+    var pct   = Math.min(100, ((p.quantity||0)/maxQ)*100);
+    var color = (p.quantity||0)===0?'var(--red)':(p.quantity||0)<=(p.minQuantity||0)?'var(--yellow)':'var(--green)';
+    return '<tr onclick="location.href=\'/products\'">' +
+      '<td>' +
+        '<div style="font-weight:600">' + p.name + '</div>' +
+        '<div style="font-size:11px;color:var(--muted);font-family:monospace">' + (p.sku||'') + '</div>' +
+      '</td>' +
+      '<td><span style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:2px 8px;font-size:11px">' + (p.category||'—') + '</span></td>' +
+      '<td>' +
+        '<div style="font-weight:700;color:' + color + '">' + (p.quantity||0) + ' ' + (p.unit||'шт') + '</div>' +
+        '<div class="stock-bar-wrap" style="margin-top:4px">' +
+          '<div class="stock-bar-bg"><div class="stock-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+        '</div>' +
+      '</td>' +
+      '<td style="font-size:12px">' +
+        (p.contractNum ? '<a href="/contracts" style="color:var(--accent);text-decoration:none;font-weight:600">' + p.contractNum + '</a>' : '<span style="color:var(--muted)">—</span>') +
+      '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<table class="detail-table">' +
+    '<thead><tr><th>Товар</th><th>Категория</th><th>Остаток</th><th>Договор</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody>' +
+  '</table>';
+}
+
+// ─── ТАБ: ФИНАНСЫ ────────────────────────────────────────────
+function renderFinanceTab(ctrs, totalRevenue) {
+  if (!ctrs.length) return '<div class="tab-empty"><div class="tab-empty-icon">💳</div>Финансовых данных нет</div>';
+
+  var totalStorage   = ctrs.reduce(function(s,c){ return s+(c.totalStorageCost||0); }, 0);
+  var totalInsurance = ctrs.reduce(function(s,c){ return s+(c.insurancePremium||0); }, 0);
+  var activeCtrs     = ctrs.filter(function(c){ return c.status==='active'; });
+  var monthlyIncome  = activeCtrs.reduce(function(s,c){ return s+(c.storageCostPerMonth||0); }, 0);
+
+  // Штрафы за просрочку
+  var now = new Date();
+  var totalPenalty = ctrs.filter(function(c){ return c.status==='expired'; }).reduce(function(s,c) {
+    var days = Math.max(0, Math.floor((now - new Date(c.endDate)) / 86400000));
+    var pen  = c.penaltyType==='fixed'
+      ? (c.penaltyPerDay||0)*days
+      : (c.totalStorageCost*(c.penaltyPercent||1.5)/100)*days;
+    if (c.maxPenalty>0) pen = Math.min(pen, c.maxPenalty);
+    return s + Math.round(pen);
+  }, 0);
+
+  var fmt = function(n){ return n.toLocaleString('ru') + ' ₽'; };
+
+  return '<div style="padding:20px;display:flex;flex-direction:column;gap:12px">' +
+
+    // Сводка
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">' +
+      kpiMini('💰', 'Всего выручка', fmt(totalRevenue+totalPenalty), 'var(--accent)') +
+      kpiMini('🏪', 'Хранение', fmt(totalStorage), 'var(--blue)') +
+      kpiMini('🛡️', 'Страховые взносы', fmt(totalInsurance), 'var(--green)') +
+      kpiMini('⚠️', 'Штрафы начислено', fmt(totalPenalty), totalPenalty>0?'var(--red)':'var(--muted)') +
+    '</div>' +
+
+    '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px">' +
+      '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:12px">Ежемесячный доход от клиента</div>' +
+      '<div style="font-family:var(--font-head);font-size:32px;color:var(--accent)">' + fmt(monthlyIncome) + '</div>' +
+      '<div style="font-size:12px;color:var(--muted);margin-top:4px">' + activeCtrs.length + ' активных договор' + (activeCtrs.length===1?'а':'ов') + '</div>' +
+    '</div>' +
+
+    // Детализация по договорам
+    ctrs.map(function(c) {
+      var pen = 0;
+      if (c.status==='expired') {
+        var days = Math.max(0, Math.floor((now - new Date(c.endDate)) / 86400000));
+        pen = c.penaltyType==='fixed' ? (c.penaltyPerDay||0)*days : (c.totalStorageCost*(c.penaltyPercent||1.5)/100)*days;
+        if (c.maxPenalty>0) pen = Math.min(pen, c.maxPenalty);
+        pen = Math.round(pen);
+      }
+      return '<div style="border:1px solid var(--border);border-radius:8px;overflow:hidden">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2)">' +
+          '<div style="display:flex;align-items:center;gap:8px">' +
+            '<span style="font-family:var(--font-head);font-size:15px;color:var(--accent)">' + c.number + '</span>' +
+            '<span class="st-badge ' + (ST_CLS[c.status]||'') + '">' + (ST_LBL[c.status]||'') + '</span>' +
+          '</div>' +
+          '<span style="font-family:var(--font-head);font-size:18px">' + fmt((c.totalStorageCost||0)+(c.insurancePremium||0)+pen) + '</span>' +
+        '</div>' +
+        '<div style="padding:10px 14px;font-size:12px;display:flex;gap:16px;flex-wrap:wrap">' +
+          '<span style="color:var(--muted)">Хранение: <b style="color:var(--text)">' + fmt(c.totalStorageCost||0) + '</b></span>' +
+          (c.insuranceEnabled ? '<span style="color:var(--muted)">Страховка: <b style="color:var(--green)">' + fmt(c.insurancePremium||0) + '</b></span>' : '') +
+          (pen>0 ? '<span style="color:var(--muted)">Штраф: <b style="color:var(--red)">' + fmt(pen) + '</b></span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('') +
+
+  '</div>';
+}
+
+function kpiMini(icon, label, val, color) {
+  return '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px 14px">' +
+    '<div style="font-size:11px;color:var(--muted);margin-bottom:4px">' + icon + ' ' + label + '</div>' +
+    '<div style="font-family:var(--font-head);font-size:20px;color:' + color + '">' + val + '</div>' +
+  '</div>';
+}
+
+// ─── ТАБ: ИСТОРИЯ ОПЕРАЦИЙ ───────────────────────────────────
+function renderHistoryTab(txList) {
+  if (!txList.length) return '<div class="tab-empty"><div class="tab-empty-icon">🔄</div>Операций по этому клиенту нет</div>';
+
+  var labels = { income:'Приход', outcome:'Расход', writeoff:'Списание' };
+
+  return txList.slice(0,30).map(function(t) {
+    return '<div class="tx-row">' +
+      '<div class="tx-icon tx-' + t.type + '">' +
+        (t.type==='income'?'📥':t.type==='outcome'?'📤':'🗑️') +
+      '</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div style="font-weight:600;font-size:13px">' + (t.product||'—') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + (t.sku||'') + (t.by?' · ' + t.by:'') + '</div>' +
+      '</div>' +
+      '<div style="text-align:right;flex-shrink:0">' +
+        '<span class="tx-badge badge-' + t.type + '">' + labels[t.type] + '</span>' +
+        '<div style="font-weight:700;margin-top:3px">' + (t.quantity||t.qty||0) + ' ' + (t.unit||'') + '</div>' +
+        '<div style="font-size:11px;color:var(--muted)">' + (t.date||'') + '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('') +
+  (txList.length>30 ? '<div style="padding:12px 16px;text-align:center;font-size:12px;color:var(--muted)">Показано 30 из ' + txList.length + '</div>' : '');
+}
+
+// ─── ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ────────────────────────────────────
+function switchTab(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.detail-tab').forEach(function(el, i) {
+    var tabs = ['contracts','products','finance','history'];
+    el.classList.toggle('active', tabs[i]===tab);
+  });
+  document.querySelectorAll('.detail-tab-content').forEach(function(el) {
+    el.classList.toggle('active', el.id==='tab-'+tab);
+  });
+}
+
+// ─── МОДАЛКА ─────────────────────────────────────────────────
+function openModal(supplier) {
+  editingId = supplier ? (supplier.id||supplier._id) : null;
+  document.getElementById('modalTitle').textContent = supplier ? 'РЕДАКТИРОВАТЬ КЛИЕНТА' : 'НОВЫЙ КЛИЕНТ';
+  document.getElementById('f_name').value    = supplier?.name    || '';
+  document.getElementById('f_contact').value = supplier?.contact || '';
+  document.getElementById('f_phone').value   = supplier?.phone   || '';
+  document.getElementById('f_email').value   = supplier?.email   || '';
+  document.getElementById('f_address').value = supplier?.address || '';
+  document.getElementById('f_comment').value = supplier?.comment || '';
   document.getElementById('modalOverlay').classList.add('open');
 }
-function editSupplier(id){openModal(suppliers.find(s=>String(s._id||s.id)===String(id)));}
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open');editingId=null;}
 
-async function saveSupplier(){
-  const data={
-    name:   document.getElementById('f_name').value.trim(),
-    contact:document.getElementById('f_contact').value.trim(),
-    phone:  document.getElementById('f_phone').value.trim(),
-    email:  document.getElementById('f_email').value.trim(),
-    address:document.getElementById('f_address').value.trim(),
-    comment:document.getElementById('f_comment').value.trim(),
-  };
-  if(!data.name){showToast('error','⚠️','Введите название клиента');return;}
-  try{
-    if(editingId){
-      const res=await fetch(`/api/suppliers/${editingId}`,{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-      if(!res.ok)throw new Error();
-      const idx=suppliers.findIndex(s=>String(s._id||s.id)===String(editingId));
-      if(idx!==-1)suppliers[idx]={...suppliers[idx],...data};
-    }else{
-      const res=await fetch('/api/suppliers',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
-      if(!res.ok)throw new Error();
-      suppliers.unshift(await res.json());
-    }
-  }catch{
-    if(editingId){const i=suppliers.findIndex(s=>String(s._id||s.id)===String(editingId));if(i!==-1)suppliers[i]={...suppliers[i],...data};}
-    else suppliers.unshift({...data,id:Date.now()});
-  }
-  closeModal();renderSuppliers();updateStats();
-  if(editingId&&String(selectedId)===String(editingId))selectSupplier(editingId);
-  showToast('success','✅',editingId?'Клиент обновлён':'Клиент добавлен');
+function editSupplier(id) {
+  var s = suppliers.find(function(s){ return String(s.id||s._id)===String(id); });
+  if (s) openModal(s);
 }
 
-// ТЕМА
-function toggleTheme(){
-  var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
-  document.documentElement.setAttribute('data-theme',t);localStorage.setItem('theme',t);
-  document.getElementById('themeBtn').textContent=t==='light'?'🌙':'☀️';
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId=null; }
+
+async function saveSupplier() {
+  var data = {
+    name:    document.getElementById('f_name').value.trim(),
+    contact: document.getElementById('f_contact').value.trim(),
+    phone:   document.getElementById('f_phone').value.trim(),
+    email:   document.getElementById('f_email').value.trim(),
+    address: document.getElementById('f_address').value.trim(),
+    comment: document.getElementById('f_comment').value.trim(),
+  };
+  if (!data.name) { showToast('error','⚠️','Введите название клиента'); return; }
+  try {
+    var res = editingId
+      ? await fetch('/api/suppliers/'+editingId, { method:'PUT',  credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) })
+      : await fetch('/api/suppliers',             { method:'POST', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify(data) });
+    if (res.ok) {
+      var saved = await res.json();
+      if (editingId) {
+        var idx = suppliers.findIndex(function(s){ return String(s.id||s._id)===String(editingId); });
+        if (idx!==-1) suppliers[idx] = saved;
+      } else {
+        suppliers.unshift(saved);
+      }
+    } else throw new Error();
+  } catch {
+    if (editingId) {
+      var idx = suppliers.findIndex(function(s){ return String(s.id||s._id)===String(editingId); });
+      if (idx!==-1) suppliers[idx] = Object.assign({}, suppliers[idx], data);
+    } else {
+      suppliers.unshift(Object.assign({id:Date.now()}, data));
+    }
+  }
+  closeModal();
+  renderSuppliers();
+  updateStats();
+  if (editingId && String(selectedId)===String(editingId)) {
+    var s = suppliers.find(function(s){ return String(s.id||s._id)===String(editingId); });
+    if (s) renderDetail(s);
+  }
+  showToast('success','✅', editingId?'Клиент обновлён':'Клиент добавлен');
+}
+
+// ─── ТЕМА ────────────────────────────────────────────────────
+function toggleTheme() {
+  var t = document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
+  document.documentElement.setAttribute('data-theme',t);
+  localStorage.setItem('theme',t);
+  document.getElementById('themeBtn').textContent = t==='light'?'🌙':'☀️';
 }
 (function(){
-  var t=localStorage.getItem('theme')||'dark';
+  var t = localStorage.getItem('theme')||'dark';
   document.documentElement.setAttribute('data-theme',t);
-  var btn=document.getElementById('themeBtn');if(btn)btn.textContent=t==='light'?'🌙':'☀️';
+  var btn = document.getElementById('themeBtn');
+  if (btn) btn.textContent = t==='light'?'🌙':'☀️';
 })();
 
-async function logout(){await fetch('/auth/logout',{method:'POST',credentials:'include'});location.href='/login';}
-function showToast(type,icon,text){
-  const t=document.getElementById('toast');
-  document.getElementById('toastIcon').textContent=icon;document.getElementById('toastText').textContent=text;
-  t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);
+// ─── УТИЛИТЫ ─────────────────────────────────────────────────
+async function logout() { await fetch('/auth/logout',{method:'POST',credentials:'include'}); location.href='/login'; }
+function showToast(type,icon,text) {
+  var t=document.getElementById('toast');
+  document.getElementById('toastIcon').textContent=icon;
+  document.getElementById('toastText').textContent=text;
+  t.className='toast '+type+' show';
+  setTimeout(function(){ t.classList.remove('show'); },3000);
 }
-document.getElementById('searchInput').addEventListener('input',renderSuppliers);
-document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target.id==='modalOverlay')closeModal();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.getElementById('modalOverlay').addEventListener('click',function(e){ if(e.target.id==='modalOverlay') closeModal(); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape') closeModal(); });
+
 init();
 </script>
 </body>
