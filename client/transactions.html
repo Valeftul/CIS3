@@ -201,7 +201,7 @@
   /* ─── MODAL ─── */
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 480px; max-width: 100%; animation: fadeUp 0.3s ease; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; width: 500px; max-width: 100%; animation: fadeUp 0.3s ease; }
   .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 1px solid var(--border); }
   .modal-title { font-family: var(--font-head); font-size: 22px; letter-spacing: 1px; }
   .modal-close { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; padding: 4px; transition: color 0.2s; }
@@ -232,6 +232,21 @@
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--accent); }
   .field input::placeholder { color: var(--muted); }
+
+  /* Инфо-блок о привязке товара к поставщику */
+  .supplier-info-box {
+    display: none;
+    align-items: center; gap: 10px;
+    background: rgba(61,139,255,0.08); border: 1px solid rgba(61,139,255,0.25);
+    border-radius: 8px; padding: 10px 14px; font-size: 12px; color: var(--blue);
+  }
+  .supplier-info-box.visible { display: flex; }
+  .supplier-info-box.warn {
+    background: rgba(255,165,0,0.08); border-color: rgba(255,165,0,0.3); color: var(--accent);
+  }
+  .supplier-info-box.err {
+    background: rgba(255,71,87,0.08); border-color: rgba(255,71,87,0.3); color: var(--red);
+  }
 
   /* ─── TOAST ─── */
   .toast { position: fixed; bottom: 24px; right: 24px; z-index: 400; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 500; transform: translateY(80px); opacity: 0; transition: all 0.3s ease; pointer-events: none; min-width: 260px; }
@@ -418,28 +433,34 @@
         </div>
       </div>
 
-      <!-- Товар -->
+      <!-- Клиент / Поставщик — СНАЧАЛА, чтобы фильтровать товары -->
+      <div class="field" id="supplierField">
+        <label>Клиент / Поставщик</label>
+        <select id="f_supplier" onchange="onSupplierChange()">
+          <option value="">— Все / без привязки —</option>
+        </select>
+      </div>
+
+      <!-- Товар — фильтруется по поставщику -->
       <div class="field">
         <label>Товар *</label>
-        <select id="f_product">
+        <select id="f_product" onchange="onProductChange()">
           <option value="">Выберите товар</option>
         </select>
       </div>
 
-      <!-- Количество (цена скрыта — передаётся автоматически) -->
+      <!-- Инфо-блок: привязка товара к поставщику -->
+      <div class="supplier-info-box" id="supplierInfoBox">
+        <span id="supplierInfoIcon">ℹ️</span>
+        <span id="supplierInfoText"></span>
+      </div>
+
+      <!-- Количество -->
       <div class="field">
         <label>Количество *</label>
         <input id="f_qty" type="number" placeholder="0" min="1" />
       </div>
       <input id="f_price" type="hidden" value="0" />
-
-      <!-- Клиент / Поставщик -->
-      <div class="field" id="supplierField">
-        <label>Клиент / Поставщик</label>
-        <select id="f_supplier">
-          <option value="">— Выберите —</option>
-        </select>
-      </div>
 
       <!-- Комментарий -->
       <div class="field">
@@ -465,38 +486,11 @@
 // ─── СОСТОЯНИЕ ────────────────────────────────────────────
 let transactions = [];
 let filtered     = [];
-let products     = [];
+let allProducts  = [];   // полный список товаров с сервера
 let typeFilter   = '';
 let currentPage  = 1;
 const PAGE_SIZE  = 15;
 let selectedType = 'income';
-
-// ─── МОКОВЫЕ ДАННЫЕ ───────────────────────────────────────
-const MOCK_PRODUCTS = [
-  { id:1, name:'Бумага А4, 500 листов', sku:'PAP-001', unit:'бл', purchasePrice:180 },
-  { id:2, name:'Ручки шариковые синие', sku:'PEN-042', unit:'уп', purchasePrice:90  },
-  { id:3, name:'Картридж HP 85A',       sku:'INK-017', unit:'шт', purchasePrice:900 },
-  { id:4, name:'Маркер перманентный',   sku:'MRK-008', unit:'шт', purchasePrice:35  },
-  { id:5, name:'Скрепки 50 мм (кор)',   sku:'CLP-003', unit:'кор',purchasePrice:25  },
-  { id:6, name:'Папки-регистраторы А4', sku:'FLD-022', unit:'шт', purchasePrice:85  },
-];
-
-const now = new Date();
-const fmtDate = (d) => d.toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
-const daysAgo = (n) => { const d = new Date(now); d.setDate(d.getDate()-n); return d; };
-
-const MOCK_TX = [
-  { id:1,  type:'income',   product:'Бумага А4, 500 листов', sku:'PAP-001', qty:50,  unit:'бл',  supplier:'ООО Ромашка',    by:'Алексей И.', date: fmtDate(daysAgo(0)),  comment:'' },
-  { id:2,  type:'outcome',  product:'Ручки шариковые синие', sku:'PEN-042', qty:10,  unit:'уп',  supplier:'',               by:'Мария С.',   date: fmtDate(daysAgo(0)),  comment:'Для отдела продаж' },
-  { id:3,  type:'writeoff', product:'Картридж HP 85A',       sku:'INK-017', qty:2,   unit:'шт',  supplier:'',               by:'Алексей И.', date: fmtDate(daysAgo(0)),  comment:'Закончился ресурс' },
-  { id:4,  type:'income',   product:'Маркер перманентный',   sku:'MRK-008', qty:100, unit:'шт',  supplier:'ИП Сидоров',     by:'Иван П.',    date: fmtDate(daysAgo(1)),  comment:'' },
-  { id:5,  type:'outcome',  product:'Скрепки 50 мм (кор)',   sku:'CLP-003', qty:5,   unit:'кор', supplier:'',               by:'Мария С.',   date: fmtDate(daysAgo(1)),  comment:'' },
-  { id:6,  type:'income',   product:'Папки-регистраторы А4', sku:'FLD-022', qty:20,  unit:'шт',  supplier:'ООО Ромашка',    by:'Иван П.',    date: fmtDate(daysAgo(2)),  comment:'' },
-  { id:7,  type:'outcome',  product:'Бумага А4, 500 листов', sku:'PAP-001', qty:15,  unit:'бл',  supplier:'',               by:'Алексей И.', date: fmtDate(daysAgo(3)),  comment:'Бухгалтерия' },
-  { id:8,  type:'writeoff', product:'Маркер перманентный',   sku:'MRK-008', qty:5,   unit:'шт',  supplier:'',               by:'Мария С.',   date: fmtDate(daysAgo(4)),  comment:'Пересохли' },
-  { id:9,  type:'income',   product:'Картридж HP 85A',       sku:'INK-017', qty:5,   unit:'шт',  supplier:'ООО Техника',    by:'Иван П.',    date: fmtDate(daysAgo(5)),  comment:'Срочная закупка' },
-  { id:10, type:'outcome',  product:'Ручки шариковые синие', sku:'PEN-042', qty:8,   unit:'уп',  supplier:'',               by:'Алексей И.', date: fmtDate(daysAgo(6)),  comment:'' },
-];
 
 // ─── ИНИЦИАЛИЗАЦИЯ ─────────────────────────────────────────
 async function init() {
@@ -514,42 +508,117 @@ async function init() {
   await loadTransactions();
 }
 
+// ─── ЗАГРУЗКА ТОВАРОВ ──────────────────────────────────────
 async function loadProducts() {
   try {
     const res = await fetch('/api/products', { credentials:'include' });
-    products = res.ok ? await res.json() : MOCK_PRODUCTS;
-  } catch { products = MOCK_PRODUCTS; }
-
-  const sel = document.getElementById('f_product');
-  sel.innerHTML = '<option value="">Выберите товар</option>' +
-    products.map(p => `<option value="${p._id || p.id}" data-price="${p.purchasePrice}" data-unit="${p.unit}">${p.name} (${p.sku})</option>`).join('');
+    allProducts = res.ok ? await res.json() : [];
+  } catch { allProducts = []; }
 }
 
+// ─── ЗАГРУЗКА ПОСТАВЩИКОВ ──────────────────────────────────
 async function loadSuppliers() {
   try {
-    const res = await fetch('/api/suppliers', { credentials:'include' });
+    const res  = await fetch('/api/suppliers', { credentials:'include' });
     const list = res.ok ? await res.json() : [];
-    const fallback = list.length ? list : [
-      {name:'ООО Ромашка'},{name:'ИП Сидоров'},{name:'ООО Техника'}
-    ];
-    const sel = document.getElementById('f_supplier');
-    sel.innerHTML = '<option value="">— Выберите —</option>' +
-      fallback.map(s=>`<option value="${s.name}">${s.name}</option>`).join('');
-  } catch {
-    const sel = document.getElementById('f_supplier');
-    ['ООО Ромашка','ИП Сидоров','ООО Техника']
-      .forEach(n => sel.innerHTML += `<option value="${n}">${n}</option>`);
+    const sel  = document.getElementById('f_supplier');
+    sel.innerHTML = '<option value="">— Все / без привязки —</option>' +
+      list.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+  } catch {}
+}
+
+// ─── ФИЛЬТРАЦИЯ ТОВАРОВ ПО ПОСТАВЩИКУ ─────────────────────
+function getFilteredProducts(supplierName) {
+  if (!supplierName) return allProducts;
+  // Показываем товары этого поставщика/клиента
+  return allProducts.filter(p =>
+    (p.clientName && p.clientName === supplierName) ||
+    (p.supplier   && p.supplier   === supplierName)
+  );
+}
+
+function renderProductSelect(supplierName, keepValue) {
+  const sel      = document.getElementById('f_product');
+  const filtered = getFilteredProducts(supplierName);
+
+  if (!filtered.length && supplierName) {
+    sel.innerHTML = '<option value="">— Нет товаров этого клиента —</option>';
+    return;
+  }
+
+  sel.innerHTML = '<option value="">Выберите товар</option>' +
+    filtered.map(p => {
+      const qty    = p.quantity || 0;
+      const unit   = p.unit || 'шт';
+      const client = p.clientName ? ` [${p.clientName}]` : '';
+      return `<option value="${p._id || p.id}" data-price="${p.purchasePrice || 0}" data-unit="${unit}" data-client="${p.clientName || ''}" data-supplier="${p.supplier || ''}">${p.name} (${p.sku}) — ${qty} ${unit}${client}</option>`;
+    }).join('');
+
+  if (keepValue) sel.value = keepValue;
+}
+
+// ─── ОБРАБОТЧИК ИЗМЕНЕНИЯ ПОСТАВЩИКА ──────────────────────
+function onSupplierChange() {
+  const supplierName = document.getElementById('f_supplier').value;
+  renderProductSelect(supplierName, '');
+  hideSupplierInfo();
+}
+
+// ─── ОБРАБОТЧИК ИЗМЕНЕНИЯ ТОВАРА ──────────────────────────
+function onProductChange() {
+  const sel = document.getElementById('f_product');
+  const opt = sel.selectedOptions[0];
+  if (!opt || !opt.value) { hideSupplierInfo(); return; }
+
+  document.getElementById('f_price').value = opt.dataset.price || '0';
+
+  const productClient   = opt.dataset.client   || '';
+  const productSupplier = opt.dataset.supplier  || '';
+  const productOwner    = productClient || productSupplier;
+  const selectedSupplier = document.getElementById('f_supplier').value;
+
+  if (!productOwner) {
+    // Товар без привязки к клиенту — нейтральная подсказка
+    hideSupplierInfo();
+    return;
+  }
+
+  if (!selectedSupplier) {
+    // Поставщик не выбран, но у товара есть привязка — автоподставляем и предупреждаем
+    document.getElementById('f_supplier').value = productOwner;
+    showSupplierInfo('info',
+      `ℹ️ Товар принадлежит клиенту «${productOwner}» — поставщик подставлен автоматически`);
+    return;
+  }
+
+  if (selectedSupplier !== productOwner) {
+    // Несоответствие — блокируем
+    showSupplierInfo('err',
+      `⛔ Товар принадлежит «${productOwner}», но выбран поставщик «${selectedSupplier}». Смените поставщика или товар.`);
+  } else {
+    showSupplierInfo('ok',
+      `✅ Товар принадлежит клиенту «${productOwner}»`);
   }
 }
 
+function showSupplierInfo(type, text) {
+  const box = document.getElementById('supplierInfoBox');
+  box.className = 'supplier-info-box visible' + (type === 'err' ? ' err' : type === 'warn' ? ' warn' : '');
+  document.getElementById('supplierInfoText').textContent = text;
+}
+function hideSupplierInfo() {
+  document.getElementById('supplierInfoBox').className = 'supplier-info-box';
+}
+
+// ─── ЗАГРУЗКА ТРАНЗАКЦИЙ ───────────────────────────────────
 async function loadTransactions() {
   try {
-    const res = await fetch('/api/transactions?limit=200', { credentials:'include' });
+    const res = await fetch('/api/transactions?limit=500', { credentials:'include' });
     if (res.ok) {
       const data = await res.json();
       transactions = data.transactions || data;
-    } else { transactions = MOCK_TX; }
-  } catch { transactions = MOCK_TX; }
+    } else { transactions = []; }
+  } catch { transactions = []; }
 
   applyFilters();
   updateStats();
@@ -557,11 +626,11 @@ async function loadTransactions() {
 
 // ─── ФИЛЬТРАЦИЯ ────────────────────────────────────────────
 function applyFilters() {
-  const search   = document.getElementById('searchInput').value.toLowerCase();
+  const search = document.getElementById('searchInput').value.toLowerCase();
 
   filtered = transactions.filter(t => {
-    const matchType    = !typeFilter || t.type === typeFilter;
-    const matchSearch  = !search || (t.product||'').toLowerCase().includes(search) || (t.sku||'').toLowerCase().includes(search);
+    const matchType   = !typeFilter || t.type === typeFilter;
+    const matchSearch = !search || (t.product||'').toLowerCase().includes(search) || (t.sku||'').toLowerCase().includes(search);
     return matchType && matchSearch;
   });
 
@@ -586,12 +655,12 @@ function clearDates() {
 
 // ─── СТАТИСТИКА ────────────────────────────────────────────
 function updateStats() {
-  const inc  = transactions.filter(t => t.type === 'income');
-  const out  = transactions.filter(t => t.type === 'outcome');
-  const wrt  = transactions.filter(t => t.type === 'writeoff');
+  const inc = transactions.filter(t => t.type === 'income');
+  const out = transactions.filter(t => t.type === 'outcome');
+  const wrt = transactions.filter(t => t.type === 'writeoff');
 
-  const todayStr = new Date().toLocaleDateString('ru-RU');
-  const todayCount = transactions.filter(t => (t.date||'').startsWith(todayStr.split('.').reverse().join('-').slice(2)) || (t.date||'').includes(todayStr)).length;
+  const todayStr   = new Date().toLocaleDateString('ru-RU');
+  const todayCount = transactions.filter(t => (t.date||'').includes(todayStr)).length;
 
   document.getElementById('statIncome').textContent    = inc.length;
   document.getElementById('statOutcome').textContent   = out.length;
@@ -632,29 +701,27 @@ function renderTable() {
 
   const labels = { income:'📥 Приход', outcome:'📤 Расход', writeoff:'🗑 Списание' };
 
-  tbody.innerHTML = page.map(t => {
-    return `
-      <tr>
-        <td><span class="tx-badge ${t.type}">${labels[t.type]}</span></td>
-        <td>
-          <div class="product-name">${t.product || t.productName || '—'}</div>
-          <div class="product-sku">${t.sku || ''}</div>
-        </td>
-        <td class="qty-cell">${t.qty || t.quantity || 0} ${t.unit || ''}</td>
-        <td>${t.supplier
-          ? `<a style="font-size:12px;color:var(--blue);cursor:pointer;text-decoration:none"
-                onmouseover="this.style.textDecoration='underline'"
-                onmouseout="this.style.textDecoration='none'"
-                onclick="location.href='/suppliers?highlight=${encodeURIComponent(t.supplier)}'">
-                👤 ${t.supplier}
-             </a>`
-          : '<span style="font-size:12px;color:var(--muted)">—</span>'
-        }</td>
-        <td class="by-cell">${t.by || t.createdBy || '—'}</td>
-        <td class="date-cell">${t.date || t.createdAt || '—'}</td>
-        <td class="comment-cell" title="${t.comment||''}">${t.comment || '—'}</td>
-      </tr>`;
-  }).join('');
+  tbody.innerHTML = page.map(t => `
+    <tr>
+      <td><span class="tx-badge ${t.type}">${labels[t.type]}</span></td>
+      <td>
+        <div class="product-name">${t.product || t.productName || '—'}</div>
+        <div class="product-sku">${t.sku || ''}</div>
+      </td>
+      <td class="qty-cell">${t.qty || t.quantity || 0} ${t.unit || ''}</td>
+      <td>${t.supplier
+        ? `<a style="font-size:12px;color:var(--blue);cursor:pointer;text-decoration:none"
+              onmouseover="this.style.textDecoration='underline'"
+              onmouseout="this.style.textDecoration='none'"
+              onclick="location.href='/suppliers?highlight=${encodeURIComponent(t.supplier)}'">
+              👤 ${t.supplier}
+           </a>`
+        : '<span style="font-size:12px;color:var(--muted)">—</span>'
+      }</td>
+      <td class="by-cell">${t.by || t.createdBy || '—'}</td>
+      <td class="date-cell">${t.date || t.createdAt || '—'}</td>
+      <td class="comment-cell" title="${t.comment||''}">${t.comment || '—'}</td>
+    </tr>`).join('');
 
   renderPagination(total);
 }
@@ -680,12 +747,13 @@ function goPage(p) {
 function openModal() {
   selectedType = 'income';
   updateTypeButtons();
-  document.getElementById('f_product').value  = '';
+  document.getElementById('f_supplier').value = '';
   document.getElementById('f_qty').value      = '';
   document.getElementById('f_price').value    = '0';
-  document.getElementById('f_supplier').value = '';
   document.getElementById('f_comment').value  = '';
-  document.getElementById('supplierField').style.display = 'flex';
+  hideSupplierInfo();
+  // Рендерим все товары (без фильтра)
+  renderProductSelect('', '');
   document.getElementById('modalOverlay').classList.add('open');
 }
 
@@ -696,12 +764,6 @@ function closeModal() {
 function selectType(type) {
   selectedType = type;
   updateTypeButtons();
-
-  // Автоподставляем цену из продукта
-  const opt = document.getElementById('f_product').selectedOptions[0];
-  if (opt && opt.dataset.price) {
-    document.getElementById('f_price').value = opt.dataset.price;
-  }
 }
 
 function updateTypeButtons() {
@@ -713,36 +775,45 @@ function updateTypeButtons() {
   document.getElementById('saveBtn').style.background = colors[selectedType];
 }
 
-// Автоподставляем цену при выборе товара
-document.getElementById('f_product')?.addEventListener('change', function() {
-  const opt = this.selectedOptions[0];
-  if (opt && opt.dataset.price) {
-    document.getElementById('f_price').value = opt.dataset.price;
-  }
-});
-
+// ─── СОХРАНЕНИЕ С ПРОВЕРКОЙ ПОСТАВЩИКА ────────────────────
 async function saveTransaction() {
-  const productSel = document.getElementById('f_product');
-  const productId  = productSel.value;
-  const qty        = Number(document.getElementById('f_qty').value);
+  const productSel   = document.getElementById('f_product');
+  const productId    = productSel.value;
+  const qty          = Number(document.getElementById('f_qty').value);
+  const selectedSupplier = document.getElementById('f_supplier').value;
 
   if (!productId || !qty) {
     showToast('error', '⚠️', 'Выберите товар и укажите количество');
     return;
   }
 
-  const productOpt  = productSel.selectedOptions[0];
-  const productName = productOpt.text.split(' (')[0];
-  const productSku  = productOpt.text.match(/\(([^)]+)\)/)?.[1] || '';
-  const unit        = productOpt.dataset.unit || 'шт';
+  // ── Проверка соответствия поставщик ↔ товар ──────────────
+  const opt           = productSel.selectedOptions[0];
+  const productClient = opt?.dataset.client   || '';
+  const productSupp   = opt?.dataset.supplier || '';
+  const productOwner  = productClient || productSupp;
+
+  if (productOwner && selectedSupplier && selectedSupplier !== productOwner) {
+    showToast('error', '⛔',
+      `Товар принадлежит «${productOwner}», а выбран «${selectedSupplier}». Исправьте перед сохранением.`);
+    showSupplierInfo('err',
+      `⛔ Товар принадлежит «${productOwner}», но выбран поставщик «${selectedSupplier}»`);
+    return;
+  }
+
+  const productName = opt?.text.split(' (')[0] || '';
+  const productSku  = opt?.text.match(/\(([^)]+)\)/)?.[1] || '';
+  const unit        = opt?.dataset.unit || 'шт';
   const price       = Number(document.getElementById('f_price').value) || 0;
+  // Если у товара есть владелец и поставщик не выбран — автоматически используем владельца
+  const supplierToSave = selectedSupplier || productOwner || '';
 
   const data = {
     type:     selectedType,
     product:  productId,
     quantity: qty,
     price,
-    supplier: document.getElementById('f_supplier').value.trim(),
+    supplier: supplierToSave,
     comment:  document.getElementById('f_comment').value.trim(),
   };
 
@@ -755,35 +826,34 @@ async function saveTransaction() {
     if (res.ok) {
       const created = await res.json();
       const tx = {
-        id: created.id,
-        type: created.type,
-        product: created.product?.name || created.product || productName,
-        sku: created.sku || created.product?.sku || productSku,
-        qty: created.quantity,
-        unit: created.unit || created.product?.unit || unit,
-        price: created.price,
-        total: created.total || created.totalAmount || 0,
-        supplier: created.supplier?.name || created.supplier || data.supplier,
-        by: created.createdBy?.displayName || created.by || 'Вы',
-        date: created.date || created.createdAt || new Date().toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-        comment: created.comment || data.comment,
+        id:       created.id,
+        type:     created.type,
+        product:  created.product?.name || created.product || productName,
+        sku:      created.sku || created.product?.sku || productSku,
+        qty:      created.quantity,
+        unit:     created.unit || created.product?.unit || unit,
+        price:    created.price,
+        total:    created.total || created.totalAmount || 0,
+        supplier: created.supplier?.name || created.supplier || supplierToSave,
+        by:       created.createdBy?.displayName || created.by || 'Вы',
+        date:     created.date || created.createdAt || new Date().toLocaleString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+        comment:  created.comment || data.comment,
       };
       transactions.unshift(tx);
-      await loadProducts();
+      // Обновляем остатки в allProducts
+      const pIdx = allProducts.findIndex(p => String(p._id || p.id) === String(productId));
+      if (pIdx !== -1) {
+        const delta = selectedType === 'income' ? qty : -qty;
+        allProducts[pIdx] = { ...allProducts[pIdx], quantity: (allProducts[pIdx].quantity || 0) + delta };
+      }
     } else {
       const err = await res.json().catch(()=>({}));
       showToast('error','⚠️', err.error || 'Ошибка сервера');
       return;
     }
   } catch {
-    transactions.unshift({
-      id: Date.now(), type: selectedType,
-      product: productName, sku: productSku,
-      qty, unit, price, total: qty * price,
-      supplier: data.supplier, by: 'Вы',
-      date: new Date().toLocaleString('ru-RU', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}),
-      comment: data.comment,
-    });
+    showToast('error','⚠️','Нет соединения с сервером');
+    return;
   }
 
   const labels = { income:'Приход записан ✅', outcome:'Расход записан ✅', writeoff:'Списание записано ✅' };
@@ -823,10 +893,9 @@ function showToast(type, icon, text) {
   document.getElementById('toastIcon').textContent = icon;
   document.getElementById('toastText').textContent = text;
   t.className = `toast ${type} show`;
-  setTimeout(() => t.classList.remove('show'), 3000);
+  setTimeout(() => t.classList.remove('show'), 4000);
 }
 
-// ТЕМА
 function toggleTheme(){
   var t=document.documentElement.getAttribute('data-theme')==='light'?'dark':'light';
   document.documentElement.setAttribute('data-theme',t);
