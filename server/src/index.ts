@@ -5,6 +5,8 @@ import cors from "cors";
 import path from "path";
 import authRoutes from "./routes/auth";
 import apiRoutes from "./routes/api";
+import { store } from "./store";
+import { checkAndNotifyLowStock } from "./mailer";
 
 dotenv.config();
 
@@ -26,10 +28,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false,           // true если HTTPS
+    secure: false,
     sameSite: "lax",
     httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, // 24 часа
+    maxAge: 1000 * 60 * 60 * 24,
   },
 }));
 
@@ -47,7 +49,6 @@ app.get("/", (_req, res) => {
   res.sendFile(path.resolve(__dirname, "../../client/public.html"));
 });
 
-// Страницы фронтенда
 const pages = ["dashboard", "products", "transactions", "suppliers",
   "analytics", "contracts", "login", "public", "finances", "public-requests"];
 pages.forEach(page => {
@@ -56,18 +57,20 @@ pages.forEach(page => {
   });
 });
 
-// API роуты
 app.use("/auth", authRoutes);
 app.use("/api",  apiRoutes);
 
-// 404
 app.use((_req, res) => {
   res.status(404).json({ error: "Маршрут не найден" });
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`\n✅ Сервер запущен: http://localhost:${port}`);
   console.log(`📦 Хранилище: in-memory (данные сбрасываются при перезапуске)`);
   console.log(`🔑 Войти: http://localhost:${port}`);
   console.log(`   Логин: admin | Пароль: admin123\n`);
+
+  // ── Проверка низких остатков при старте сервера ──────────
+  console.log(`📧 Проверка низких остатков при старте...`);
+  await checkAndNotifyLowStock(store.products).catch(console.error);
 });
