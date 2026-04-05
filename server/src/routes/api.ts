@@ -1,6 +1,7 @@
 import { Router, Request, Response } from "express";
 import { store } from "../store";
 import { requireAuth } from "../middleware/auth";
+import { sendLowStockAlert } from "../mailer";
 
 const router = Router();
 
@@ -71,6 +72,12 @@ router.post("/products", requireAuth, (req: Request, res: Response) => {
     updatedAt: new Date().toISOString(),
   };
   store.products.push(product);
+
+  // Проверяем: если добавлен товар с уже низким остатком — уведомляем
+  if (product.minQuantity > 0 && product.quantity <= product.minQuantity) {
+    sendLowStockAlert(product).catch(console.error);
+  }
+
   res.status(201).json(product);
 });
 
@@ -142,7 +149,6 @@ router.get("/suppliers", requireAuth, (req: Request, res: Response) => {
   const { search } = req.query;
   if (search) list = list.filter(s => s.name.toLowerCase().includes(String(search).toLowerCase()));
   list.sort((a, b) => {
-    // Сортировка: активные → просроченные → архивные → без договора
     const order: Record<string, number> = { active: 0, expired: 1, archive: 2, nocontract: 3 };
     const sa = getClientStatus(a.name);
     const sb = getClientStatus(b.name);
@@ -166,7 +172,6 @@ router.get("/suppliers/:id", requireAuth, (req: Request, res: Response) => {
 router.post("/suppliers", requireAuth, (req: Request, res: Response) => {
   const data = req.body;
   if (!data.name) return res.status(400).json({ error: "Укажите название клиента" });
-  // Проверяем дубликат
   const exists = store.suppliers.find(s => s.name.toLowerCase() === data.name.toLowerCase());
   if (exists) return res.status(409).json({ error: "Клиент с таким именем уже существует" });
   const supplier = {
@@ -197,7 +202,7 @@ router.delete("/suppliers/:id", requireAuth, (req: Request, res: Response) => {
 });
 
 // ════════════════════════════════════════════════
-//  TRANSACTIONS
+//  TRANSACTIONS — с проверкой низкого остатка
 // ════════════════════════════════════════════════
 router.get("/transactions", requireAuth, (req: Request, res: Response) => {
   const { type, page = "1", limit = "20" } = req.query;
@@ -225,6 +230,7 @@ router.post("/transactions", requireAuth, (req: Request, res: Response) => {
   const idx = store.products.findIndex(p => p.id === product.id);
   store.products[idx].quantity += delta;
   store.products[idx].updatedAt = new Date().toISOString();
+
   const by = (req as any).user?.displayName || "Администратор";
   const unitPrice = Number(price) || 0;
   const transaction = {
@@ -238,6 +244,25 @@ router.post("/transactions", requireAuth, (req: Request, res: Response) => {
     date: new Date().toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
   };
   store.transactions.push(transaction);
+
+  // ── Проверяем: стал ли остаток ниже минимума после операции ──
+  const updatedProduct = store.products[idx];
+  if (
+    updatedProduct.minQuantity > 0 &&
+    updatedProduct.quantity <= updatedProduct.minQuantity
+  ) {
+    sendLowStockAlert({
+      name:        updatedProduct.name,
+      sku:         updatedProduct.sku,
+      category:    updatedProduct.category,
+      quantity:    updatedProduct.quantity,
+      minQuantity: updatedProduct.minQuantity,
+      unit:        updatedProduct.unit,
+      clientName:  updatedProduct.clientName,
+      contractNum: updatedProduct.contractNum,
+    }).catch(console.error);
+  }
+
   res.status(201).json(transaction);
 });
 
@@ -245,18 +270,14 @@ router.post("/transactions", requireAuth, (req: Request, res: Response) => {
 //  CONTRACTS — авто-создание клиента + товара
 // ════════════════════════════════════════════════
 
-/** Авто-добавление или обновление клиента в справочнике */
 function ensureSupplierExists(data: Record<string, any>, contractNumber: string): void {
   if (!data.clientName) return;
-
   const existsIdx = store.suppliers.findIndex(s =>
     s.name === data.clientName ||
     (data.clientPhone && s.phone === data.clientPhone) ||
     (data.clientEmail && s.email === data.clientEmail)
   );
-
   if (existsIdx === -1) {
-    // Создаём нового клиента
     store.suppliers.push({
       id: store.nextId("suppliers"),
       name:      data.clientName,
@@ -269,7 +290,6 @@ function ensureSupplierExists(data: Record<string, any>, contractNumber: string)
     });
     console.log(`✅ Авто-создан клиент: ${data.clientName}`);
   } else {
-    // Обновляем недостающие контакты
     const s = store.suppliers[existsIdx];
     store.suppliers[existsIdx] = {
       ...s,
@@ -281,27 +301,19 @@ function ensureSupplierExists(data: Record<string, any>, contractNumber: string)
   }
 }
 
-/**
- * Авто-регистрация товара клиента на складе.
- * Количество = 0: договор не означает физический приход товара.
- * Фактический приход регистрируется вручную через операции.
- */
 function ensureProductExists(data: Record<string, any>, contractNumber: string): void {
   if (!data.productName) return;
-
   const sku = data.productSku || `CLT-${Date.now().toString().slice(-6)}`;
-
   const existsProdIdx = store.products.findIndex(p =>
     (p.clientName === data.clientName && p.name === data.productName) || p.sku === sku
   );
-
   if (existsProdIdx === -1) {
     store.products.push({
       id: store.nextId("products"),
       name:          data.productName,
       sku:           sku,
       category:      data.productCategory || "Товары на хранении",
-      quantity:      0,  // товар ещё не поступил физически — приход делается вручную
+      quantity:      0,
       unit:          data.unit || "шт",
       purchasePrice: 0,
       minQuantity:   0,
@@ -313,7 +325,6 @@ function ensureProductExists(data: Record<string, any>, contractNumber: string):
     } as any);
     console.log(`✅ Авто-создан товар (ожидается поступление): ${data.productName} для клиента ${data.clientName}`);
   } else {
-    // Привязываем к договору, количество не меняем
     store.products[existsProdIdx] = {
       ...store.products[existsProdIdx],
       contractNum: contractNumber,
@@ -326,13 +337,10 @@ function ensureProductExists(data: Record<string, any>, contractNumber: string):
 router.get("/contracts", requireAuth, (req: Request, res: Response) => {
   let list = [...store.contracts];
   const { status, search } = req.query;
-
-  // Автообновление просроченных
   const now = new Date();
   list.forEach(c => {
     if (c.status === "active" && new Date(c.endDate) < now) c.status = "expired";
   });
-
   if (status) list = list.filter(c => c.status === String(status));
   if (search)  list = list.filter(c => c.clientName.toLowerCase().includes(String(search).toLowerCase()) || c.number.toLowerCase().includes(String(search).toLowerCase()));
   list.sort((a, b) => b.id - a.id);
@@ -395,11 +403,7 @@ router.post("/contracts", requireAuth, (req: Request, res: Response) => {
   };
 
   store.contracts.push(contract);
-
-  // ── Авто-регистрация клиента ──────────────────────────────
   ensureSupplierExists(data, contractNumber);
-
-  // ── Авто-регистрация товара (количество = 0, без транзакции) ──
   ensureProductExists(data, contractNumber);
 
   res.status(201).json(contract);
@@ -413,7 +417,6 @@ router.put("/contracts/:id", requireAuth, (req: Request, res: Response) => {
   const current = store.contracts[idx];
   const updated = { ...current, ...data, id: current.id };
 
-  // Пересчёт страховки
   if ("insuranceEnabled" in data || "declaredValue" in data) {
     updated.insuranceEnabled = Boolean(updated.insuranceEnabled);
     updated.declaredValue    = updated.insuranceEnabled ? (Number(updated.declaredValue) || 0) : 0;
@@ -421,13 +424,11 @@ router.put("/contracts/:id", requireAuth, (req: Request, res: Response) => {
     if (!updated.insuranceEnabled) updated.insuranceCompany = "";
   }
 
-  // Пересчёт хранения
   if (data.storageArea || data.storageRate || data.durationMonths) {
     updated.storageCostPerMonth = updated.storageArea * updated.storageRate;
     updated.totalStorageCost    = updated.storageCostPerMonth * updated.durationMonths;
   }
 
-  // Пересчёт конечной даты
   if (data.startDate || data.durationMonths) {
     const end = new Date(updated.startDate);
     end.setMonth(end.getMonth() + Number(updated.durationMonths));
@@ -436,7 +437,6 @@ router.put("/contracts/:id", requireAuth, (req: Request, res: Response) => {
 
   store.contracts[idx] = updated;
 
-  // Синхронизация товара при завершении/отмене
   if (data.status && (data.status === "completed" || data.status === "cancelled")) {
     const pIdx = store.products.findIndex(p => p.contractNum === current.number);
     if (pIdx !== -1) {
@@ -446,7 +446,6 @@ router.put("/contracts/:id", requireAuth, (req: Request, res: Response) => {
         quantity: 0,
         updatedAt: new Date().toISOString(),
       };
-      // Создаём транзакцию расхода при завершении (если был остаток)
       if (data.status === "completed" && store.products[pIdx].quantity > 0) {
         const by = (req as any).user?.displayName || "Администратор";
         store.transactions.push({
