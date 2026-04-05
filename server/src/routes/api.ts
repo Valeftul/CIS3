@@ -281,9 +281,13 @@ function ensureSupplierExists(data: Record<string, any>, contractNumber: string)
   }
 }
 
-/** Авто-регистрация товара клиента на складе */
+/**
+ * Авто-регистрация товара клиента на складе.
+ * Количество = 0: договор не означает физический приход товара.
+ * Фактический приход регистрируется вручную через операции.
+ */
 function ensureProductExists(data: Record<string, any>, contractNumber: string): void {
-  if (!data.productName || !data.quantity || Number(data.quantity) <= 0) return;
+  if (!data.productName) return;
 
   const sku = data.productSku || `CLT-${Date.now().toString().slice(-6)}`;
 
@@ -294,22 +298,22 @@ function ensureProductExists(data: Record<string, any>, contractNumber: string):
   if (existsProdIdx === -1) {
     store.products.push({
       id: store.nextId("products"),
-      name:         data.productName,
-      sku:          sku,
-      category:     data.productCategory || "Товары на хранении",
-      quantity:     Number(data.quantity),
-      unit:         data.unit || "шт",
+      name:          data.productName,
+      sku:           sku,
+      category:      data.productCategory || "Товары на хранении",
+      quantity:      0,  // товар ещё не поступил физически — приход делается вручную
+      unit:          data.unit || "шт",
       purchasePrice: 0,
-      minQuantity:  0,
-      supplier:     data.clientName,
-      clientName:   data.clientName,
-      contractNum:  contractNumber,
-      description:  `Принято на хранение по договору ${contractNumber}`,
-      updatedAt:    new Date().toISOString(),
+      minQuantity:   0,
+      supplier:      data.clientName,
+      clientName:    data.clientName,
+      contractNum:   contractNumber,
+      description:   `Ожидается по договору ${contractNumber}. Ожидаемое кол-во: ${data.quantity || '—'} ${data.unit || 'шт'}`,
+      updatedAt:     new Date().toISOString(),
     } as any);
-    console.log(`✅ Авто-создан товар: ${data.productName} для клиента ${data.clientName}`);
+    console.log(`✅ Авто-создан товар (ожидается поступление): ${data.productName} для клиента ${data.clientName}`);
   } else {
-    // Привязываем к договору и обновляем количество
+    // Привязываем к договору, количество не меняем
     store.products[existsProdIdx] = {
       ...store.products[existsProdIdx],
       contractNum: contractNumber,
@@ -395,26 +399,8 @@ router.post("/contracts", requireAuth, (req: Request, res: Response) => {
   // ── Авто-регистрация клиента ──────────────────────────────
   ensureSupplierExists(data, contractNumber);
 
-  // ── Авто-регистрация товара ───────────────────────────────
+  // ── Авто-регистрация товара (количество = 0, без транзакции) ──
   ensureProductExists(data, contractNumber);
-
-  // ── Добавляем транзакцию прихода ────────────────────────
-  if (data.productName && Number(data.quantity) > 0) {
-    const product = store.products.find(p => p.contractNum === contractNumber);
-    if (product) {
-      const by = (req as any).user?.displayName || "Администратор";
-      store.transactions.push({
-        id: store.nextId("transactions"),
-        type: "income",
-        product: product.name, sku: product.sku,
-        productId: product.id, quantity: Number(data.quantity),
-        unit: data.unit || "шт", price: 0, total: 0,
-        supplier: data.clientName || "",
-        by, comment: `Приём по договору ${contractNumber}`,
-        date: new Date().toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
-      });
-    }
-  }
 
   res.status(201).json(contract);
 });
@@ -460,7 +446,7 @@ router.put("/contracts/:id", requireAuth, (req: Request, res: Response) => {
         quantity: 0,
         updatedAt: new Date().toISOString(),
       };
-      // Создаём транзакцию расхода при завершении
+      // Создаём транзакцию расхода при завершении (если был остаток)
       if (data.status === "completed" && store.products[pIdx].quantity > 0) {
         const by = (req as any).user?.displayName || "Администратор";
         store.transactions.push({
