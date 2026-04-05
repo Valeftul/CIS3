@@ -110,6 +110,12 @@
   .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent)}
   .field input::placeholder,.field textarea::placeholder{color:var(--muted)}
 
+  /* Подсказка к полю договора */
+  .contract-hint{font-size:11px;margin-top:3px;min-height:16px;transition:color .2s}
+  .contract-hint.found{color:var(--green)}
+  .contract-hint.found-inactive{color:var(--yellow)}
+  .contract-hint.empty{color:var(--muted)}
+
   /* Метка клиента в таблице */
   .client-badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:12px;background:rgba(61,139,255,.1);color:var(--blue);border:1px solid rgba(61,139,255,.2)}
 
@@ -242,11 +248,15 @@
         <!-- ══ КЛИЕНТ — ВЫПАДАЮЩИЙ СПИСОК ══ -->
         <div class="field">
           <label>Клиент (владелец товара)</label>
-          <select id="f_clientName">
+          <select id="f_clientName" onchange="onClientChange()">
             <option value="">— Без клиента —</option>
           </select>
         </div>
-        <div class="field"><label>№ Договора</label><input id="f_contractNum" type="text" placeholder="ДХ-2025-0001" /></div>
+        <div class="field">
+          <label>№ Договора</label>
+          <input id="f_contractNum" type="text" placeholder="Выберите клиента выше" />
+          <div class="contract-hint empty" id="contractHint"></div>
+        </div>
 
         <div class="field span2"><label>Описание / Особые условия хранения</label><textarea id="f_description" rows="2" placeholder="Хранить в сухом тёмном месте..."></textarea></div>
       </div>
@@ -275,6 +285,9 @@
 <script>
 let products=[], filtered=[], editingId=null, deleteId=null, sortField='name', sortDir=1, currentPage=1;
 const PAGE_SIZE=10;
+
+// ─── Кэш договоров для автозаполнения ──────────────────────
+let contractsCache = [];
 
 function getLevel(p){
   if(p.quantity===0) return 'critical';
@@ -305,6 +318,17 @@ async function init(){
   }catch{location.href='/login';return;}
   await loadProducts();
   await loadClientsForSelect();
+  await loadContractsCache();
+}
+
+// ─── ЗАГРУЗКА ДОГОВОРОВ В КЭШ ─────────────────────────────
+async function loadContractsCache() {
+  try {
+    const res = await fetch('/api/contracts', { credentials: 'include' });
+    contractsCache = res.ok ? await res.json() : [];
+  } catch(e) {
+    contractsCache = [];
+  }
 }
 
 // ─── ЗАГРУЗКА КЛИЕНТОВ В ВЫПАДАЮЩИЙ СПИСОК ────────────────
@@ -317,11 +341,67 @@ async function loadClientsForSelect() {
     const currentVal = sel.value;
     sel.innerHTML = '<option value="">— Без клиента —</option>' +
       suppliers.map(s => `<option value="${s.name}">${s.name}${s.clientStatus === 'active' ? ' ✅' : s.clientStatus === 'expired' ? ' ⚠️' : ''}</option>`).join('');
-    // Восстанавливаем выбранное значение если редактируем
     if (currentVal) sel.value = currentVal;
   } catch(e) {
     console.error('Ошибка загрузки клиентов:', e);
   }
+}
+
+// ─── АВТОЗАПОЛНЕНИЕ НОМЕРА ДОГОВОРА ───────────────────────
+async function onClientChange() {
+  const clientName = document.getElementById('f_clientName').value;
+  const contractNumField = document.getElementById('f_contractNum');
+  const hint = document.getElementById('contractHint');
+
+  // При редактировании — не перезаписываем поле автоматически
+  if (editingId) {
+    hint.className = 'contract-hint empty';
+    hint.textContent = '';
+    return;
+  }
+
+  if (!clientName) {
+    contractNumField.value = '';
+    contractNumField.placeholder = 'Выберите клиента выше';
+    hint.className = 'contract-hint empty';
+    hint.textContent = '';
+    return;
+  }
+
+  // Ищем сначала активный договор
+  const activeContract = contractsCache.find(function(c) {
+    return c.clientName === clientName && c.status === 'active';
+  });
+
+  if (activeContract) {
+    contractNumField.value = activeContract.number;
+    contractNumField.style.borderColor = 'var(--green)';
+    hint.className = 'contract-hint found';
+    hint.textContent = '✅ Активный договор подставлен автоматически';
+    setTimeout(function() { contractNumField.style.borderColor = ''; }, 2000);
+    return;
+  }
+
+  // Если активного нет — ищем любой другой (просроченный, завершённый)
+  const anyContract = contractsCache.find(function(c) {
+    return c.clientName === clientName;
+  });
+
+  if (anyContract) {
+    contractNumField.value = anyContract.number;
+    contractNumField.style.borderColor = 'var(--yellow)';
+    const statusLabel = { expired: 'просроченный', completed: 'завершённый', cancelled: 'отменённый' };
+    hint.className = 'contract-hint found-inactive';
+    hint.textContent = '⚠️ Подставлен ' + (statusLabel[anyContract.status] || '') + ' договор — проверьте';
+    setTimeout(function() { contractNumField.style.borderColor = ''; }, 2000);
+    return;
+  }
+
+  // Договоров нет совсем
+  contractNumField.value = '';
+  contractNumField.placeholder = 'Нет договоров для этого клиента';
+  hint.className = 'contract-hint empty';
+  hint.textContent = 'У клиента нет договоров — введите вручную';
 }
 
 async function loadProducts(){
@@ -374,7 +454,6 @@ function renderTable(){
     const id=p._id||p.id;
     const barMax=Math.max((p.minQuantity||0)*3,p.quantity||0,1);
     const barPct=Math.min(100,((p.quantity||0)/barMax)*100);
-    // Клиент — показываем бейджем если есть
     const clientHtml=p.clientName
       ?`<div><span class="client-badge">👤 ${p.clientName}</span></div><div style="font-size:11px;color:var(--muted);margin-top:3px">${p.contractNum||''}</div>`
       :'<span style="font-size:12px;color:var(--muted)">—</span>';
@@ -430,8 +509,15 @@ async function openModal(product=null){
   editingId=product?(product._id||product.id):null;
   document.getElementById('modalTitle').textContent=product?'РЕДАКТИРОВАТЬ ТОВАР':'НОВЫЙ ТОВАР';
 
-  // Сначала обновляем список клиентов (может быть устаревшим)
+  // Сбрасываем подсказку
+  const hint = document.getElementById('contractHint');
+  hint.className = 'contract-hint empty';
+  hint.textContent = '';
+
+  // Обновляем список клиентов
   await loadClientsForSelect();
+  // Обновляем кэш договоров
+  await loadContractsCache();
 
   // Заполняем поля
   ['name','sku','quantity','minQuantity','description','contractNum'].forEach(f=>{
@@ -439,17 +525,17 @@ async function openModal(product=null){
     if(el)el.value=product?(product[f]??''):'';
   });
 
-  // Категория и единица
+  // Сбрасываем placeholder поля договора
+  document.getElementById('f_contractNum').placeholder = product ? 'ДХ-2025-0001' : 'Выберите клиента выше';
+
   if(product?.category)document.getElementById('f_category').value=product.category;
   else document.getElementById('f_category').value='';
   if(product?.unit)document.getElementById('f_unit').value=product.unit;
   else document.getElementById('f_unit').value='шт';
 
-  // Клиент — выпадающий список
   const clientSel = document.getElementById('f_clientName');
   if(clientSel) {
     clientSel.value = product ? (product.clientName || '') : '';
-    // Если значение не нашлось в списке, добавляем временную опцию
     if(product?.clientName && clientSel.value !== product.clientName) {
       const opt = document.createElement('option');
       opt.value = product.clientName;
@@ -466,7 +552,14 @@ function editProduct(id){
   const p=products.find(p=>(p._id||p.id)==id||String(p._id||p.id)===String(id));
   if(p)openModal(p);
 }
-function closeModal(){document.getElementById('modalOverlay').classList.remove('open');editingId=null;}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId=null;
+  // Сбрасываем подсказку при закрытии
+  const hint = document.getElementById('contractHint');
+  hint.className = 'contract-hint empty';
+  hint.textContent = '';
+}
 
 async function saveProduct(){
   const data={
@@ -476,7 +569,7 @@ async function saveProduct(){
     quantity:    Number(document.getElementById('f_quantity').value)||0,
     unit:        document.getElementById('f_unit').value,
     minQuantity: Number(document.getElementById('f_minQuantity').value)||0,
-    clientName:  document.getElementById('f_clientName').value,   // из select
+    clientName:  document.getElementById('f_clientName').value,
     contractNum: document.getElementById('f_contractNum').value.trim(),
     description: document.getElementById('f_description').value.trim(),
     purchasePrice: 0,
