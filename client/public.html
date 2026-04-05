@@ -105,7 +105,7 @@ input[type=range]{width:100%;height:6px;appearance:none;background:var(--border)
 input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 2px var(--accent)}
 .period-ticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:4px}
 
-/* ─── СТРАХОВАНИЕ ─── */
+/* СТРАХОВАНИЕ */
 .insurance-block{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
 .insurance-toggle{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;cursor:pointer;user-select:none;transition:background .15s}
 .insurance-toggle:hover{background:rgba(255,255,255,.03)}
@@ -113,12 +113,9 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
 .ins-icon{font-size:22px}
 .ins-title{font-weight:700;font-size:14px}
 .ins-subtitle{font-size:12px;color:var(--muted);margin-top:2px}
-/* переключатель */
 .toggle-switch{width:44px;height:24px;background:var(--border);border-radius:12px;position:relative;transition:background .2s;flex-shrink:0}
 .toggle-switch::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s}
-.toggle-switch.on{background:var(--green)}
-.toggle-switch.on::after{transform:translateX(20px)}
-/* тело страховки */
+.toggle-switch.on{background:var(--green)}.toggle-switch.on::after{transform:translateX(20px)}
 .insurance-body{padding:16px 18px;border-top:1px solid var(--border);background:rgba(46,213,115,.04);display:none}
 .insurance-body.open{display:block}
 .ins-note{font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.5}
@@ -128,7 +125,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
 .ins-total-lbl{font-size:13px;font-weight:700}
 .ins-total-val{font-family:var(--font-head);font-size:24px;color:var(--green)}
 
-/* ИТОГО РЕЗУЛЬТАТ */
+/* ИТОГО */
 .calc-result{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px 22px;margin-bottom:20px}
 .res-row{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:3px 0}
 .res-row .rv{color:var(--text);font-weight:600}
@@ -168,10 +165,117 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
 .feat-name{font-weight:700;font-size:15px;margin-bottom:6px}
 .feat-desc{font-size:13px;color:var(--muted);line-height:1.6}
 
+/* ══════════════════════════════════════════════
+   СЕКЦИЯ СТРАХОВОГО АГЕНТА
+══════════════════════════════════════════════ */
+.insurance-agent-section{padding:0 48px 80px;max-width:1200px;margin:0 auto}
+
+.agent-card-wrap{
+  display:grid;grid-template-columns:1fr 360px;gap:28px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:40px;position:relative;overflow:hidden;
+}
+.agent-card-wrap::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--green),var(--blue));
+}
+
+.agent-badge-row{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.agent-shield{font-size:40px;flex-shrink:0}
+.agent-title{font-family:var(--font-head);font-size:20px;letter-spacing:1px;line-height:1.1}
+.agent-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.agent-verified{
+  margin-left:auto;flex-shrink:0;
+  background:rgba(46,213,115,.12);border:1px solid rgba(46,213,115,.3);
+  color:var(--green);font-size:12px;font-weight:700;
+  padding:5px 12px;border-radius:20px;white-space:nowrap;
+}
+
+.agent-desc{font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:24px}
+.agent-desc strong{color:var(--text)}
+
+.agent-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+.agent-fact{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:14px 12px;text-align:center;
+}
+.af-val{font-family:var(--font-head);font-size:28px;letter-spacing:1px;color:var(--accent);line-height:1}
+.af-lbl{font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4}
+
+/* Превью документа */
+.agent-doc-preview{
+  background:linear-gradient(160deg,#1a2340 0%,#111828 100%);
+  border:1px solid rgba(61,139,255,.25);border-radius:14px;
+  padding:28px;cursor:pointer;transition:all .2s;position:relative;
+  display:flex;flex-direction:column;gap:12px;
+}
+.agent-doc-preview:hover{border-color:rgba(61,139,255,.5);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.doc-preview-header{display:flex;align-items:center;justify-content:space-between}
+.doc-preview-logo{font-family:var(--font-head);font-size:20px;letter-spacing:2px;color:var(--blue)}
+.doc-preview-stamp{
+  font-size:10px;font-weight:700;letter-spacing:2px;
+  border:2px solid rgba(46,213,115,.4);color:var(--green);
+  padding:3px 8px;border-radius:4px;
+}
+.doc-preview-title{font-family:var(--font-head);font-size:15px;letter-spacing:2px;color:var(--text);text-align:center;margin-top:4px}
+.doc-preview-num{font-size:12px;color:var(--muted);text-align:center}
+.doc-preview-lines{display:flex;flex-direction:column;gap:7px;margin:8px 0;flex:1}
+.dp-line{height:6px;background:rgba(255,255,255,.07);border-radius:3px}
+.dp-line.long{width:100%}.dp-line.medium{width:72%}.dp-line.short{width:45%}
+.doc-preview-sigs{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:4px}
+.sig-block-mini{display:flex;flex-direction:column;gap:6px}
+.sig-line-mini{height:1px;background:rgba(255,255,255,.2)}
+.sig-name-mini{font-size:11px;color:var(--muted)}
+.doc-preview-hint{
+  text-align:center;font-size:11px;color:rgba(61,139,255,.6);
+  letter-spacing:1px;text-transform:uppercase;margin-top:4px;
+}
+
+/* ══════════════════════════════════════════════
+   МОДАЛЬНОЕ ОКНО: АГЕНТСКИЙ ДОГОВОР
+══════════════════════════════════════════════ */
+.ins-modal{
+  width:800px;max-width:100%;max-height:90vh;
+  display:flex;flex-direction:column;
+}
+.ins-doc-body{
+  padding:28px;overflow-y:auto;flex:1;
+  display:flex;flex-direction:column;gap:24px;
+}
+.ins-doc-section{display:flex;flex-direction:column;gap:10px}
+.ins-section-title{
+  font-family:var(--font-head);font-size:16px;letter-spacing:1px;
+  color:var(--accent);border-bottom:1px solid var(--border);
+  padding-bottom:8px;
+}
+.ins-doc-body p{font-size:13px;color:var(--muted);line-height:1.8}
+.ins-doc-body p strong{color:var(--text)}
+.ins-list{display:flex;flex-direction:column;gap:6px;padding-left:20px}
+.ins-list li{font-size:13px;color:var(--muted);line-height:1.7;list-style:disc}
+
+.ins-doc-parties{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center}
+.ins-party{
+  background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:16px;
+}
+.ins-party-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:6px}
+.ins-party-name{font-weight:700;font-size:15px;margin-bottom:6px;color:var(--text)}
+.ins-party-details{font-size:12px;color:var(--muted);line-height:1.7}
+.ins-party-and{font-family:var(--font-head);font-size:24px;color:var(--muted);text-align:center}
+
+.ins-sigs-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:8px}
+.ins-sig-block{display:flex;flex-direction:column;gap:8px}
+.ins-sig-role{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
+.ins-sig-name{font-weight:700;font-size:15px;color:var(--text)}
+.ins-sig-detail{font-size:12px;color:var(--muted);line-height:1.7}
+.ins-sig-line{margin-top:16px}
+.ins-sig-stroke{height:1px;background:var(--border);margin-bottom:6px}
+.ins-sig-caption{font-size:11px;color:var(--muted)}
+
 /* MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
 .modal-overlay.open{display:flex}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:500px;max-width:100%;animation:fadeUp .3s ease;position:relative;overflow:hidden}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;width:500px;max-width:100%;animation:fadeUp .3s ease;position:relative;overflow:hidden;margin:auto}
 .modal::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
 .modal-head{padding:24px 28px 16px;border-bottom:1px solid var(--border)}
 .modal-title{font-family:var(--font-head);font-size:24px;letter-spacing:1px;margin-bottom:4px}
@@ -223,11 +327,29 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
 
 @media(max-width:900px){
   .header{padding:14px 24px}.hero{padding:100px 24px 60px}
-  .warehouse-section,.tariffs-section,.features-section{padding-left:24px;padding-right:24px}
+  .warehouse-section,.tariffs-section,.features-section,.insurance-agent-section{padding-left:24px;padding-right:24px}
   .tariffs-grid,.features-grid{grid-template-columns:1fr}.calc-grid{grid-template-columns:1fr}.period-full{grid-column:span 1}
   .footer{padding:32px 24px;flex-direction:column;text-align:center}
+  .agent-card-wrap{grid-template-columns:1fr}
+  .agent-doc-preview{display:none}
+  .agent-facts{grid-template-columns:1fr 1fr}
+  .ins-doc-parties{grid-template-columns:1fr;}.ins-party-and{display:none}
+  .ins-sigs-grid{grid-template-columns:1fr}
 }
-@media(max-width:600px){.hero-title{font-size:48px}.header-nav{display:none}}
+@media(max-width:600px){.hero-title{font-size:48px}.header-nav{display:none}.agent-facts{grid-template-columns:1fr}}
+
+/* Печать */
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .ins-doc-body{font-size:11pt}
+  .modal-overlay{position:static!important;background:none!important;padding:0!important;display:block!important;overflow:visible!important}
+  .ins-modal{width:100%!important;max-height:none!important;border:none!important}
+  .modal-close,.btn-print-ins,.header,.footer,.hero,.warehouse-section,.tariffs-section,.features-section,.insurance-agent-section{display:none!important}
+  .ins-section-title{color:#000!important;border-bottom:1px solid #ccc!important}
+  .ins-doc-body p,.ins-list li{color:#333!important}
+  .ins-party{background:#f5f5f5!important;border:1px solid #ccc!important}
+  .ins-party-name,.ins-sig-name{color:#000!important}
+}
 </style>
 </head>
 <body>
@@ -238,6 +360,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
     <a href="#warehouse">Склад</a>
     <a href="#tariffs">Тарифы</a>
     <a href="#features">Услуги</a>
+    <a href="#insurance-agent">Страхование</a>
     <a href="#warehouse" class="header-btn">Арендовать</a>
   </nav>
   <button class="btn-outline" style="padding:7px 14px;font-size:12px;border-radius:8px" onclick="toggleTheme()" id="themeBtn">🌙</button>
@@ -304,7 +427,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
       <rect x="100" y="255" width="700" height="40" fill="#0f1318" rx="0"/>
       <text x="450" y="280" text-anchor="middle" font-family="Golos Text" font-size="10" fill="#2a3050" letter-spacing="2">ВНУТРЕННИЙ ПРОЕЗД / КОРИДОР</text>
       <line x1="120" y1="275" x2="870" y2="275" stroke="#1e2840" stroke-width="1" stroke-dasharray="12,8"/>
-      <!-- Секция A1 -->
       <g id="sec_A1" class="sec-group" onclick="selectSection('A1')" style="cursor:pointer">
         <rect id="body_A1" x="108" y="103" width="130" height="145" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="148" y="95" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -317,7 +439,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="173" y="217" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="173" y="229" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 8м</text>
       </g>
-      <!-- Секция A2 ЗАНЯТА -->
       <g id="sec_A2" class="sec-group" style="cursor:not-allowed">
         <rect id="body_A2" x="248" y="103" width="130" height="145" fill="rgba(255,71,87,.1)" stroke="rgba(255,71,87,.4)" stroke-width="1.5" rx="3"/>
         <rect x="288" y="95" width="50" height="14" fill="rgba(255,71,87,.2)" stroke="rgba(255,71,87,.5)" stroke-width="1.5" rx="2"/>
@@ -331,7 +452,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="313" y="217" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="313" y="229" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 8м</text>
       </g>
-      <!-- Секция A3 -->
       <g id="sec_A3" class="sec-group" onclick="selectSection('A3')" style="cursor:pointer">
         <rect id="body_A3" x="388" y="103" width="130" height="145" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="428" y="95" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -344,7 +464,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="453" y="217" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="453" y="229" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 8м</text>
       </g>
-      <!-- Секция A4 ЗАНЯТА -->
       <g id="sec_A4" class="sec-group" style="cursor:not-allowed">
         <rect id="body_A4" x="528" y="103" width="130" height="145" fill="rgba(255,71,87,.1)" stroke="rgba(255,71,87,.4)" stroke-width="1.5" rx="3"/>
         <rect x="568" y="95" width="50" height="14" fill="rgba(255,71,87,.2)" stroke="rgba(255,71,87,.5)" stroke-width="1.5" rx="2"/>
@@ -358,7 +477,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="593" y="217" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="593" y="229" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 8м</text>
       </g>
-      <!-- Секция A5 -->
       <g id="sec_A5" class="sec-group" onclick="selectSection('A5')" style="cursor:pointer">
         <rect id="body_A5" x="668" y="103" width="124" height="145" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="703" y="95" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -371,7 +489,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="730" y="217" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="730" y="229" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 8м</text>
       </g>
-      <!-- Секция B1 ЗАНЯТА -->
       <g id="sec_B1" class="sec-group" style="cursor:not-allowed">
         <rect id="body_B1" x="108" y="302" width="130" height="140" fill="rgba(255,71,87,.1)" stroke="rgba(255,71,87,.4)" stroke-width="1.5" rx="3"/>
         <rect x="148" y="436" width="50" height="14" fill="rgba(255,71,87,.2)" stroke="rgba(255,71,87,.5)" stroke-width="1.5" rx="2"/>
@@ -385,7 +502,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="173" y="316" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="173" y="328" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 6м</text>
       </g>
-      <!-- Секция B2 -->
       <g id="sec_B2" class="sec-group" onclick="selectSection('B2')" style="cursor:pointer">
         <rect id="body_B2" x="248" y="302" width="130" height="140" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="288" y="436" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -398,7 +514,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="313" y="316" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="313" y="328" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 6м</text>
       </g>
-      <!-- Секция B3 ЗАНЯТА -->
       <g id="sec_B3" class="sec-group" style="cursor:not-allowed">
         <rect id="body_B3" x="388" y="302" width="130" height="140" fill="rgba(255,71,87,.1)" stroke="rgba(255,71,87,.4)" stroke-width="1.5" rx="3"/>
         <rect x="428" y="436" width="50" height="14" fill="rgba(255,71,87,.2)" stroke="rgba(255,71,87,.5)" stroke-width="1.5" rx="2"/>
@@ -412,7 +527,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="453" y="316" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="453" y="328" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 6м</text>
       </g>
-      <!-- Секция B4 -->
       <g id="sec_B4" class="sec-group" onclick="selectSection('B4')" style="cursor:pointer">
         <rect id="body_B4" x="528" y="302" width="130" height="140" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="568" y="436" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -425,7 +539,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="593" y="316" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="593" y="328" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 6м</text>
       </g>
-      <!-- Секция B5 -->
       <g id="sec_B5" class="sec-group" onclick="selectSection('B5')" style="cursor:pointer">
         <rect id="body_B5" x="668" y="302" width="124" height="140" fill="rgba(46,213,115,.08)" stroke="rgba(46,213,115,.4)" stroke-width="1.5" rx="3"/>
         <rect x="703" y="436" width="50" height="14" fill="rgba(61,139,255,.25)" stroke="rgba(61,139,255,.6)" stroke-width="1.5" rx="2"/>
@@ -438,7 +551,6 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
         <text x="730" y="316" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">▤ Стеллажи</text>
         <text x="730" y="328" text-anchor="middle" font-family="Golos Text" font-size="9" fill="#3a4560">высота 6м</text>
       </g>
-      <!-- ОХРАНА -->
       <rect x="50" y="240" width="50" height="60" fill="#111822" stroke="#2a3050" stroke-width="1.5" rx="3"/>
       <text x="75" y="265" text-anchor="middle" font-family="Golos Text" font-size="8" fill="#5a6380">ОХРАНА</text>
       <text x="75" y="282" text-anchor="middle" font-size="16" fill="#f0a500">🛡</text>
@@ -502,14 +614,14 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
       </div>
     </div>
 
-    <!-- ─── БЛОК СТРАХОВАНИЯ ─── -->
+    <!-- СТРАХОВАНИЕ -->
     <div class="insurance-block">
       <div class="insurance-toggle" onclick="toggleInsurance()">
         <div class="ins-toggle-left">
           <span class="ins-icon">🛡️</span>
           <div>
             <div class="ins-title">Страхование товара</div>
-            <div class="ins-subtitle">Мы выступаем агентом страховой компании «СтрахПро»</div>
+            <div class="ins-subtitle">Мы выступаем агентом страховой компании «СтрахПро» · <span style="color:var(--green);font-weight:700;cursor:pointer" onclick="event.stopPropagation();openInsDoc()">смотреть договор →</span></div>
           </div>
         </div>
         <div class="toggle-switch" id="insSwitch"></div>
@@ -612,12 +724,92 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
     <div class="feat-card"><div class="feat-icon">🚛</div><div class="feat-name">Прямой въезд к секции</div><div class="feat-desc">У каждого помещения собственные ворота 4×4м и рампа для прямой разгрузки грузовика</div></div>
     <div class="feat-card"><div class="feat-icon">🔒</div><div class="feat-name">Охрана 24/7</div><div class="feat-desc">Круглосуточная охрана, видеонаблюдение на всей территории, контроль въезда по пропускам</div></div>
     <div class="feat-card"><div class="feat-icon">🌡️</div><div class="feat-name">Климат-контроль</div><div class="feat-desc">Поддержание температуры 15–22°C и влажности 40–60% в каждой секции независимо</div></div>
-    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-name">Страхование товара</div><div class="feat-desc">Мы — агент страховой компании «СтрахПро». Клиент сам оценивает товар и платит 10% от стоимости в виде страхового взноса. При утрате — полное возмещение.</div></div>
+    <div class="feat-card"><div class="feat-icon">🛡️</div><div class="feat-name">Страхование товара</div><div class="feat-desc">Мы — агент страховой компании «СтрахПро». Клиент сам оценивает товар и платит 10% от стоимости. При утрате — полное возмещение.</div></div>
     <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-name">Оформление за 1 день</div><div class="feat-desc">Договор, ключи и пропуска в течение одного рабочего дня после подачи заявки</div></div>
     <div class="feat-card"><div class="feat-icon">📐</div><div class="feat-name">Гибкая площадь</div><div class="feat-desc">Аренда от 100 м² с возможностью расширения на соседние секции при необходимости</div></div>
   </div>
 </section>
 
+<!-- ══════════════════════════════════════════════════════
+     СЕКЦИЯ: МЫ — СТРАХОВОЙ АГЕНТ
+══════════════════════════════════════════════════════ -->
+<section class="insurance-agent-section" id="insurance-agent">
+  <div class="section-label">Партнёрство</div>
+  <h2 class="section-title">МЫ — СТРАХОВОЙ АГЕНТ</h2>
+  <p class="section-sub">Официально аккредитованный агент страховой компании «СтрахПро» · Лицензия ЦБ РФ СЛ № 3967</p>
+
+  <div class="agent-card-wrap">
+    <!-- Левая часть: инфо -->
+    <div class="agent-info">
+      <div class="agent-badge-row">
+        <div class="agent-shield">🛡️</div>
+        <div>
+          <div class="agent-title">Агентский договор № 2023-А-0047</div>
+          <div class="agent-sub">ООО «СкладПро» × СК «СтрахПро» · с 15 марта 2023 г.</div>
+        </div>
+        <div class="agent-verified">✓ Действует</div>
+      </div>
+
+      <p class="agent-desc">
+        Наша компания на основании агентского договора вправе заключать договоры страхования имущества от имени и по поручению страховой компании <strong>«СтрахПро»</strong>. Клиент самостоятельно объявляет стоимость своего товара — мы её не проверяем и не разглашаем третьим лицам. Страховой взнос составляет <strong>10% от объявленной стоимости</strong>, оплачивается единовременно. При наступлении страхового случая «СтрахПро» выплачивает возмещение в размере объявленной стоимости.
+      </p>
+
+      <div class="agent-facts">
+        <div class="agent-fact">
+          <div class="af-val">10%</div>
+          <div class="af-lbl">страховой взнос от объявленной стоимости</div>
+        </div>
+        <div class="agent-fact">
+          <div class="af-val">100%</div>
+          <div class="af-lbl">возмещение при страховом случае</div>
+        </div>
+        <div class="agent-fact">
+          <div class="af-val">2+ лет</div>
+          <div class="af-lbl">партнёрство со «СтрахПро»</div>
+        </div>
+      </div>
+
+      <button class="btn-big btn-outline" onclick="openInsDoc()">
+        📄 Посмотреть агентский договор
+      </button>
+    </div>
+
+    <!-- Правая часть: превью документа -->
+    <div class="agent-doc-preview" onclick="openInsDoc()" title="Открыть агентский договор">
+      <div class="doc-preview-header">
+        <div class="doc-preview-logo">СтрахПро</div>
+        <div class="doc-preview-stamp">ОРИГИНАЛ</div>
+      </div>
+      <div class="doc-preview-title">АГЕНТСКИЙ ДОГОВОР</div>
+      <div class="doc-preview-num">№ 2023-А-0047 от 15.03.2023</div>
+      <div class="doc-preview-lines">
+        <div class="dp-line long"></div>
+        <div class="dp-line medium"></div>
+        <div class="dp-line long"></div>
+        <div class="dp-line short"></div>
+        <div class="dp-line long"></div>
+        <div class="dp-line medium"></div>
+        <div class="dp-line long"></div>
+        <div class="dp-line short"></div>
+        <div class="dp-line medium"></div>
+        <div class="dp-line long"></div>
+      </div>
+      <div class="doc-preview-sigs">
+        <div class="sig-block-mini">
+          <div class="sig-line-mini"></div>
+          <div class="sig-name-mini">Агент / СкладПро</div>
+        </div>
+        <div class="sig-block-mini">
+          <div class="sig-line-mini"></div>
+          <div class="sig-name-mini">Принципал / СтрахПро</div>
+        </div>
+      </div>
+      <div class="doc-preview-hint">Нажмите для просмотра</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
 <footer class="footer">
   <div><div class="footer-logo">СКЛАД ПРО</div><div class="footer-sub">Профессиональное складское хранение</div></div>
   <div class="footer-links">
@@ -628,7 +820,7 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
   <div class="footer-copy">© 2025 СкладПро</div>
 </footer>
 
-<!-- MODAL -->
+<!-- MODAL: ЗАЯВКА НА АРЕНДУ -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <button class="modal-close" onclick="closeModal()">✕</button>
@@ -655,6 +847,122 @@ input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:20px;b
       <div class="success-text">Менеджер свяжется с вами в течение 30 минут для уточнения деталей</div>
       <br/>
       <button class="btn-cancel" style="width:100%;margin-top:8px" onclick="closeModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: АГЕНТСКИЙ ДОГОВОР -->
+<div class="modal-overlay" id="insDocOverlay">
+  <div class="modal ins-modal">
+    <button class="modal-close" onclick="closeInsDoc()" style="z-index:10">✕</button>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:24px 28px 20px;border-bottom:1px solid var(--border);gap:16px;flex-shrink:0">
+      <div>
+        <div style="font-family:var(--font-head);font-size:22px;letter-spacing:1px">АГЕНТСКИЙ ДОГОВОР</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:2px">№ 2023-А-0047 от 15 марта 2023 года</div>
+      </div>
+      <button class="btn-big btn-outline btn-print-ins" onclick="printInsDoc()" style="padding:8px 16px;font-size:13px;flex-shrink:0">🖨 Печать</button>
+    </div>
+
+    <div class="ins-doc-body">
+
+      <div class="ins-doc-section">
+        <div class="ins-doc-parties">
+          <div class="ins-party">
+            <div class="ins-party-role">Страховщик (Принципал)</div>
+            <div class="ins-party-name">АО «Страховая компания СтрахПро»</div>
+            <div class="ins-party-details">ОГРН 1027739583234 · ИНН 7736050397<br>Лицензия ЦБ РФ СЛ № 3967 от 01.02.2020<br>г. Москва, ул. Страховая, д. 8, стр. 2</div>
+          </div>
+          <div class="ins-party-and">и</div>
+          <div class="ins-party">
+            <div class="ins-party-role">Агент</div>
+            <div class="ins-party-name">ООО «СкладПро»</div>
+            <div class="ins-party-details">ОГРН 1027700000001 · ИНН 7700000001<br>г. Москва, Промышленная ул., д. 12<br>р/с 40702810000000000001, ПАО Сбербанк</div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13px;color:var(--muted)">совместно именуемые «Стороны», заключили настоящий агентский договор о нижеследующем:</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">1. Предмет договора</div>
+        <p>1.1. Принципал поручает, а Агент принимает на себя обязательство за вознаграждение совершать от имени и за счёт Принципала юридические и иные действия по заключению договоров страхования имущества с физическими и юридическими лицами (Страхователями).</p>
+        <p>1.2. Агент вправе заключать договоры страхования имущества, принятого на ответственное хранение, в соответствии с Правилами страхования имущества юридических лиц Принципала.</p>
+        <p>1.3. Стоимость застрахованного имущества определяется Страхователем самостоятельно на основании его объявленной стоимости. Агент не несёт ответственности за достоверность данной оценки. Закупочная цена и иные коммерческие характеристики товара являются коммерческой тайной Страхователя.</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">2. Права и обязанности сторон</div>
+        <p>2.1. Агент обязуется:</p>
+        <ul class="ins-list">
+          <li>заключать договоры страхования от имени Принципала на условиях, предусмотренных настоящим договором и Правилами страхования;</li>
+          <li>разъяснять Страхователям условия страхования, порядок уплаты страховых взносов и процедуру обращения за страховым возмещением;</li>
+          <li>передавать Принципалу полученные страховые взносы не позднее 10 рабочих дней с момента их получения;</li>
+          <li>обеспечивать сохранность и конфиденциальность документов, связанных с заключёнными договорами страхования;</li>
+          <li>не разглашать сведения о закупочной стоимости или иных коммерческих характеристиках имущества Страхователей.</li>
+        </ul>
+        <p>2.2. Принципал обязуется:</p>
+        <ul class="ins-list">
+          <li>выплачивать страховое возмещение Страхователям при наступлении страхового случая в соответствии с условиями заключённых договоров страхования;</li>
+          <li>выплачивать Агенту вознаграждение в размере 15% от суммы полученных страховых взносов;</li>
+          <li>предоставлять Агенту бланки страховых полисов и иные необходимые документы.</li>
+        </ul>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">3. Страховая премия и вознаграждение</div>
+        <p>3.1. Страховой взнос (премия) устанавливается в размере <strong>10 (десяти) процентов</strong> от объявленной Страхователем стоимости имущества, принятого на хранение.</p>
+        <p>3.2. Страховой взнос уплачивается Страхователем единовременно при заключении договора страхования.</p>
+        <p>3.3. Агентское вознаграждение составляет 15% от суммы страховых взносов. Вознаграждение удерживается Агентом из суммы полученных взносов при их перечислении Принципалу.</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">4. Страховые случаи и порядок возмещения</div>
+        <p>4.1. Страховым случаем признаётся утрата, уничтожение или повреждение имущества Страхователя, находящегося на хранении у Агента, вследствие:</p>
+        <ul class="ins-list">
+          <li>пожара, взрыва газа, стихийных бедствий;</li>
+          <li>противоправных действий третьих лиц (кража, грабёж, умышленное уничтожение);</li>
+          <li>аварий систем водоснабжения, отопления, канализации;</li>
+          <li>ненадлежащего исполнения Агентом обязательств по обеспечению сохранности имущества.</li>
+        </ul>
+        <p>4.2. При наступлении страхового случая Принципал выплачивает страховое возмещение в размере объявленной Страхователем стоимости, но не превышающей фактического ущерба.</p>
+        <p>4.3. Обращение за страховым возмещением: г. Москва, ул. Страховая, д. 8, стр. 2 · тел. +7 (495) 800-10-20 · email: claims@strakhpro.ru</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">5. Конфиденциальность</div>
+        <p>5.1. Агент обязуется не разглашать закупочную стоимость, фактическую стоимость или иные коммерческие характеристики имущества Страхователей третьим лицам. Объявленная Страхователем стоимость фиксируется исключительно в документах, оформляемых между Агентом и Страхователем.</p>
+        <p>5.2. Принципал обеспечивает конфиденциальность сведений о размере страховых взносов отдельных Страхователей в соответствии с действующим законодательством РФ.</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">6. Срок действия и расторжение</div>
+        <p>6.1. Настоящий договор вступает в силу с 15 марта 2023 года и действует <strong>бессрочно</strong>.</p>
+        <p>6.2. Каждая из сторон вправе расторгнуть договор, уведомив другую сторону не менее чем за 30 календарных дней до предполагаемой даты расторжения.</p>
+      </div>
+
+      <div class="ins-doc-section">
+        <div class="ins-section-title">7. Реквизиты и подписи сторон</div>
+        <div class="ins-sigs-grid">
+          <div class="ins-sig-block">
+            <div class="ins-sig-role">Принципал</div>
+            <div class="ins-sig-name">АО «СтрахПро»</div>
+            <div class="ins-sig-detail">ИНН 7736050397 · ОГРН 1027739583234<br>г. Москва, ул. Страховая, д. 8, стр. 2<br>р/с 40701810700000000888<br>Банк ГПБ (АО), БИК 044030653, к/с 30101810200000000653</div>
+            <div class="ins-sig-line">
+              <div class="ins-sig-stroke"></div>
+              <div class="ins-sig-caption">Генеральный директор Петров А.С. / МП</div>
+            </div>
+          </div>
+          <div class="ins-sig-block">
+            <div class="ins-sig-role">Агент</div>
+            <div class="ins-sig-name">ООО «СкладПро»</div>
+            <div class="ins-sig-detail">ИНН 7700000001 · ОГРН 1027700000001<br>г. Москва, Промышленная ул., д. 12<br>р/с 40702810000000000001<br>ПАО Сбербанк, БИК 044525225, к/с 30101810400000000225</div>
+            <div class="ins-sig-line">
+              <div class="ins-sig-stroke"></div>
+              <div class="ins-sig-caption">Генеральный директор _________________ / МП</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -687,7 +995,6 @@ var selectedSec   = null;
 var currentPeriod = 1;
 var insEnabled    = false;
 
-// ─── ИНИЦИАЛИЗАЦИЯ ───────────────────────────────────────────
 function init() {
   var total    = Object.keys(SECTIONS).length;
   var occupied = Object.values(SECTIONS).filter(function(s){ return s.occupied; }).length;
@@ -702,7 +1009,6 @@ function init() {
   onPeriod(1);
 }
 
-// ─── СТРАХОВАНИЕ ─────────────────────────────────────────────
 function toggleInsurance() {
   insEnabled = !insEnabled;
   var sw   = document.getElementById('insSwitch');
@@ -718,7 +1024,6 @@ function getInsurancePremium() {
   return Math.round(val * 0.1);
 }
 
-// ─── ВЫБОР СЕКЦИИ ────────────────────────────────────────────
 function selectSection(id) {
   var sec = SECTIONS[id];
   if (!sec || sec.occupied) return;
@@ -734,9 +1039,7 @@ function selectSection(id) {
   document.getElementById('selName').textContent = 'Секция ' + id + ' — ' + sec.area + ' м²';
   document.getElementById('selMeta').textContent = sec.desc;
   calcPrice();
-  setTimeout(function(){
-    document.getElementById('calculator').scrollIntoView({behavior:'smooth', block:'nearest'});
-  }, 300);
+  setTimeout(function(){ document.getElementById('calculator').scrollIntoView({behavior:'smooth', block:'nearest'}); }, 300);
 }
 
 function clearSel() {
@@ -749,7 +1052,6 @@ function clearSel() {
   resetCalc();
 }
 
-// ─── ПЕРИОД ──────────────────────────────────────────────────
 function onPeriod(val) {
   currentPeriod = parseInt(val);
   document.getElementById('periodSlider').value = currentPeriod;
@@ -772,13 +1074,11 @@ function setPeriod(months) {
 
 document.getElementById('startDate').addEventListener('change', function(){ onPeriod(currentPeriod); });
 
-// ─── РАСЧЁТ ──────────────────────────────────────────────────
 function getRate(m) { return m>=12?950:m>=3?1200:1500; }
 function getDisc(m) { return m>=12?37:m>=6?20:m>=3?10:0; }
 
 function calcPrice() {
   if (!selectedSec) {
-    // обновляем только страховую часть
     var prem = getInsurancePremium();
     var decl = insEnabled ? (parseFloat(document.getElementById('declaredValue').value)||0) : 0;
     document.getElementById('insDeclared').textContent = decl ? decl.toLocaleString('ru') + ' ₽' : '—';
@@ -808,7 +1108,6 @@ function calcPrice() {
   } else {
     document.getElementById('discRow').style.display = 'none';
   }
-
   if (premium > 0) {
     document.getElementById('insRow').style.display = 'flex';
     document.getElementById('rInsurance').textContent = '+' + premium.toLocaleString('ru') + ' ₽';
@@ -816,11 +1115,10 @@ function calcPrice() {
     document.getElementById('insRow').style.display = 'none';
   }
 
-  // Страховой блок
   var decl = insEnabled ? (parseFloat(document.getElementById('declaredValue').value)||0) : 0;
-  document.getElementById('insDeclared').textContent = decl ? decl.toLocaleString('ru') + ' ₽' : '—';
-  document.getElementById('insPremium').textContent  = premium ? premium.toLocaleString('ru') + ' ₽' : '—';
-  document.getElementById('insTotalVal').textContent = premium ? premium.toLocaleString('ru') + ' ₽' : '— ₽';
+  document.getElementById('insDeclared').textContent = decl    ? decl.toLocaleString('ru')    + ' ₽' : '—';
+  document.getElementById('insPremium').textContent  = premium ? premium.toLocaleString('ru')  + ' ₽' : '—';
+  document.getElementById('insTotalVal').textContent = premium ? premium.toLocaleString('ru')  + ' ₽' : '— ₽';
 
   document.getElementById('submitBtn').disabled = false;
 }
@@ -835,7 +1133,7 @@ function resetCalc() {
   document.getElementById('insRow').style.display  = 'none';
 }
 
-// ─── МОДАЛКА ─────────────────────────────────────────────────
+// ─── ЗАЯВКА НА АРЕНДУ ───────────────────────────────────────
 function openModal() {
   if (!selectedSec) { showToast('error','⚠️','Выберите секцию на плане'); return; }
   var area    = SECTIONS[selectedSec].area;
@@ -852,8 +1150,8 @@ function openModal() {
   document.getElementById('m_name').value = document.getElementById('clientName').value;
 
   var insHtml = insEnabled && premium > 0
-    ? '<div class="osum-divider"></div>' +
-      '<div class="osum-row"><span>🛡️ Объявл. стоимость товара</span><span class="ov">' + decl.toLocaleString('ru') + ' ₽</span></div>' +
+    ? '<div style="height:1px;background:var(--border);margin:6px 0"></div>' +
+      '<div class="osum-row"><span>🛡️ Объявл. стоимость</span><span class="ov">' + decl.toLocaleString('ru') + ' ₽</span></div>' +
       '<div class="osum-row"><span>🛡️ Страховой взнос (10%)</span><span class="ov green">' + premium.toLocaleString('ru') + ' ₽</span></div>'
     : '<div class="osum-row" style="color:var(--muted);font-size:12px"><span>🛡️ Страхование</span><span class="ov">не выбрано</span></div>';
 
@@ -866,7 +1164,7 @@ function openModal() {
     insHtml +
     '<div class="osum-total"><span>Итого к оплате</span><span>' + total.toLocaleString('ru') + ' ₽</span></div>';
 
-  document.getElementById('modalForm').style.display    = 'block';
+  document.getElementById('modalForm').style.display     = 'block';
   document.getElementById('successScreen').style.display = 'none';
   document.getElementById('modalOverlay').classList.add('open');
 }
@@ -892,28 +1190,32 @@ async function submitOrder() {
 
   try {
     await fetch('/api/public-requests', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        clientName:       name,
-        clientPhone:      phone,
-        clientEmail:      email,
-        sectionId:        selectedSec || '',
-        area:             area,
-        storageRate:      rate,
-        periodMonths:     currentPeriod,
-        totalCost:        total,
-        startDate:        sd,
-        comment:          comment,
-        insuranceEnabled: insEnabled,
-        declaredValue:    decl,
+        clientName: name, clientPhone: phone, clientEmail: email,
+        sectionId: selectedSec || '', area: area, storageRate: rate,
+        periodMonths: currentPeriod, totalCost: total, startDate: sd,
+        comment: comment, insuranceEnabled: insEnabled, declaredValue: decl,
       })
     });
-  } catch(e) { /* офлайн — всё равно показываем успех */ }
+  } catch(e) {}
 
   document.getElementById('modalForm').style.display     = 'none';
   document.getElementById('successScreen').style.display = 'flex';
 }
+
+// ─── АГЕНТСКИЙ ДОГОВОР ───────────────────────────────────────
+function openInsDoc() {
+  document.getElementById('insDocOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeInsDoc() {
+  document.getElementById('insDocOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function printInsDoc() { window.print(); }
 
 // ─── ТЕМА ────────────────────────────────────────────────────
 function toggleTheme(){
@@ -937,8 +1239,10 @@ function showToast(type, icon, text){
   t.className = 'toast ' + type + ' show';
   setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
+
 document.getElementById('modalOverlay').addEventListener('click', function(e){ if(e.target.id==='modalOverlay') closeModal(); });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
+document.getElementById('insDocOverlay').addEventListener('click', function(e){ if(e.target.id==='insDocOverlay') closeInsDoc(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeModal(); closeInsDoc(); } });
 
 init();
 </script>
